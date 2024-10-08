@@ -4008,7 +4008,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 4
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -4189,7 +4189,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 5
   m_Sprite: {fileID: -1529971918, guid: ff72d070dbbb38a45bd42edd041dc796, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -5453,6 +5453,7 @@ MonoBehaviour:
   _grounTilemap: {fileID: 204544912}
   _wallTilemap: {fileID: 1727267774}
   _stuffTilmap: {fileID: 12378299}
+  _moveCD: 0.5
 --- !u!1 &2117906026
 GameObject:
   m_ObjectHideFlags: 0
