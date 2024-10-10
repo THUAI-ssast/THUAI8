@@ -13,6 +13,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private  GameObject loadingPanel;
     [SerializeField] private  TextMeshProUGUI matchingText;
     private int playercount = 1;
+    private Coroutine matchingCoroutine;
     public void Start()
     {
         loadingPanel.SetActive(false);
@@ -25,12 +26,13 @@ public class MainMenu : MonoBehaviour
     public void CancelMatching()
     {
         loadingPanel.SetActive(false);
+        StopCoroutine(matchingCoroutine);
     }
     public void StartGame()
     {   
         loadingPanel.SetActive(true);
         // NetworkManager.singleton.StartClient();
-        StartCoroutine(StartMatching());
+        matchingCoroutine = StartCoroutine(StartMatching());
     }
     IEnumerator StartMatching()
     {
