@@ -18,6 +18,7 @@ public class GridMoveController : MonoBehaviour
     private void Start()
     {
         var position = _playerMove.transform.position;
+        //初始化玩家位置
         _playerMove.SetPosition(position, _grounTilemap.WorldToCell(position));
     }
 
@@ -27,6 +28,9 @@ public class GridMoveController : MonoBehaviour
             tryMove();
     }
 
+    /// <summary>
+    /// 捕获玩家输入并尝试移动，点击角色范围内7*7Tile或按下wasd移动，有CD
+    /// </summary>
     private async void tryMove()
     {
         Vector3Int cellPos = Vector3Int.back;
@@ -55,21 +59,30 @@ public class GridMoveController : MonoBehaviour
             cellPos = _playerMove.TilePosition + Vector3Int.down;
         }
 
-        List<Vector3> path = new List<Vector3>();
+        List<Vector3Int> path = new List<Vector3Int>();
         if (findTilePath(_playerMove.TilePosition, cellPos, path))
         {
             Vector3 bias = _grounTilemap.cellSize * 0.5f;
-            for (int i = 0; i < path.Count; i++)
-                path[i] += bias;
+            List<Vector3> worldPath = new List<Vector3>(path.Count);
+            foreach (var t in path)
+                worldPath.Add(_grounTilemap.CellToWorld(t) + bias);
+
             _playerMove.SetPosition(_grounTilemap.CellToWorld(cellPos) + _grounTilemap.cellSize * 0.5f, cellPos,
-                path.ToArray());
+                worldPath.ToArray());
             _isMovable = false;
             await Task.Delay((int)(_moveCD * 1000));
             _isMovable = true;
         }
     }
 
-    private bool findTilePath(Vector3Int from, Vector3Int to, List<Vector3> list)
+    /// <summary>
+    /// 查找一条可以移动的路径，使用递归枚举
+    /// </summary>
+    /// <param name="from">起点，使用Tilemap坐标</param>
+    /// <param name="to">目标点，使用Tilemap坐标</param>
+    /// <param name="list">查找路径结果，使用Tilemap坐标</param>
+    /// <returns>是否成功查找，查找结果则保存在list中</returns>
+    private bool findTilePath(Vector3Int from, Vector3Int to, List<Vector3Int> list)
     {
         if ((!_grounTilemap.HasTile(from)) || _wallTilemap.HasTile(from))
             return false;

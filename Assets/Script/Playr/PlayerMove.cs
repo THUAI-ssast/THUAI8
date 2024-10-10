@@ -18,7 +18,12 @@ public class PlayerMove : MonoBehaviour
         _pathLineRenderer = GetComponent<LineRenderer>();
     }
 
-
+    /// <summary>
+    /// 将player设置到对应位置上,生成直线移动动画
+    /// </summary>
+    /// <param name="worldPosition">目标位置的世界坐标</param>
+    /// <param name="tilePosition">目标位置的Tilemap坐标</param>
+    /// <returns>是否成功移动</returns>
     public bool SetPosition(Vector3 worldPosition, Vector3Int tilePosition)
     {
         if (_isMoving)
@@ -34,12 +39,18 @@ public class PlayerMove : MonoBehaviour
         TilePosition = tilePosition;
         return true;
     }
+    /// <summary>
+    /// 将player设置到对应位置上，生成路径移动动画
+    /// </summary>
+    /// <param name="worldPosition">目标位置的世界坐标</param>
+    /// <param name="tilePosition">目标位置的Tilemap坐标</param>
+    /// <param name="path">移动路径，使用世界坐标，用于生成移动动画</param>
+    /// <returns>是否成功移动</returns>
     public bool SetPosition(Vector3 worldPosition, Vector3Int tilePosition, Vector3[] path)
     {
         if (_isMoving||path.Length<2)
             return false;
         _isMoving = true;
-        var position = transform.position;
         float duration = (path.Length - 1) * 0.6f;
         drawPathLine(path, duration);
         Vector3 moveVector = path[^1] - path[^2];
@@ -49,7 +60,11 @@ public class PlayerMove : MonoBehaviour
         TilePosition = tilePosition;
         return true;
     }
-
+    /// <summary>
+    /// 显示玩家当前位置和目标位置间的直线路径指示器
+    /// </summary>
+    /// <param name="target">目标位置，使用世界坐标</param>
+    /// <param name="duration">显示持续时间</param>
     private async void drawPathLine(Vector3 target, float duration)
     {
         _pathLineRenderer.SetPositions(new []{transform.position,target});
@@ -58,6 +73,11 @@ public class PlayerMove : MonoBehaviour
         _pathLineRenderer.enabled = false;
         _isMoving = false;
     }
+    /// <summary>
+    /// 显示路线指示器
+    /// </summary>
+    /// <param name="path">显示的路径，使用世界坐标</param>
+    /// <param name="duration">显示持续时间</param>
     private async void drawPathLine(Vector3[] path, float duration)
     {
         _pathLineRenderer.positionCount = path.Length;
