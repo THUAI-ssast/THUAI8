@@ -31,7 +31,7 @@ public class PlayerMove : MonoBehaviour
         _isMoving = true;
         var position = transform.position;
         float duration = (worldPosition - position).magnitude * 0.6f;
-        drawPathLine(worldPosition,duration);
+        StartCoroutine(drawPathLine(worldPosition, duration));
         Vector3 moveVector = worldPosition - position;
         float angle = (moveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, moveVector);
         transform.DORotate(new Vector3(0, 0, angle),0.2f).SetEase(Ease.Linear);
@@ -52,7 +52,7 @@ public class PlayerMove : MonoBehaviour
             return false;
         _isMoving = true;
         float duration = (path.Length - 1) * 0.6f;
-        drawPathLine(path, duration);
+        StartCoroutine(drawPathLine(path, duration));
         Vector3 moveVector = path[^1] - path[^2];
         float angle = (moveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, moveVector);
         transform.DORotate(new Vector3(0, 0, angle), duration*0.5f).SetEase(Ease.Linear);
@@ -65,11 +65,11 @@ public class PlayerMove : MonoBehaviour
     /// </summary>
     /// <param name="target">目标位置，使用世界坐标</param>
     /// <param name="duration">显示持续时间</param>
-    private async void drawPathLine(Vector3 target, float duration)
+    private IEnumerator drawPathLine(Vector3 target, float duration)
     {
         _pathLineRenderer.SetPositions(new []{transform.position,target});
         _pathLineRenderer.enabled = true;
-        await Task.Delay((int)duration*1000);
+        yield return new WaitForSeconds(duration);
         _pathLineRenderer.enabled = false;
         _isMoving = false;
     }
@@ -78,12 +78,12 @@ public class PlayerMove : MonoBehaviour
     /// </summary>
     /// <param name="path">显示的路径，使用世界坐标</param>
     /// <param name="duration">显示持续时间</param>
-    private async void drawPathLine(Vector3[] path, float duration)
+    private IEnumerator drawPathLine(Vector3[] path, float duration)
     {
         _pathLineRenderer.positionCount = path.Length;
         _pathLineRenderer.SetPositions(path);
         _pathLineRenderer.enabled = true;
-        await Task.Delay((int)duration * 1000);
+        yield return new WaitForSeconds(duration);
         _pathLineRenderer.enabled = false;
         _isMoving = false;
     }
