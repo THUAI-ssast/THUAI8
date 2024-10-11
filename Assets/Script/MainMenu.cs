@@ -7,12 +7,14 @@ using Mirror;
 using TMPro;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Mirror.Examples.TopDownShooter;
 
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] private  GameObject loadingPanel;
     [SerializeField] private  TextMeshProUGUI matchingText;
-    private int playercount = 1;
+    private int playerCount = 1;
+    private int playerCountLimit = 10;
     private Coroutine matchingCoroutine;
     public void Start()
     {
@@ -32,17 +34,27 @@ public class MainMenu : MonoBehaviour
     {   
         loadingPanel.SetActive(true);
         // NetworkManager.singleton.StartClient();
+        playerCountLimit = GetServerPlayerCountLimit();
         matchingCoroutine = StartCoroutine(StartMatching());
     }
     IEnumerator StartMatching()
     {
-        while (playercount < 6)
+        while (playerCount < playerCountLimit)
         {
-            playercount = 1;
-            matchingText.text = "(" + playercount.ToString() + "/6)";
+            matchingText.text = "(" + playerCount.ToString() + "/" + playerCountLimit.ToString() + ")";
             yield return new WaitForSeconds(1);
-            playercount = 6;
+            playerCount = GetServerPlayerCount();
         }
         SceneManager.LoadScene("BattleScene");
+    }
+    private int GetServerPlayerCountLimit()
+    {
+        // TODO
+        return 6;
+    }
+    private int GetServerPlayerCount()
+    {
+        // TODO
+        return 6;
     }
 }
