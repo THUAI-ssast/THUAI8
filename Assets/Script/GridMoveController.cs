@@ -31,7 +31,7 @@ public class GridMoveController : MonoBehaviour
     /// <summary>
     /// 捕获玩家输入并尝试移动，点击角色范围内7*7Tile或按下wasd移动，有CD
     /// </summary>
-    private async void tryMove()
+    private void tryMove()
     {
         Vector3Int cellPos = Vector3Int.back;
         if (Input.GetKeyDown(KeyCode.Mouse0))
@@ -69,9 +69,7 @@ public class GridMoveController : MonoBehaviour
 
             _playerMove.SetPosition(_grounTilemap.CellToWorld(cellPos) + _grounTilemap.cellSize * 0.5f, cellPos,
                 worldPath.ToArray());
-            _isMovable = false;
-            await Task.Delay((int)(_moveCD * 1000));
-            _isMovable = true;
+            StartCoroutine(setMoveCD());
         }
     }
 
@@ -96,5 +94,12 @@ public class GridMoveController : MonoBehaviour
             return true;
         list.RemoveAt(list.Count - 1);
         return false;
+    }
+
+    private IEnumerator setMoveCD()
+    {
+        _isMovable = false;
+        yield return new WaitForSeconds(_moveCD);
+        _isMovable = true;
     }
 }
