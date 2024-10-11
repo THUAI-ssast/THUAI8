@@ -8,18 +8,25 @@ using TMPro;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Mirror.Examples.TopDownShooter;
+using Unity.VisualScripting;
 
 public class MainMenu : MonoBehaviour
 {
+    public static MainMenu Instance;
+    public NetPlayer Player;
     [SerializeField] private  GameObject loadingPanel;
     [SerializeField] private  TextMeshProUGUI matchingText;
-    private int playerCount = 1;
-    private int playerCountLimit = 10;
-    private Coroutine matchingCoroutine;
+    private int playerCount { get => LobbyManager.Instance.CurrentRoomPlayerCount;  }
+    private int playerCountLimit { get => LobbyManager.Instance.MaxPlayersPerRoom;}
+    private Coroutine matchingCoroutine; 
+    public bool isJoinGame = false;
+
     public void Start()
     {
+        Instance = this;
         loadingPanel.SetActive(false);
     }
+
     public void ExitGame()
     {
         Application.Quit();
@@ -28,13 +35,22 @@ public class MainMenu : MonoBehaviour
     public void CancelMatching()
     {
         loadingPanel.SetActive(false);
+        Debug.Log(Player == null);
+        if (Player != null)
+        {
+            Player.CancelMatching();
+            isJoinGame = false;
+        }
         StopCoroutine(matchingCoroutine);
     }
     public void StartGame()
     {   
         loadingPanel.SetActive(true);
-        // NetworkManager.singleton.StartClient();
-        playerCountLimit = GetServerPlayerCountLimit();
+        if (Player != null)
+        {
+            Player.StartMatching();
+            isJoinGame = true;
+        }
         matchingCoroutine = StartCoroutine(StartMatching());
     }
     IEnumerator StartMatching()
@@ -42,19 +58,9 @@ public class MainMenu : MonoBehaviour
         while (playerCount < playerCountLimit)
         {
             matchingText.text = "(" + playerCount.ToString() + "/" + playerCountLimit.ToString() + ")";
-            yield return new WaitForSeconds(1);
-            playerCount = GetServerPlayerCount();
+            yield return new WaitForSeconds(0.1f);
         }
         SceneManager.LoadScene("BattleScene");
     }
-    private int GetServerPlayerCountLimit()
-    {
-        // TODO
-        return 6;
-    }
-    private int GetServerPlayerCount()
-    {
-        // TODO
-        return 6;
-    }
+
 }
