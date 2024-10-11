@@ -49,9 +49,10 @@ public class GameNetworkManager : NetworkManager
     public override void OnClientDisconnect()
     {
         if (MainMenu.Instance.isJoinGame)
-    {
+        {
             MainMenu.Instance.Player = null;
             MainMenu.Instance.CancelMatching();
+        }
     }
 
     public void EnterBattle()

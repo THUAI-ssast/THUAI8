@@ -35,7 +35,7 @@ public class MainMenu : MonoBehaviour
     public void CancelMatching()
     {
         loadingPanel.SetActive(false);
-        Debug.Log(Player == null);
+        Debug.Log(Player == null); 
         if (Player != null)
         {
             Player.CancelMatching();
