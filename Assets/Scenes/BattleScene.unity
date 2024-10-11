@@ -3961,7 +3961,7 @@ GameObject:
   m_Component:
   - component: {fileID: 600331036}
   - component: {fileID: 600331035}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: GridLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5333,7 +5333,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1789217802}
   - component: {fileID: 1789217803}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: GridParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
