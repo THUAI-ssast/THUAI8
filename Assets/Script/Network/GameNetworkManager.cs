@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Mirror;
 using System.Linq;
 
@@ -32,7 +34,7 @@ public class GameNetworkManager : NetworkManager
     {
         // 取消匹配
         LobbyManager.Instance.CancelGame(conn);
-
+        
         // 销毁该连接拥有的所有对象
         int ownedLength = conn.owned.Count;
         NetworkIdentity[] identityArray = conn.owned.ToArray();
@@ -47,9 +49,13 @@ public class GameNetworkManager : NetworkManager
     public override void OnClientDisconnect()
     {
         if (MainMenu.Instance.isJoinGame)
-        {
+    {
             MainMenu.Instance.Player = null;
             MainMenu.Instance.CancelMatching();
-        }
+    }
+
+    public void EnterBattle()
+    {
+        SceneManager.LoadScene("BattleScene");
     }
 }

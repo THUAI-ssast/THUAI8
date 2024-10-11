@@ -3961,7 +3961,7 @@ GameObject:
   m_Component:
   - component: {fileID: 600331036}
   - component: {fileID: 600331035}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: GridLine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4130,17 +4130,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1189286732 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6972068894313922891, guid: e5745f16a1d5fbf45a52eb294a3b576a, type: 3}
-  m_PrefabInstance: {fileID: 5434791189600248278}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a2f450a97a0e5e4daf7a5017352ea1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1280574111
 GameObject:
   m_ObjectHideFlags: 0
@@ -4188,6 +4177,128 @@ Transform:
   - {fileID: 12378297}
   m_Father: {fileID: 1789217802}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1725339302
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1725339305}
+  - component: {fileID: 1725339306}
+  - component: {fileID: 1725339308}
+  - component: {fileID: 1725339307}
+  m_Layer: 0
+  m_Name: NetworkManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1725339305
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1725339302}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.582016, y: 0.9768262, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1725339306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1725339302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  port: 7777
+  DualMode: 1
+  NoDelay: 1
+  Interval: 10
+  Timeout: 10000
+  RecvBufferSize: 7361536
+  SendBufferSize: 7361536
+  FastResend: 2
+  ReceiveWindowSize: 4096
+  SendWindowSize: 4096
+  MaxRetransmit: 40
+  MaximizeSocketBuffers: 1
+  ReliableMaxMessageSize: 297433
+  UnreliableMaxMessageSize: 1194
+  debugLog: 0
+  statisticsGUI: 0
+  statisticsLog: 0
+--- !u!114 &1725339307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1725339302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offsetX: 0
+  offsetY: 0
+--- !u!114 &1725339308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1725339302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e06d11f7646858f458b6c96bd096467f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dontDestroyOnLoad: 1
+  runInBackground: 1
+  headlessStartMode: 0
+  editorAutoStart: 0
+  sendRate: 60
+  offlineScene: 
+  onlineScene: 
+  offlineSceneLoadDelay: 0
+  transport: {fileID: 1725339306}
+  networkAddress: localhost
+  maxConnections: 100
+  disconnectInactiveConnections: 0
+  disconnectInactiveTimeout: 60
+  authenticator: {fileID: 0}
+  playerPrefab: {fileID: 4470334930336716649, guid: ccd67effaef07e148acc5b284af364b7, type: 3}
+  autoCreatePlayer: 1
+  playerSpawnMethod: 0
+  spawnPrefabs: []
+  exceptionsDisconnect: 1
+  snapshotSettings:
+    bufferTimeMultiplier: 2
+    bufferLimit: 32
+    catchupNegativeThreshold: -1
+    catchupPositiveThreshold: 1
+    catchupSpeed: 0.019999999552965164
+    slowdownSpeed: 0.03999999910593033
+    driftEmaDuration: 1
+    dynamicAdjustment: 1
+    dynamicAdjustmentTolerance: 1
+    deliveryTimeEmaDuration: 2
+  evaluationMethod: 0
+  evaluationInterval: 3
+  timeInterpolationGui: 0
 --- !u!1 &1727267771
 GameObject:
   m_ObjectHideFlags: 0
@@ -5222,7 +5333,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1789217802}
   - component: {fileID: 1789217803}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: GridParent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5258,7 +5369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcb0b91f0a261bb498e6bf839fb612ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerMove: {fileID: 1189286732}
+  _playerMove: {fileID: 1469498358163839840, guid: ccd67effaef07e148acc5b284af364b7, type: 3}
   _grounTilemap: {fileID: 204544912}
   _wallTilemap: {fileID: 1727267774}
   _stuffTilmap: {fileID: 12378299}
@@ -5503,5 +5614,5 @@ SceneRoots:
   - {fileID: 2117906029}
   - {fileID: 70104012}
   - {fileID: 284694671}
-  - {fileID: 5434791189600248278}
   - {fileID: 1789217802}
+  - {fileID: 1725339305}
