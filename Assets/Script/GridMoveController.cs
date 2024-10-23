@@ -14,13 +14,15 @@ public class GridMoveController : MonoBehaviour
     [SerializeField] private Tilemap _wallTilemap;
     [SerializeField] private Tilemap _stuffTilmap;
 
+    private Transform _gridLine;
+
     [SerializeField] private float _moveCD;
     private bool _isMovable = true;
 
     private void Start()
     {
         Instance = this;
-       
+        _gridLine = transform.Find("GridLine");
     }
 
     private void Update()
@@ -33,6 +35,7 @@ public class GridMoveController : MonoBehaviour
     {
         var position = Player.transform.position;
         Player.SetPosition(position, _grounTilemap.WorldToCell(position));
+        _gridLine.position = position + new Vector3(0.5f, 0.5f);
     }
 
     /// <summary>
@@ -79,22 +82,9 @@ public class GridMoveController : MonoBehaviour
 
             // 调用网络同步方法
             Player.SetPosition(_grounTilemap.CellToWorld(cellPos) + _grounTilemap.cellSize * 0.5f, cellPos, worldPath.ToArray());
-            StartCoroutine(setMoveCD());
+            StartCoroutine(setMoveCD((path.Count - 1) * 0.6f));
         }
     }
-
-    //[Command]
-    private void CmdMovePlayer(Vector3 worldPosition, Vector3Int tilePosition, Vector3[] path)
-    {
-        RpcMovePlayer(worldPosition, tilePosition, path);
-    }
-
-    //[ClientRpc]
-    private void RpcMovePlayer(Vector3 worldPosition, Vector3Int tilePosition, Vector3[] path)
-    {
-        
-    }
-
     private bool findTilePath(Vector3Int from, Vector3Int to, List<Vector3Int> list)
     {
         if ((!_grounTilemap.HasTile(from)) || _wallTilemap.HasTile(from))
@@ -111,10 +101,11 @@ public class GridMoveController : MonoBehaviour
         return false;
     }
 
-    private IEnumerator setMoveCD()
+    private IEnumerator setMoveCD(float cd)
     {
         _isMovable = false;
-        yield return new WaitForSeconds(_moveCD);
+        yield return new WaitForSeconds(cd);
+        _gridLine.position = Player.transform.position + new Vector3(0.5f,0.5f);
         _isMovable = true;
     }
 }
