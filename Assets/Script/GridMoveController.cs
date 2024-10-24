@@ -5,24 +5,45 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Mirror;
+using Pathfinding;
+using UnityEngine.UIElements;
 
 public class GridMoveController : MonoBehaviour
 {
     public static GridMoveController Instance;
     public PlayerMove Player;
-    [SerializeField] private Tilemap _grounTilemap;
-    [SerializeField] private Tilemap _wallTilemap;
-    [SerializeField] private Tilemap _stuffTilmap;
+
+    //A* 寻路相关
+    private Seeker _pathSeeker;
+    private Transform _pathTarget;
+    private AstarPath _pathBaker;
+    
+    //所用Tilemaps
+    private Tilemap _groundTilemap;
+    private Tilemap _wallTilemap;
+    private Tilemap _furnitureTilemap;
+    private Tilemap _glassTilemap;
+    private Tilemap _stuffTilemap;
 
     private Transform _gridLine;
 
-    [SerializeField] private float _moveCD;
+    private Vector3Int _targetCellPosition;
     private bool _isMovable = true;
+
+    private Vector3 _cellBias;
 
     private void Start()
     {
         Instance = this;
+        _groundTilemap = transform.GetChild(0).Find("GroundTilemap").GetComponent<Tilemap>();
+        _wallTilemap = transform.GetChild(0).Find("WallTilemap").GetComponent<Tilemap>();
+        _furnitureTilemap = transform.GetChild(0).Find("FurnitureTilemap").GetComponent<Tilemap>();
+        _glassTilemap = transform.GetChild(0).Find("GlassTilemap").GetComponent<Tilemap>();
+        _stuffTilemap = transform.GetChild(0).Find("StuffTilemap").GetComponent<Tilemap>();
+
         _gridLine = transform.Find("GridLine");
+
+        _cellBias = _groundTilemap.cellSize * 0.5f;
     }
 
     private void Update()
@@ -30,11 +51,20 @@ public class GridMoveController : MonoBehaviour
         if (_isMovable&&Player!=null)
             tryMove();
     }
-
-    public void InitPlayerPosition()
+    /// <summary>
+    /// 将player初始化为本机player，绑定移动、寻路等组件。
+    /// </summary>
+    /// <param name="player">本机player</param>
+    public void InitLocalPlayer(PlayerMove player)
     {
+        Player = player;
         var position = Player.transform.position;
-        Player.SetPosition(position, _grounTilemap.WorldToCell(position));
+        Player.SetPosition(position, _groundTilemap.WorldToCell(position));
+        var finderObj = Instantiate(Resources.Load<GameObject>(("PathFinder")), Player.transform);
+        _pathBaker = finderObj.GetComponent<AstarPath>();
+        _pathSeeker = finderObj.GetComponent<Seeker>();
+        _pathTarget = finderObj.transform.GetChild(0);
+        updateGraph();
         _gridLine.position = position + new Vector3(0.5f, 0.5f);
     }
 
@@ -43,69 +73,88 @@ public class GridMoveController : MonoBehaviour
     /// </summary>
     private void tryMove()
     {
-        Vector3Int cellPos = Vector3Int.back;
+        _targetCellPosition = Vector3Int.back;
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int targetCellPos = _grounTilemap.WorldToCell(mousePos);
+            Vector3Int targetCellPos = _groundTilemap.WorldToCell(mousePos);
             if (Math.Abs(targetCellPos.x - Player.TilePosition.x) <= 3 &&
                 Math.Abs(targetCellPos.y - Player.TilePosition.y) <= 3)
-                cellPos = targetCellPos;
+                _targetCellPosition = targetCellPos;
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            cellPos = Player.TilePosition + Vector3Int.left;
+            _targetCellPosition = Player.TilePosition + Vector3Int.left;
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            cellPos = Player.TilePosition + Vector3Int.right;
+            _targetCellPosition = Player.TilePosition + Vector3Int.right;
         }
         else if (Input.GetKeyDown(KeyCode.W))
         {
-            cellPos = Player.TilePosition + Vector3Int.up;
+            _targetCellPosition = Player.TilePosition + Vector3Int.up;
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            cellPos = Player.TilePosition + Vector3Int.down;
+            _targetCellPosition = Player.TilePosition + Vector3Int.down;
         }
-
-        List<Vector3Int> path = new List<Vector3Int>();
-        if (findTilePath(Player.TilePosition, cellPos, path))
+        if (_targetCellPosition != Vector3Int.back)
         {
-            Vector3 bias = _grounTilemap.cellSize * 0.5f;
-            List<Vector3> worldPath = new List<Vector3>(path.Count);
-            foreach (var t in path)
-                worldPath.Add(_grounTilemap.CellToWorld(t) + bias);
-
-            float duration = (path.Count - 1) * 0.6f; // 假设移动速度为每格0.6秒
-            StartCoroutine(Player.drawPathLine(worldPath.ToArray(), duration)); // 绘制路径
-
-            // 调用网络同步方法
-            Player.SetPosition(_grounTilemap.CellToWorld(cellPos) + _grounTilemap.cellSize * 0.5f, cellPos, worldPath.ToArray());
-            StartCoroutine(setMoveCD((path.Count - 1) * 0.6f));
+            var targetWorldPosition = _groundTilemap.CellToWorld(_targetCellPosition) + _cellBias;
+            _pathTarget.position = targetWorldPosition - Player.transform.position;
+            _pathSeeker.StartPath(_groundTilemap.CellToWorld(Player.TilePosition) + _cellBias, targetWorldPosition, onPathComplete);
         }
     }
-    private bool findTilePath(Vector3Int from, Vector3Int to, List<Vector3Int> list)
+    /// <summary>
+    /// A* seeker寻路完成后所调用的回调函数,若路径有效则进行角色移动。
+    /// </summary>
+    /// <param name="p">seeker找到的Path路径</param>
+    private void onPathComplete(Path p)
     {
-        if ((!_grounTilemap.HasTile(from)) || _wallTilemap.HasTile(from))
-            return false;
-        list.Add(from);
-        if (from == to)
-            return true;
-        Vector3Int horizontal = Math.Sign(to.x - from.x) * Vector3Int.right;
-        Vector3Int vertical = Math.Sign(to.y - from.y) * Vector3Int.up;
-        if ((horizontal != Vector3Int.zero && findTilePath(from + horizontal, to, list))
-            || (vertical != Vector3Int.zero && findTilePath(from + vertical, to, list)))
-            return true;
-        list.RemoveAt(list.Count - 1);
-        return false;
+        var targetWorldPosition = _groundTilemap.CellToWorld(_targetCellPosition) + _cellBias;
+        if (p.error)
+        {
+            Debug.Log("path error");
+        }
+        else
+        {
+            //成功找到路径
+            Debug.Log(p.vectorPath[^1]);
+            if (p.vectorPath[^1]==targetWorldPosition&&_isMovable)
+            {
+                float duration = (p.vectorPath.Count - 1) * 0.6f; // 假设移动速度为每格0.6秒
+                var pathArray = p.vectorPath.ToArray();
+                StartCoroutine(Player.drawPathLine(pathArray, duration)); // 绘制路径
+                // 调用网络同步方法,改变位置并生成对应动画
+                Player.SetPosition(targetWorldPosition, _targetCellPosition, pathArray);
+                StartCoroutine(setMoveCD(duration));
+            }
+            
+        }
     }
 
+    /// <summary>
+    /// 将_isMovable设置为false，经过cd秒后恢复为true。
+    /// </summary>
+    /// <param name="cd">_isMovable持续为false的时间</param>
+    /// <returns></returns>
     private IEnumerator setMoveCD(float cd)
     {
         _isMovable = false;
         yield return new WaitForSeconds(cd);
         _gridLine.position = Player.transform.position + new Vector3(0.5f,0.5f);
         _isMovable = true;
+        updateGraph();
+    }
+
+    /// <summary>
+    /// 更新用于寻路的graph位置到玩家处，并重新扫描附近障碍。
+    /// </summary>
+    private void updateGraph()
+    {
+        var graph = _pathBaker.data.gridGraph;
+        graph.RelocateNodes(_groundTilemap.WorldToCell(Player.TilePosition), Quaternion.identity, 1);
+        graph.is2D = true;
+        _pathBaker.Scan();
     }
 }
