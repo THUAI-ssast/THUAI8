@@ -51,10 +51,10 @@ TagManager:
   - name: Glass
     uniqueID: 3101566009
     locked: 0
-  - name: Stuff
+  - name: Furniture
     uniqueID: 2557215657
     locked: 0
-  - name: Player
+  - name: Stuff
     uniqueID: 1942730699
     locked: 0
   - name: 

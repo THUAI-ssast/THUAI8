@@ -26,8 +26,7 @@ public class PlayerMove : NetworkBehaviour
         _pathLineRenderer = GetComponent<LineRenderer>();
         if (this.isLocalPlayer)
         {
-            GridMoveController.Instance.Player = this;
-            GridMoveController.Instance.InitPlayerPosition();
+            GridMoveController.Instance.InitLocalPlayer(this);
             tag = "LocalPlayer";
         }
         else
@@ -52,7 +51,13 @@ public class PlayerMove : NetworkBehaviour
         TilePosition = tilePosition; // 更新同步位置
         return true;
     }
-
+    /// <summary>
+    /// 将player设置到对应位置上，生成路径移动动画
+    /// </summary>
+    /// <param name="worldPosition">目标位置的世界坐标</param>
+    /// <param name="tilePosition">目标位置的Tilemap坐标</param>
+    /// <param name="path">移动路径，使用世界坐标，用于生成移动动画</param>
+    /// <returns>是否成功移动</returns>
     [Command]
     public void SetPosition(Vector3 worldPosition, Vector3Int tilePosition, Vector3[] path)
     {

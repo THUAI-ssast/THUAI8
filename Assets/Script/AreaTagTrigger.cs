@@ -31,7 +31,6 @@ public class AreaTagTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log(other.tag);
         if (_targetTags.Contains(other.tag))
         {
             _targetComponents.ForEach(c=>c.enabled = _enableStateWhileInside);
