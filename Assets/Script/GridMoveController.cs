@@ -48,7 +48,7 @@ public class GridMoveController : MonoBehaviour
 
     private void Update()
     {
-        if (_isMovable&&Player!=null)
+        if (!UIManager.Instance.IsUIActivating&&_isMovable&&Player!=null)
             tryMove();
     }
     /// <summary>
@@ -114,12 +114,11 @@ public class GridMoveController : MonoBehaviour
         var targetWorldPosition = _groundTilemap.CellToWorld(_targetCellPosition) + _cellBias;
         if (p.error)
         {
-            Debug.Log("path error");
+            Debug.LogError("path error");
         }
         else
         {
             //成功找到路径
-            Debug.Log(p.vectorPath[^1]);
             if (p.vectorPath[^1]==targetWorldPosition&&_isMovable)
             {
                 float duration = (p.vectorPath.Count - 1) * 0.6f; // 假设移动速度为每格0.6秒
