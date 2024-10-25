@@ -1,29 +1,35 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Mirror;
 using Pathfinding;
-using UnityEngine.UIElements;
 
 public class GridMoveController : MonoBehaviour
 {
     public static GridMoveController Instance;
     public PlayerMove Player;
 
-    //A* 寻路相关
+    public Tile brokenGlassTile;
+
+    public Tile doorTileHorizontal;
+    public Tile doorTileVertical;
+
+    // A* 寻路相关
     private Seeker _pathSeeker;
     private Transform _pathTarget;
     private AstarPath _pathBaker;
-    
-    //所用Tilemaps
+
+    // 所用Tilemaps
     private Tilemap _groundTilemap;
     private Tilemap _wallTilemap;
     private Tilemap _furnitureTilemap;
     private Tilemap _glassTilemap;
     private Tilemap _stuffTilemap;
+
+    private ShadowCaster2DCreator _shadowCreator;
+    private TilemapCollider2D _wallCollider2D;
 
     private Transform _gridLine;
 
@@ -31,6 +37,8 @@ public class GridMoveController : MonoBehaviour
     private bool _isMovable = true;
 
     private Vector3 _cellBias;
+
+    private Vector3Int? _lastAdjacentDoor; // 相邻门的位置
 
     private void Start()
     {
@@ -41,6 +49,9 @@ public class GridMoveController : MonoBehaviour
         _glassTilemap = transform.GetChild(0).Find("GlassTilemap").GetComponent<Tilemap>();
         _stuffTilemap = transform.GetChild(0).Find("StuffTilemap").GetComponent<Tilemap>();
 
+        _shadowCreator = _wallTilemap.GetComponent<ShadowCaster2DCreator>();
+        _wallCollider2D = _wallTilemap.GetComponent<TilemapCollider2D>();
+
         _gridLine = transform.Find("GridLine");
 
         _cellBias = _groundTilemap.cellSize * 0.5f;
@@ -48,9 +59,23 @@ public class GridMoveController : MonoBehaviour
 
     private void Update()
     {
-        if (_isMovable&&Player!=null)
+        if (_isMovable && Player != null)
             tryMove();
+
+        // 点击门
+        if (Input.GetKeyDown(KeyCode.Mouse1) && _lastAdjacentDoor.HasValue)
+        {
+            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3Int doorPosition = _lastAdjacentDoor.Value;
+
+            // 点击的位置在门的Tile上
+            if (doorPosition == _wallTilemap.WorldToCell(mousePos))
+            {
+                RotateDoor(doorPosition);
+            }
+        }
     }
+
     /// <summary>
     /// 将player初始化为本机player，绑定移动、寻路等组件。
     /// </summary>
@@ -98,6 +123,7 @@ public class GridMoveController : MonoBehaviour
         {
             _targetCellPosition = Player.TilePosition + Vector3Int.down;
         }
+
         if (_targetCellPosition != Vector3Int.back)
         {
             var targetWorldPosition = _groundTilemap.CellToWorld(_targetCellPosition) + _cellBias;
@@ -105,6 +131,41 @@ public class GridMoveController : MonoBehaviour
             _pathSeeker.StartPath(_groundTilemap.CellToWorld(Player.TilePosition) + _cellBias, targetWorldPosition, onPathComplete);
         }
     }
+
+    private bool CheckForDoorBlock(Vector3[] path)
+    {
+        for (int i = 0; i < path.Length - 1; i++)
+        {
+            Vector3Int start = _wallTilemap.WorldToCell(path[i]);
+            Vector3Int end = _wallTilemap.WorldToCell(path[i + 1]);
+
+            Vector3Int direction = end - start;
+
+            int stepX = direction.x != 0 ? (direction.x > 0 ? 1 : -1) : 0;
+            int stepY = direction.y != 0 ? (direction.y > 0 ? 1 : -1) : 0;
+
+            Vector3Int currentPosition = start;
+
+            while (currentPosition != end)
+            {
+                if (_wallTilemap.HasTile(currentPosition) && IsDoorTile(currentPosition))
+                {
+                    TileBase tile = _wallTilemap.GetTile(currentPosition);
+                    Debug.Log("cannot cross the door at: " + currentPosition);
+
+                    if ((stepX != 0 && tile == doorTileVertical) || (stepY != 0 && tile == doorTileHorizontal))
+                    {
+                        return true; // 有门阻挡
+                    }
+                }
+
+                currentPosition += new Vector3Int(stepX, stepY, 0);
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// A* seeker寻路完成后所调用的回调函数,若路径有效则进行角色移动。
     /// </summary>
@@ -120,16 +181,85 @@ public class GridMoveController : MonoBehaviour
         {
             //成功找到路径
             Debug.Log(p.vectorPath[^1]);
-            if (p.vectorPath[^1]==targetWorldPosition&&_isMovable)
+            if (p.vectorPath[^1] == targetWorldPosition && _isMovable)
             {
                 float duration = (p.vectorPath.Count - 1) * 0.6f; // 假设移动速度为每格0.6秒
                 var pathArray = p.vectorPath.ToArray();
+
+                if (CheckForDoorBlock(pathArray))
+                {
+                    Debug.Log("Path is blocked by a door.");
+                    return; // 如果被门阻挡，直接返回，不进行后面的操作
+                }
+
+                foreach (var pathPoint in pathArray)
+                {
+                    // 将世界坐标转换为GlassTilemap中的网格坐标
+                    Vector3Int cellPosition = _glassTilemap.WorldToCell(pathPoint);
+
+                    if (_glassTilemap.HasTile(cellPosition))
+                    {
+                        _glassTilemap.SetTile(cellPosition, brokenGlassTile);
+                    }
+
+                    // 记录相邻的门
+                    Vector3Int cellPosition_1 = _wallTilemap.WorldToCell(pathPoint);
+                    CheckForAdjacentDoor(cellPosition_1);
+                }
+
                 StartCoroutine(Player.drawPathLine(pathArray, duration)); // 绘制路径
                 // 调用网络同步方法,改变位置并生成对应动画
                 Player.SetPosition(targetWorldPosition, _targetCellPosition, pathArray);
                 StartCoroutine(setMoveCD(duration));
             }
-            
+        }
+    }
+
+    private void CheckForAdjacentDoor(Vector3Int targetCellPos)
+    {
+        Vector3Int[] adjacentPositions = {
+            targetCellPos + Vector3Int.left,
+            targetCellPos + Vector3Int.right,
+            targetCellPos + Vector3Int.up,
+            targetCellPos + Vector3Int.down
+        };
+
+        foreach (var pos in adjacentPositions)
+        {
+            if (_wallTilemap.HasTile(pos) && (IsDoorTile(pos)))
+            {
+                _lastAdjacentDoor = pos;
+                return;
+            }
+        }
+
+        _lastAdjacentDoor = null;
+    }
+
+    private bool IsDoorTile(Vector3Int position)
+    {
+        TileBase tile = _wallTilemap.GetTile(position);
+        return tile == doorTileHorizontal || tile == doorTileVertical;
+    }
+
+    private void RotateDoor(Vector3Int doorPosition)
+    {
+        TileBase tile = _wallTilemap.GetTile(doorPosition);
+        if (tile != null)
+        {
+            // 旋转门Tile
+            _pathBaker.Scan();
+            if (tile == doorTileHorizontal)
+            {
+                _wallTilemap.SetTile(doorPosition, doorTileVertical);
+            }
+            else if (tile == doorTileVertical)
+            {
+                _wallTilemap.SetTile(doorPosition, doorTileHorizontal);
+            }
+            _wallCollider2D.usedByComposite = true;
+            _shadowCreator.Create();
+            _wallCollider2D.usedByComposite = false;
         }
     }
 
@@ -142,7 +272,7 @@ public class GridMoveController : MonoBehaviour
     {
         _isMovable = false;
         yield return new WaitForSeconds(cd);
-        _gridLine.position = Player.transform.position + new Vector3(0.5f,0.5f);
+        _gridLine.position = Player.transform.position + new Vector3(0.5f, 0.5f);
         _isMovable = true;
         updateGraph();
     }
