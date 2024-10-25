@@ -62,7 +62,7 @@ public class GridMoveController : MonoBehaviour
         if (_isMovable && Player != null)
             tryMove();
 
-        // 点击门
+        // 鼠标右键点击门
         if (Input.GetKeyDown(KeyCode.Mouse1) && _lastAdjacentDoor.HasValue)
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -71,7 +71,6 @@ public class GridMoveController : MonoBehaviour
             // 点击的位置在门的Tile上
             if (doorPosition == _wallTilemap.WorldToCell(mousePos))
             {
-                // RotateDoor(doorPosition);
                 Player.CmdRotateDoor(doorPosition);
             }
         }
@@ -133,6 +132,9 @@ public class GridMoveController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 检查path的每两个相邻节点之间是否有门和前进方向垂直阻挡前进。
+    /// </summary>
     private bool CheckForDoorBlock(Vector3[] path)
     {
         for (int i = 0; i < path.Length - 1; i++)
@@ -198,10 +200,7 @@ public class GridMoveController : MonoBehaviour
                     // 将世界坐标转换为GlassTilemap中的网格坐标
                     Vector3Int cellPosition = _glassTilemap.WorldToCell(pathPoint);
 
-                    if (_glassTilemap.HasTile(cellPosition))
-                    {
-                        _glassTilemap.SetTile(cellPosition, brokenGlassTile);
-                    }
+                    Player.CmdBreakGlass(cellPosition);
 
                     // 记录相邻的门
                     Vector3Int cellPosition_1 = _wallTilemap.WorldToCell(pathPoint);
@@ -216,6 +215,9 @@ public class GridMoveController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 检查相邻格子是否有门
+    /// </summary>
     private void CheckForAdjacentDoor(Vector3Int targetCellPos)
     {
         Vector3Int[] adjacentPositions = {
@@ -243,6 +245,17 @@ public class GridMoveController : MonoBehaviour
         return tile == doorTileHorizontal || tile == doorTileVertical;
     }
 
+    public void BreakGlass(Vector3Int cellPosition)
+    {
+        if (_glassTilemap.HasTile(cellPosition))
+        {
+            _glassTilemap.SetTile(cellPosition, brokenGlassTile);
+        }
+    }
+
+    /// <summary>
+    /// 竖直门与水平门切换代表开关门
+    /// </summary>
     public void RotateDoor(Vector3Int doorPosition)
     {
         TileBase tile = _wallTilemap.GetTile(doorPosition);

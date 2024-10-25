@@ -85,6 +85,20 @@ public class PlayerMove : NetworkBehaviour
         _tilePosition = tilePosition;
     }
 
+    // 同步玻璃
+    [Command]
+    public void CmdBreakGlass(Vector3Int cellPosition)
+    {
+        RpcBreakGlass(cellPosition);
+    }
+
+    [ClientRpc]
+    private void RpcBreakGlass(Vector3Int cellPosition)
+    {
+        GridMoveController.Instance.BreakGlass(cellPosition);
+    }
+
+    // 同步门
     [Command]
     public void CmdRotateDoor(Vector3Int doorPosition)
     {
