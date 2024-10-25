@@ -71,7 +71,8 @@ public class GridMoveController : MonoBehaviour
             // 点击的位置在门的Tile上
             if (doorPosition == _wallTilemap.WorldToCell(mousePos))
             {
-                RotateDoor(doorPosition);
+                // RotateDoor(doorPosition);
+                Player.CmdRotateDoor(doorPosition);
             }
         }
     }
@@ -242,7 +243,7 @@ public class GridMoveController : MonoBehaviour
         return tile == doorTileHorizontal || tile == doorTileVertical;
     }
 
-    private void RotateDoor(Vector3Int doorPosition)
+    public void RotateDoor(Vector3Int doorPosition)
     {
         TileBase tile = _wallTilemap.GetTile(doorPosition);
         if (tile != null)

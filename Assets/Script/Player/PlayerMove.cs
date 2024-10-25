@@ -85,6 +85,18 @@ public class PlayerMove : NetworkBehaviour
         _tilePosition = tilePosition;
     }
 
+    [Command]
+    public void CmdRotateDoor(Vector3Int doorPosition)
+    {
+        RpcRotateDoor(doorPosition);
+    }
+
+    [ClientRpc]
+    private void RpcRotateDoor(Vector3Int doorPosition)
+    {
+        GridMoveController.Instance.RotateDoor(doorPosition);
+    }
+
     /// <summary>
     /// 显示玩家当前位置和目标位置间的直线路径指示器
     /// </summary>
