@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,12 +14,14 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
 
     public bool IsUIActivating => _activeUIList.Count > 0;
+    public bool MenuActivating = false;
+    public GameObject ExistingOperationMenu;
 
     /// <summary>
     /// ±³°üUI½çÃæ
     /// </summary>
-    [SerializeField] private GameObject _bagPanel;
-
+    public GameObject BagPanel{ get=>_bagPanel; private set=>_bagPanel=value; }
+    [SerializeField]private GameObject _bagPanel;
     private GameObject _craftPanel;
 
     private List<GameObject> _activeUIList = new List<GameObject>();
@@ -35,7 +38,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         _craftPanel = _bagPanel.transform.Find("CraftPanel").gameObject;
@@ -51,14 +53,18 @@ public class UIManager : MonoBehaviour
 
         _craftPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() => reverseUIActive(_craftPanel));
+        
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
             reverseUIActive(_bagPanel);
+            if(_bagPanel.activeSelf == false && ExistingOperationMenu != null)
+            {
+                Destroy(ExistingOperationMenu);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -89,5 +95,5 @@ public class UIManager : MonoBehaviour
         if (ui.activeSelf == active)
             return;
         reverseUIActive(ui);
-    }
+    }    
 }

@@ -54,7 +54,7 @@ TagManager:
   - name: Furniture
     uniqueID: 2557215657
     locked: 0
-  - name: Stuff
+  - name: Item
     uniqueID: 1942730699
     locked: 0
   - name: 
