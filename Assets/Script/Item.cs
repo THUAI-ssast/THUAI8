@@ -14,12 +14,15 @@ public class Item : NetworkBehaviour
         _itemlocation.Owner = owner;
         _itemlocation.PlayerId = playerId;
     }
-    private void OnMouseDown()
+    private void OnMouseOver()
     {
-        Debug.Log("OnMouseDown");
-        GameObject player = GameObject.FindWithTag("LocalPlayer");
-        player.GetComponent<PlayerItemInteraction>().PickUpItem(gameObject);
-        BackpackManager.Instance.Additem(gameObject.GetComponent<Item>());
+        if(Input.GetMouseButtonDown(1))
+        {
+            Debug.Log("OnMouseDown");
+            GameObject player = GameObject.FindWithTag("LocalPlayer");
+            player.GetComponent<PlayerItemInteraction>().PickUpItem(gameObject);
+            BackpackManager.Instance.Additem(gameObject.GetComponent<Item>());
+        }
     }
 }
 

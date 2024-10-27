@@ -64,6 +64,7 @@ public class BackpackManager : MonoBehaviour
             else
             {
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().sprite = null;
+                slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
             }
         }
     }

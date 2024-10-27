@@ -8,8 +8,10 @@ using UnityEngine.UI;
 public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private GameObject _operationMenuPrefab;
+    [SerializeField] private GameObject _itemDescriptionPanelPrefab;
     private GameObject _bagPanel;
     private GameObject operationMenu;
+    private GameObject itemDescriptionPanel;
     private Item _slotItem = null;
     private Transform _layout;
     void Start()
@@ -52,4 +54,22 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
             }
         }
     }
+//     public void OnPointerEnter(PointerEventData eventData)
+//     {
+//         if(_slotItem != null)
+//         {
+//             itemDescriptionPanel = Instantiate(_itemDescriptionPanelPrefab);
+//             itemDescriptionPanel.transform.SetParent(_bagPanel.transform);
+//             itemDescriptionPanel.transform.position = gameObject.transform.position + new Vector3(40, -50, 0);
+//             itemDescriptionPanel.transform.GetChild(0).GetComponent<Text>().text = _slotItem.ItemData.ItemDesc;
+//         }   
+//     }
+    
+//     public void OnPointerExit(PointerEventData eventData)
+//     {
+//         if(itemDescriptionPanel != null)
+//         {
+//             Destroy(itemDescriptionPanel);
+//         }
+//     }
 }

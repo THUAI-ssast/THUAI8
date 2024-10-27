@@ -166,6 +166,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _operationMenuPrefab: {fileID: 8184533505767772537, guid: f1f13e0f8ca089d418cc6c19f48bde0e, type: 3}
+  _itemDescriptionPanelPrefab: {fileID: 8364959480719521508, guid: 1351dc518e7472548884d2dc9e1dd7ff, type: 3}
 --- !u!1 &4744918122507492816
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,7 +179,7 @@ GameObject:
   - component: {fileID: 4219925789746350970}
   - component: {fileID: 4999746716534808558}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
