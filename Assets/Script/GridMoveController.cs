@@ -13,12 +13,12 @@ public class GridMoveController : MonoBehaviour
     public static GridMoveController Instance;
     public PlayerMove Player;
 
-    //A* 寻路相关
+    //A* ?锟斤拷???
     private Seeker _pathSeeker;
     private Transform _pathTarget;
     private AstarPath _pathBaker;
     
-    //所用Tilemaps
+    //????Tilemaps
     private Tilemap _groundTilemap;
     private Tilemap _wallTilemap;
     private Tilemap _furnitureTilemap;
@@ -39,7 +39,7 @@ public class GridMoveController : MonoBehaviour
         _wallTilemap = transform.GetChild(0).Find("WallTilemap").GetComponent<Tilemap>();
         _furnitureTilemap = transform.GetChild(0).Find("FurnitureTilemap").GetComponent<Tilemap>();
         _glassTilemap = transform.GetChild(0).Find("GlassTilemap").GetComponent<Tilemap>();
-        _stuffTilemap = transform.GetChild(0).Find("StuffTilemap").GetComponent<Tilemap>();
+        _stuffTilemap = transform.GetChild(0).Find("ItemTilemap").GetComponent<Tilemap>();
 
         _gridLine = transform.Find("GridLine");
 
@@ -52,9 +52,9 @@ public class GridMoveController : MonoBehaviour
             tryMove();
     }
     /// <summary>
-    /// 将player初始化为本机player，绑定移动、寻路等组件。
+    /// ??player??????????player??????????锟斤拷???????
     /// </summary>
-    /// <param name="player">本机player</param>
+    /// <param name="player">????player</param>
     public void InitLocalPlayer(PlayerMove player)
     {
         Player = player;
@@ -69,7 +69,7 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// 捕获玩家输入并尝试移动，点击角色范围内7*7Tile或按下wasd移动，有CD
+    /// ????????????????????????????锟斤拷??7*7Tile????wasd???????CD
     /// </summary>
     private void tryMove()
     {
@@ -106,9 +106,9 @@ public class GridMoveController : MonoBehaviour
         }
     }
     /// <summary>
-    /// A* seeker寻路完成后所调用的回调函数,若路径有效则进行角色移动。
+    /// A* seeker?锟斤拷?????????????????,??锟斤拷????锟斤拷????锟斤拷???????
     /// </summary>
-    /// <param name="p">seeker找到的Path路径</param>
+    /// <param name="p">seeker?????Path锟斤拷??</param>
     private void onPathComplete(Path p)
     {
         var targetWorldPosition = _groundTilemap.CellToWorld(_targetCellPosition) + _cellBias;
@@ -118,13 +118,13 @@ public class GridMoveController : MonoBehaviour
         }
         else
         {
-            //成功找到路径
+            //??????锟斤拷??
             if (p.vectorPath[^1]==targetWorldPosition&&_isMovable)
             {
-                float duration = (p.vectorPath.Count - 1) * 0.6f; // 假设移动速度为每格0.6秒
+                float duration = (p.vectorPath.Count - 1) * 0.6f; // ??????????????0.6??
                 var pathArray = p.vectorPath.ToArray();
-                StartCoroutine(Player.drawPathLine(pathArray, duration)); // 绘制路径
-                // 调用网络同步方法,改变位置并生成对应动画
+                StartCoroutine(Player.drawPathLine(pathArray, duration)); // ????锟斤拷??
+                // ???????????????,???锟斤拷?锟斤拷???????????
                 Player.SetPosition(targetWorldPosition, _targetCellPosition, pathArray);
                 StartCoroutine(setMoveCD(duration));
             }
@@ -133,9 +133,9 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// 将_isMovable设置为false，经过cd秒后恢复为true。
+    /// ??_isMovable?????false??????cd??????true??
     /// </summary>
-    /// <param name="cd">_isMovable持续为false的时间</param>
+    /// <param name="cd">_isMovable?????false?????</param>
     /// <returns></returns>
     private IEnumerator setMoveCD(float cd)
     {
@@ -147,7 +147,7 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// 更新用于寻路的graph位置到玩家处，并重新扫描附近障碍。
+    /// ?????????锟斤拷??graph锟斤拷?????????????????锟斤拷???????
     /// </summary>
     private void updateGraph()
     {
