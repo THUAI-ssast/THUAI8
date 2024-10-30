@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - LocalPlayer
   layers:
   - Default
   - TransparentFX
@@ -13,7 +14,7 @@ TagManager:
   - UI
   - 
   - Tilemap
-  - 
+  - Player
   - 
   - 
   - 
@@ -40,4 +41,31 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Ground
+    uniqueID: 1614982049
+    locked: 0
+  - name: Wall
+    uniqueID: 1961314271
+    locked: 0
+  - name: Glass
+    uniqueID: 3101566009
+    locked: 0
+  - name: Furniture
+    uniqueID: 2557215657
+    locked: 0
+  - name: Item
+    uniqueID: 1942730699
+    locked: 0
+  - name: 
+    uniqueID: 347690821
+    locked: 0
+  - name: Player
+    uniqueID: 3279157105
+    locked: 0
+  - name: New Layer 8
+    uniqueID: 3910657141
+    locked: 0
+  - name: UI
+    uniqueID: 281975897
     locked: 0
