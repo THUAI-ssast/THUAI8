@@ -873,7 +873,7 @@ MonoBehaviour:
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 4470334930336716649, guid: ccd67effaef07e148acc5b284af364b7, type: 3}
+  playerPrefab: {fileID: 4470334930336716649, guid: 7b93804306ce27d449a68a870449db34, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs: []
@@ -896,7 +896,7 @@ MonoBehaviour:
   minPlayers: 1
   roomPlayerPrefab: {fileID: 9146896800030117036, guid: ecaa81a92e68d33499de74dbaf33c88f, type: 3}
   RoomScene: Assets/Scenes/StartScene.unity
-  GameplayScene: Assets/Scenes/MyBattleScene.unity
+  GameplayScene: Assets/Scenes/BattleScene.unity
   _allPlayersReady: 0
   clientIndex: 0
 --- !u!114 &461385728
