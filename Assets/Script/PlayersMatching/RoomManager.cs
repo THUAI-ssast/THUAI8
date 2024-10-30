@@ -1,0 +1,22 @@
+using Mirror;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
+
+/// <summary>
+/// 继承自NetworkRoomManager，用于管理场景同步加载、房间匹配、预制体生成等
+/// </summary>
+public class RoomManager : NetworkRoomManager
+{
+    /// <summary>
+    /// RoomManager的单例
+    /// </summary>
+    public static RoomManager Instance;
+
+    // Start is called before the first frame update
+    public override void Start()
+    {
+        Instance = this;
+    }
+}
