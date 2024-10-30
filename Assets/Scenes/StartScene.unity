@@ -893,10 +893,10 @@ MonoBehaviour:
   evaluationInterval: 3
   timeInterpolationGui: 0
   showRoomGUI: 0
-  minPlayers: 2
+  minPlayers: 1
   roomPlayerPrefab: {fileID: 9146896800030117036, guid: ecaa81a92e68d33499de74dbaf33c88f, type: 3}
   RoomScene: Assets/Scenes/StartScene.unity
-  GameplayScene: Assets/Scenes/BattleScene.unity
+  GameplayScene: Assets/Scenes/MyBattleScene.unity
   _allPlayersReady: 0
   clientIndex: 0
 --- !u!114 &461385728
