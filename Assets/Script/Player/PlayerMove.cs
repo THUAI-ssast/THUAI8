@@ -85,6 +85,32 @@ public class PlayerMove : NetworkBehaviour
         _tilePosition = tilePosition;
     }
 
+    // 同步玻璃
+    [Command]
+    public void CmdBreakGlass(Vector3Int cellPosition)
+    {
+        RpcBreakGlass(cellPosition);
+    }
+
+    [ClientRpc]
+    private void RpcBreakGlass(Vector3Int cellPosition)
+    {
+        GridMoveController.Instance.BreakGlass(cellPosition);
+    }
+
+    // 同步门
+    [Command]
+    public void CmdRotateDoor(Vector3Int doorPosition)
+    {
+        RpcRotateDoor(doorPosition);
+    }
+
+    [ClientRpc]
+    private void RpcRotateDoor(Vector3Int doorPosition)
+    {
+        GridMoveController.Instance.RotateDoor(doorPosition);
+    }
+
     /// <summary>
     /// 显示玩家当前位置和目标位置间的直线路径指示器
     /// </summary>
