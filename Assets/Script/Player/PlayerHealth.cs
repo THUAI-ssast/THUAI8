@@ -79,21 +79,6 @@ public class PlayerHealth : NetworkBehaviour
         }
     }
 
-    int cnt = 0; // 调试用
-    // Update is called once per frame
-    void Update()
-    {
-        if (isServer)
-        {
-            cnt++;
-            if (cnt % 1000 == 0)
-            {
-                HeadHealth--;
-                BodyHealth--;
-                LegHealth--;
-            }
-        }
-    }
 
     /// <summary>
     /// hook函数，当HeadHealth改变后自动被调用

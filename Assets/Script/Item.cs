@@ -18,7 +18,6 @@ public class Item : NetworkBehaviour
     {
         if(Input.GetMouseButtonDown(1))
         {
-            Debug.Log("OnMouseDown");
             GameObject player = GameObject.FindWithTag("LocalPlayer");
             player.GetComponent<PlayerItemInteraction>().PickUpItem(gameObject);
             BackpackManager.Instance.Additem(gameObject.GetComponent<Item>());

@@ -24,14 +24,9 @@ public class HealthGUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        transform.position = TargetPlayer.transform.position + Offset;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        transform.position = TargetPlayer.transform.position + Offset;
-        transform.rotation = Quaternion.identity;
-    }
 
     /// <summary>
     /// 更新玩家血条的长度，当玩家血量更改时会自动调用

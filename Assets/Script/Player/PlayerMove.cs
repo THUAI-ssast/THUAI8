@@ -11,6 +11,7 @@ public class PlayerMove : NetworkBehaviour
 {
     private LineRenderer _pathLineRenderer;
     private bool _isMoving;
+    private Transform _spriteDisplay;
 
     [SyncVar] private Vector3Int _tilePosition; // 用于同步的字段
 
@@ -24,6 +25,7 @@ public class PlayerMove : NetworkBehaviour
     private void Start()
     {
         _pathLineRenderer = GetComponent<LineRenderer>();
+        _spriteDisplay = transform.Find("SpriteDisplay");
         if (this.isLocalPlayer)
         {
             GridMoveController.Instance.InitLocalPlayer(this);
@@ -70,8 +72,8 @@ public class PlayerMove : NetworkBehaviour
         float firstAngle = (firstMoveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, firstMoveVector);
         Vector3 endMoveVector = path[^1] - path[^2];
         float angle = (endMoveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, endMoveVector);
-        transform.DORotate(new Vector3(0, 0, firstAngle), duration * 0.1f).SetEase(Ease.Linear).OnComplete(() =>
-            transform.DORotate(new Vector3(0, 0, angle), duration * 0.3f).SetEase(Ease.Linear));
+        _spriteDisplay.DORotate(new Vector3(0, 0, firstAngle), duration * 0.15f).SetEase(Ease.Linear).OnComplete(() =>
+            _spriteDisplay.DORotate(new Vector3(0, 0, angle), duration * 0.35f).SetEase(Ease.Linear));
 
         transform.DOPath(path, duration);
         SetTilePos(tilePosition);

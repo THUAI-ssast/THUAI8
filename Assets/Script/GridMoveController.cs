@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Mirror;
 using Pathfinding;
+using Unity.VisualScripting;
 
 public class GridMoveController : MonoBehaviour
 {
@@ -138,10 +139,13 @@ public class GridMoveController : MonoBehaviour
     /// </summary>
     private bool CheckForDoorBlock(Vector3[] path)
     {
+        if (IsDoorTile(_wallTilemap.WorldToCell(path[^1])))
+            return true;
         for (int i = 0; i < path.Length - 1; i++)
         {
             Vector3Int start = _wallTilemap.WorldToCell(path[i]);
             Vector3Int end = _wallTilemap.WorldToCell(path[i + 1]);
+
 
             Vector3Int direction = end - start;
 

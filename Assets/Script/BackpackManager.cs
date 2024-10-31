@@ -51,7 +51,6 @@ public class BackpackManager : MonoBehaviour
     }
     private void RefreshSlots()
     {
-        Debug.Log(_itemList.Count);
         Transform slots = _bagPanel.transform.Find("ItemsPanel/Scroll View/Viewport/Slots");
         for (int i = 0; i < slots.childCount; i++)
         {
