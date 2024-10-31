@@ -61,7 +61,6 @@ public class GridMoveController : MonoBehaviour
     private void Update()
     {
         if (!UIManager.Instance.IsUIActivating&&_isMovable&&Player!=null)
-        if (_isMovable && Player != null)
             tryMove();
 
         // 鼠标右键点击门
