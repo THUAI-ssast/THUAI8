@@ -16,10 +16,24 @@ public class MainMenu : MonoBehaviour
     public NetPlayer Player;
     [SerializeField] private  GameObject loadingPanel;
     [SerializeField] private  TextMeshProUGUI matchingText;
-    private int playerCount { get => LobbyManager.Instance.CurrentRoomPlayerCount;  }
-    private int playerCountLimit { get => LobbyManager.Instance.MaxPlayersPerRoom;}
+    [SerializeField] private TextMeshProUGUI playerNameText;
+    private int playerCount 
+    { 
+        get 
+        {   
+            int count = 0;
+            foreach (NetworkRoomPlayer player in RoomManager.Instance.roomSlots)
+            {
+                if(player.readyToBegin)
+                {
+                    count++;
+                }
+            }
+            return count;
+        } 
+    }
+    private int playerCountLimit { get => RoomManager.Instance.maxConnections; }
     private Coroutine matchingCoroutine; 
-    public bool isJoinGame = false;
 
     public void Start()
     {
@@ -35,21 +49,22 @@ public class MainMenu : MonoBehaviour
     public void CancelMatching()
     {
         loadingPanel.SetActive(false);
-        Debug.Log(Player == null); 
         if (Player != null)
         {
             Player.CancelMatching();
-            isJoinGame = false;
         }
-        StopCoroutine(matchingCoroutine);
+        if (matchingCoroutine != null)
+        {
+            StopCoroutine(matchingCoroutine);
+        }
+ 
     }
     public void StartGame()
     {   
         loadingPanel.SetActive(true);
         if (Player != null)
         {
-            Player.StartMatching();
-            isJoinGame = true;
+            Player.StartMatching(playerNameText.text);
         }
         matchingCoroutine = StartCoroutine(StartMatching());
     }
@@ -60,7 +75,6 @@ public class MainMenu : MonoBehaviour
             matchingText.text = "(" + playerCount.ToString() + "/" + playerCountLimit.ToString() + ")";
             yield return new WaitForSeconds(0.1f);
         }
-        SceneManager.LoadScene("BattleScene");
     }
 
 }

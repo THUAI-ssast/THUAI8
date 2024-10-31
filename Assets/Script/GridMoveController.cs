@@ -16,12 +16,12 @@ public class GridMoveController : MonoBehaviour
     public Tile doorTileHorizontal;
     public Tile doorTileVertical;
 
-    // A* Ñ°Â·Ïà¹Ø
+    // A* å¯»è·¯ç›¸å…³
     private Seeker _pathSeeker;
     private Transform _pathTarget;
     private AstarPath _pathBaker;
 
-    // ËùÓÃTilemaps
+    // æ‰€ç”¨Tilemaps
     private Tilemap _groundTilemap;
     private Tilemap _wallTilemap;
     private Tilemap _furnitureTilemap;
@@ -38,7 +38,7 @@ public class GridMoveController : MonoBehaviour
 
     private Vector3 _cellBias;
 
-    private Vector3Int? _lastAdjacentDoor; // ÏàÁÚÃÅµÄÎ»ÖÃ
+    private Vector3Int? _lastAdjacentDoor; // ç›¸é‚»é—¨çš„ä½ç½®
 
     private void Start()
     {
@@ -47,7 +47,7 @@ public class GridMoveController : MonoBehaviour
         _wallTilemap = transform.GetChild(0).Find("WallTilemap").GetComponent<Tilemap>();
         _furnitureTilemap = transform.GetChild(0).Find("FurnitureTilemap").GetComponent<Tilemap>();
         _glassTilemap = transform.GetChild(0).Find("GlassTilemap").GetComponent<Tilemap>();
-        _stuffTilemap = transform.GetChild(0).Find("StuffTilemap").GetComponent<Tilemap>();
+        _stuffTilemap = transform.GetChild(0).Find("ItemTilemap").GetComponent<Tilemap>();
 
         _shadowCreator = _wallTilemap.GetComponent<ShadowCaster2DCreator>();
         _wallCollider2D = _wallTilemap.GetComponent<TilemapCollider2D>();
@@ -59,16 +59,17 @@ public class GridMoveController : MonoBehaviour
 
     private void Update()
     {
+        if (!UIManager.Instance.IsUIActivating&&_isMovable&&Player!=null)
         if (_isMovable && Player != null)
             tryMove();
 
-        // Êó±êÓÒ¼üµã»÷ÃÅ
+        // é¼ æ ‡å³é”®ç‚¹å‡»é—¨
         if (Input.GetKeyDown(KeyCode.Mouse1) && _lastAdjacentDoor.HasValue)
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int doorPosition = _lastAdjacentDoor.Value;
 
-            // µã»÷µÄÎ»ÖÃÔÚÃÅµÄTileÉÏ
+            // ç‚¹å‡»çš„ä½ç½®åœ¨é—¨çš„Tileä¸Š
             if (doorPosition == _wallTilemap.WorldToCell(mousePos))
             {
                 Player.CmdRotateDoor(doorPosition);
@@ -77,9 +78,9 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// ½«player³õÊ¼»¯Îª±¾»úplayer£¬°ó¶¨ÒÆ¶¯¡¢Ñ°Â·µÈ×é¼ş¡£
+    /// å°†playeråˆå§‹åŒ–ä¸ºæœ¬æœºplayerï¼Œç»‘å®šç§»åŠ¨ã€å¯»è·¯ç­‰ç»„ä»¶ã€‚
     /// </summary>
-    /// <param name="player">±¾»úplayer</param>
+    /// <param name="player">æœ¬æœºplayer</param>
     public void InitLocalPlayer(PlayerMove player)
     {
         Player = player;
@@ -94,7 +95,7 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// ²¶»ñÍæ¼ÒÊäÈë²¢³¢ÊÔÒÆ¶¯£¬µã»÷½ÇÉ«·¶Î§ÄÚ7*7Tile»ò°´ÏÂwasdÒÆ¶¯£¬ÓĞCD
+    /// æ•è·ç©å®¶è¾“å…¥å¹¶å°è¯•ç§»åŠ¨ï¼Œç‚¹å‡»è§’è‰²èŒƒå›´å†…7*7Tileæˆ–æŒ‰ä¸‹wasdç§»åŠ¨ï¼Œæœ‰CD
     /// </summary>
     private void tryMove()
     {
@@ -133,7 +134,7 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// ¼ì²épathµÄÃ¿Á½¸öÏàÁÚ½ÚµãÖ®¼äÊÇ·ñÓĞÃÅºÍÇ°½ø·½Ïò´¹Ö±×èµ²Ç°½ø¡£
+    /// æ£€æŸ¥pathçš„æ¯ä¸¤ä¸ªç›¸é‚»èŠ‚ç‚¹ä¹‹é—´æ˜¯å¦æœ‰é—¨å’Œå‰è¿›æ–¹å‘å‚ç›´é˜»æŒ¡å‰è¿›ã€‚
     /// </summary>
     private bool CheckForDoorBlock(Vector3[] path)
     {
@@ -158,7 +159,7 @@ public class GridMoveController : MonoBehaviour
 
                     if ((stepX != 0 && tile == doorTileVertical) || (stepY != 0 && tile == doorTileHorizontal))
                     {
-                        return true; // ÓĞÃÅ×èµ²
+                        return true; // æœ‰é—¨é˜»æŒ¡
                     }
                 }
 
@@ -170,45 +171,44 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// A* seekerÑ°Â·Íê³ÉºóËùµ÷ÓÃµÄ»Øµ÷º¯Êı,ÈôÂ·¾¶ÓĞĞ§Ôò½øĞĞ½ÇÉ«ÒÆ¶¯¡£
+    /// A* seekerå¯»è·¯å®Œæˆåæ‰€è°ƒç”¨çš„å›è°ƒå‡½æ•°,è‹¥è·¯å¾„æœ‰æ•ˆåˆ™è¿›è¡Œè§’è‰²ç§»åŠ¨ã€‚
     /// </summary>
-    /// <param name="p">seekerÕÒµ½µÄPathÂ·¾¶</param>
+    /// <param name="p">seekeræ‰¾åˆ°çš„Pathè·¯å¾„</param>
     private void onPathComplete(Path p)
     {
         var targetWorldPosition = _groundTilemap.CellToWorld(_targetCellPosition) + _cellBias;
         if (p.error)
         {
-            Debug.Log("path error");
+            Debug.LogError("path error");
         }
         else
         {
-            //³É¹¦ÕÒµ½Â·¾¶
-            Debug.Log(p.vectorPath[^1]);
-            if (p.vectorPath[^1] == targetWorldPosition && _isMovable)
+            //æˆåŠŸæ‰¾åˆ°è·¯å¾„
+            if (p.vectorPath[^1]==targetWorldPosition&&_isMovable)
             {
-                float duration = (p.vectorPath.Count - 1) * 0.6f; // ¼ÙÉèÒÆ¶¯ËÙ¶ÈÎªÃ¿¸ñ0.6Ãë
+                float duration = (p.vectorPath.Count - 1) * 0.6f; // å‡è®¾ç§»åŠ¨é€Ÿåº¦ä¸ºæ¯æ ¼0.6ç§’
                 var pathArray = p.vectorPath.ToArray();
 
                 if (CheckForDoorBlock(pathArray))
                 {
                     Debug.Log("Path is blocked by a door.");
-                    return; // Èç¹û±»ÃÅ×èµ²£¬Ö±½Ó·µ»Ø£¬²»½øĞĞºóÃæµÄ²Ù×÷
+                    return; // å¦‚æœè¢«é—¨é˜»æŒ¡ï¼Œç›´æ¥è¿”å›ï¼Œä¸è¿›è¡Œåé¢çš„æ“ä½œ
                 }
 
                 foreach (var pathPoint in pathArray)
                 {
-                    // ½«ÊÀ½ç×ø±ê×ª»»ÎªGlassTilemapÖĞµÄÍø¸ñ×ø±ê
+                    // å°†ä¸–ç•Œåæ ‡è½¬æ¢ä¸ºGlassTilemapä¸­çš„ç½‘æ ¼åæ ‡
                     Vector3Int cellPosition = _glassTilemap.WorldToCell(pathPoint);
 
                     Player.CmdBreakGlass(cellPosition);
 
-                    // ¼ÇÂ¼ÏàÁÚµÄÃÅ
+                    // è®°å½•ç›¸é‚»çš„é—¨
                     Vector3Int cellPosition_1 = _wallTilemap.WorldToCell(pathPoint);
                     CheckForAdjacentDoor(cellPosition_1);
                 }
 
-                StartCoroutine(Player.drawPathLine(pathArray, duration)); // »æÖÆÂ·¾¶
-                // µ÷ÓÃÍøÂçÍ¬²½·½·¨,¸Ä±äÎ»ÖÃ²¢Éú³É¶ÔÓ¦¶¯»­
+                StartCoroutine(Player.drawPathLine(pathArray, duration)); // ç»˜åˆ¶è·¯å¾„
+                // è°ƒç”¨ç½‘ç»œåŒæ­¥æ–¹æ³•,æ”¹å˜ä½ç½®å¹¶ç”Ÿæˆå¯¹åº”åŠ¨ç”»
                 Player.SetPosition(targetWorldPosition, _targetCellPosition, pathArray);
                 StartCoroutine(setMoveCD(duration));
             }
@@ -216,7 +216,7 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// ¼ì²éÏàÁÚ¸ñ×ÓÊÇ·ñÓĞÃÅ
+    /// æ£€æŸ¥ç›¸é‚»æ ¼å­æ˜¯å¦æœ‰é—¨
     /// </summary>
     private void CheckForAdjacentDoor(Vector3Int targetCellPos)
     {
@@ -254,14 +254,14 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// ÊúÖ±ÃÅÓëË®Æ½ÃÅÇĞ»»´ú±í¿ª¹ØÃÅ
+    /// ç«–ç›´é—¨ä¸æ°´å¹³é—¨åˆ‡æ¢ä»£è¡¨å¼€å…³é—¨
     /// </summary>
     public void RotateDoor(Vector3Int doorPosition)
     {
         TileBase tile = _wallTilemap.GetTile(doorPosition);
         if (tile != null)
         {
-            // Ğı×ªÃÅTile
+            // æ—‹è½¬é—¨Tile
             _pathBaker.Scan();
             if (tile == doorTileHorizontal)
             {
@@ -278,9 +278,9 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// ½«_isMovableÉèÖÃÎªfalse£¬¾­¹ıcdÃëºó»Ö¸´Îªtrue¡£
+    /// å°†_isMovableè®¾ç½®ä¸ºfalseï¼Œç»è¿‡cdç§’åæ¢å¤ä¸ºtrueã€‚
     /// </summary>
-    /// <param name="cd">_isMovable³ÖĞøÎªfalseµÄÊ±¼ä</param>
+    /// <param name="cd">_isMovableæŒç»­ä¸ºfalseçš„æ—¶é—´</param>
     /// <returns></returns>
     private IEnumerator setMoveCD(float cd)
     {
@@ -292,7 +292,7 @@ public class GridMoveController : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸üĞÂÓÃÓÚÑ°Â·µÄgraphÎ»ÖÃµ½Íæ¼Ò´¦£¬²¢ÖØĞÂÉ¨Ãè¸½½üÕÏ°­¡£
+    /// æ›´æ–°ç”¨äºå¯»è·¯çš„graphä½ç½®åˆ°ç©å®¶å¤„ï¼Œå¹¶é‡æ–°æ‰«æé™„è¿‘éšœç¢ã€‚
     /// </summary>
     private void updateGraph()
     {
