@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbd688f2255ba0b43b9cc644ec1f6c9d, type: 3}
+  m_Name: Mace
+  m_EditorClassIdentifier: 
+  CostItems:
+  - {fileID: 11400000, guid: ca8fda709dc920c4c8a9f54a9901452b, type: 2}
+  - {fileID: 11400000, guid: 8d5ba779e561f634a91d1ba65cd6f822, type: 2}
+  CatalystItems:
+  - {fileID: 11400000, guid: 241c97ed3dc1e1e43b59884b55c70f58, type: 2}
+  ProductItem: {fileID: 11400000, guid: 3f332585b15c0c845aef77117a9a1a02, type: 2}
