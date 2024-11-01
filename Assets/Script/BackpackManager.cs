@@ -25,12 +25,11 @@ public class BackpackManager : MonoBehaviour
     {
         RefreshSlots();
     }
-    public void Additem(Item item) 
+    public void AddItem(Item item) 
     {
         Debug.Log("AddItem");
         // 从背包中添加物品
         _itemList.Add(item);
-        // Debug.Log(_itemList);
         RefreshSlots();
     }
 

@@ -20,7 +20,7 @@ public class Item : NetworkBehaviour
         {
             GameObject player = GameObject.FindWithTag("LocalPlayer");
             player.GetComponent<PlayerItemInteraction>().PickUpItem(gameObject);
-            BackpackManager.Instance.Additem(gameObject.GetComponent<Item>());
+            BackpackManager.Instance.AddItem(gameObject.GetComponent<Item>());
         }
     }
 }
