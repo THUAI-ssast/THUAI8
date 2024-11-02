@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 9140526380179849139}
   - component: {fileID: 3642528029091016442}
   - component: {fileID: 5080838172717945116}
+  - component: {fileID: 238042744213544984}
   m_Layer: 5
   m_Name: CraftWayUI
   m_TagString: Untagged
@@ -192,6 +193,50 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &238042744213544984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5390999899366484196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.8050314, g: 0.8050314, b: 0.8050314, a: 1}
+    m_PressedColor: {r: 0.6603774, g: 0.6603774, b: 0.6603774, a: 1}
+    m_SelectedColor: {r: 0.5558126, g: 0.87366396, b: 0.98742133, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 21300000, guid: 8fd9a09a952bad4478401e32ce5664d6, type: 3}
+    m_PressedSprite: {fileID: 21300000, guid: d91181eddea2b464c88c6f8f5a2e6c1c, type: 3}
+    m_SelectedSprite: {fileID: 21300000, guid: cb2c49a97385ecb409157009f5875d2b, type: 3}
+    m_DisabledSprite: {fileID: 21300000, guid: 00e9401477f564f4c9316f009cfecda4, type: 3}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 9140526380179849139}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5425326216608054086
 GameObject:
   m_ObjectHideFlags: 0
@@ -260,7 +305,7 @@ MonoBehaviour:
   m_text: "\u7269\u54C1"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2d47345a621ced245a407257581fd134, type: 2}
-  m_sharedMaterial: {fileID: 3114029235034608195, guid: 2d47345a621ced245a407257581fd134, type: 2}
+  m_sharedMaterial: {fileID: -5471723069554805099, guid: 2d47345a621ced245a407257581fd134, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

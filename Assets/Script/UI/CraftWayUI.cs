@@ -6,12 +6,32 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class CraftWayUI : MonoBehaviour
-{ 
+{
     private static GameObject _craftWayItemImage;
     private static GameObject _catalystItemUI;
-    private static Sprite _craftNone;
-    private static Sprite _craftPartly;
+    private static Sprite _craftDefault;
     private static Sprite _craftSatisfied;
+    /// <summary>
+    /// 所有的CraftWayUI
+    /// </summary>
+    private static List<CraftWayUI> _uiList = new List<CraftWayUI>();
+
+    /// <summary>
+    /// 当前选中的合成路线数据，点击应用合成时会被deploy
+    /// </summary>
+    public static CraftWayData SelectedCraftWay { get; private set; }
+
+        /// <summary>
+    /// 对于所有的CraftWayUI，更新其已满足的物品个数并据此从大到小排序
+    /// </summary>
+    public static void UpdateSatisfiedAll()
+    {
+        foreach (CraftWayUI craftWayUI in _uiList)
+            craftWayUI.UpdateSatisfied();
+        _uiList.Sort((u1, u2) => u1._satisfiedItemCount.CompareTo(u2._satisfiedItemCount));
+        foreach (CraftWayUI craftWayUI in _uiList)
+            craftWayUI.transform.SetAsFirstSibling();
+    }
 
     public CraftWayData CraftWayData
     {
@@ -19,34 +39,43 @@ public class CraftWayUI : MonoBehaviour
         set
         {
             _craftWayData = value;
-            upDateDisplay();
+            updateDisplay();
         }
     }
+
     private CraftWayData _craftWayData;
     private List<GameObject> _itemList;
 
     private Image _backgroundImage;
     private Transform _equalsIcon;
     private Transform _targetIcon;
+    /// <summary>
+    /// 排序使用的属性，全部满足则为100+满足物品个数，否则为满足物品个数
+    /// </summary>
+    private int _satisfiedItemCount;
 
     private void Awake()
     {
-        if (_craftWayItemImage==null|| _catalystItemUI==null)
+        _uiList.Add(this);
+        if (_craftWayItemImage == null || _catalystItemUI == null)
         {
             _craftWayItemImage = Resources.Load<GameObject>("UI/CraftItemImage");
             _catalystItemUI = Resources.Load<GameObject>("UI/CatalystItemUI");
-            _craftNone = Resources.Load<Sprite>("UI/Sprite/CraftNone");
-            _craftPartly = Resources.Load<Sprite>("UI/Sprite/CraftPartly");
+            _craftDefault = Resources.Load<Sprite>("UI/Sprite/CraftDefault");
             _craftSatisfied = Resources.Load<Sprite>("UI/Sprite/CraftSatisfied");
         }
+
         _equalsIcon = transform.Find("EqualsTo");
         _targetIcon = transform.Find("Target");
         _backgroundImage = GetComponent<Image>();
+        GetComponent<Button>().onClick.AddListener(() => SelectedCraftWay = this.CraftWayData);
     }
-
-    private void upDateDisplay()
+    /// <summary>
+    /// 更新此合成路径的所需物品Icon显示
+    /// </summary>
+    private void updateDisplay()
     {
-        if (_craftWayData==null)
+        if (_craftWayData == null)
             return;
         foreach (ItemData costItem in _craftWayData.CostItems)
         {
@@ -67,9 +96,13 @@ public class CraftWayUI : MonoBehaviour
         _targetIcon.GetChild(1).GetComponent<TMP_Text>().text = _craftWayData.ProductItem.ItemName;
         _targetIcon.SetAsLastSibling();
     }
-
+    /// <summary>
+    /// 更新此ui的满足状态，并据此更改显示状态（背景图）
+    /// </summary>
     public void UpdateSatisfied()
     {
-        
+        _backgroundImage.sprite = (_satisfiedItemCount = BackpackManager.Instance.IsCraftSatisfied(_craftWayData)) >=100
+            ? _craftSatisfied
+            : _craftDefault;
     }
 }

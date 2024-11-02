@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da1d47110da67af408090f29d149749b, type: 3}
-  m_Name: HammerStone
+  m_Name: "\u5C0F\u5200"
   m_EditorClassIdentifier: 
-  ItemName: "\u9524\u77F3"
-  ItemIcon: {fileID: 21300000, guid: 993411dc6d668de48a90f25a3a48676e, type: 3}
+  ItemName: "\u5C0F\u5200"
+  ItemIcon: {fileID: 21300000, guid: e06f2e7504be1054fb918d5c6e2059c8, type: 3}
   ItemDesc: 
-  ItemType: 0
+  ItemType: 2
   ItemValue: 0

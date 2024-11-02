@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da1d47110da67af408090f29d149749b, type: 3}
-  m_Name: Blade
+  m_Name: "\u5200\u7247"
   m_EditorClassIdentifier: 
   ItemName: "\u5200\u7247"
   ItemIcon: {fileID: 21300000, guid: 65762df79d1f4fb4db31dfb566c7fd25, type: 3}

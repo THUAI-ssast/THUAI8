@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da1d47110da67af408090f29d149749b, type: 3}
-  m_Name: Bat
+  m_Name: "\u6728\u677F"
   m_EditorClassIdentifier: 
-  ItemName: "\u6728\u68D2"
-  ItemIcon: {fileID: 21300000, guid: 07273caf6a6bc9d41a08e5f8993d5915, type: 3}
+  ItemName: "\u6728\u677F"
+  ItemIcon: {fileID: 21300000, guid: 86331ba9dc8b00940a5a6b9c67a8fc67, type: 3}
   ItemDesc: 
   ItemType: 0
   ItemValue: 0
