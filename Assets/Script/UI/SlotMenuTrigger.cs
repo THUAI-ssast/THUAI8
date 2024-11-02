@@ -14,6 +14,7 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     private GameObject _itemDescriptionPanel;
     private Item _slotItem = null;
     private Transform _layout;
+    private GameObject _existingOperationMenu;
     void Start()
     {
         _bagPanel = UIManager.Instance.BagPanel;
@@ -26,18 +27,19 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     {
         if (eventData.button == PointerEventData.InputButton.Right && _slotItem != null)
         {
-            Debug.Log("Right Clicked");
-            if(UIManager.Instance.MenuActivating == true)
+            if(_existingOperationMenu != null)
             {
-                UIManager.Instance.MenuActivating = false;
-                Destroy(UIManager.Instance.ExistingOperationMenu);
+                Destroy(_existingOperationMenu);
                 return ;
             }
-            UIManager.Instance.MenuActivating = true;
-            _operationMenu = Instantiate(_operationMenuPrefab);
-            _operationMenu.transform.SetParent(_bagPanel.transform.GetChild(2));
-            _operationMenu.transform.position = gameObject.transform.position + new Vector3(40, -50, 0);    
+            if(UIManager.Instance.ExistingOperationMenu != null)
+            {
+                Destroy(UIManager.Instance.ExistingOperationMenu);
+            }
+            _operationMenu = Instantiate(_operationMenuPrefab, _bagPanel.transform.GetChild(2), false);
+            _operationMenu.transform.position = gameObject.transform.position + new Vector3(60, -100, 0);
             UIManager.Instance.ExistingOperationMenu = _operationMenu;
+            _existingOperationMenu = _operationMenu;
             _layout = _operationMenu.transform.GetChild(0);
             if(_slotItem != null)
             {
@@ -54,22 +56,4 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
             }
         }
     }
-//     public void OnPointerEnter(PointerEventData eventData)
-//     {
-//         if(_slotItem != null)
-//         {
-//             itemDescriptionPanel = Instantiate(_itemDescriptionPanelPrefab);
-//             itemDescriptionPanel.transform.SetParent(_bagPanel.transform);
-//             itemDescriptionPanel.transform.position = gameObject.transform.position + new Vector3(40, -50, 0);
-//             itemDescriptionPanel.transform.GetChild(0).GetComponent<Text>().text = _slotItem.ItemData.ItemDesc;
-//         }   
-//     }
-    
-//     public void OnPointerExit(PointerEventData eventData)
-//     {
-//         if(itemDescriptionPanel != null)
-//         {
-//             Destroy(itemDescriptionPanel);
-//         }
-//     }
 }

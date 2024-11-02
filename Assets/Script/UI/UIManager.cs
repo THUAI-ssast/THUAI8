@@ -7,18 +7,17 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ����ս������������UI��չʾ��������Ϊ
+/// 管理战斗场景内所有UI的展示、交互行为
 /// </summary>
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
     public bool IsUIActivating => _activeUIList.Count > 0;
-    public bool MenuActivating = false;
     public GameObject ExistingOperationMenu;
 
     /// <summary>
-    /// ����UI����
+    /// 背包UI界面
     /// </summary>
     public GameObject BagPanel{ get=>_bagPanel; private set=>_bagPanel=value; }
     [SerializeField]private GameObject _bagPanel;
