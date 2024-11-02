@@ -10,8 +10,8 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     [SerializeField] private GameObject _operationMenuPrefab;
     [SerializeField] private GameObject _itemDescriptionPanelPrefab;
     private GameObject _bagPanel;
-    private GameObject operationMenu;
-    private GameObject itemDescriptionPanel;
+    private GameObject _operationMenu;
+    private GameObject _itemDescriptionPanel;
     private Item _slotItem = null;
     private Transform _layout;
     void Start()
@@ -26,30 +26,30 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     {
         if (eventData.button == PointerEventData.InputButton.Right && _slotItem != null)
         {
-            if(UIManager.Instance.MenuActivating == false)
+            Debug.Log("Right Clicked");
+            if(UIManager.Instance.MenuActivating == true)
             {
-                UIManager.Instance.MenuActivating = true;
-            }
-            else
-            {
+                UIManager.Instance.MenuActivating = false;
                 Destroy(UIManager.Instance.ExistingOperationMenu);
+                return ;
             }
-            operationMenu = Instantiate(_operationMenuPrefab);
-            operationMenu.transform.SetParent(_bagPanel.transform);
-            operationMenu.transform.position = gameObject.transform.position + new Vector3(40, -50, 0);    
-            UIManager.Instance.ExistingOperationMenu = operationMenu;
-            _layout = operationMenu.transform.GetChild(0);
+            UIManager.Instance.MenuActivating = true;
+            _operationMenu = Instantiate(_operationMenuPrefab);
+            _operationMenu.transform.SetParent(_bagPanel.transform.GetChild(2));
+            _operationMenu.transform.position = gameObject.transform.position + new Vector3(40, -50, 0);    
+            UIManager.Instance.ExistingOperationMenu = _operationMenu;
+            _layout = _operationMenu.transform.GetChild(0);
             if(_slotItem != null)
             {
                 _layout.GetChild(0).GetComponent<Button>().onClick.AddListener(() => 
                 {
                     BackpackManager.Instance.UseItem(_slotItem);
-                    Destroy(operationMenu);
+                    Destroy(_operationMenu);
                 });
                 _layout.GetChild(1).GetComponent<Button>().onClick.AddListener(() => 
                 {
-                    BackpackManager.Instance.RemoveItem(_slotItem);
-                    Destroy(operationMenu);
+                    BackpackManager.Instance.DropItem(_slotItem);
+                    Destroy(_operationMenu);
                 });
             }
         }

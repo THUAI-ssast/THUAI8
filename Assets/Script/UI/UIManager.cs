@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ¹ÜÀíÕ½¶·³¡¾°ÄÚËùÓÐUIµÄÕ¹Ê¾¡¢½»»¥ÐÐÎª
+/// ï¿½ï¿½ï¿½ï¿½Õ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½UIï¿½ï¿½Õ¹Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª
 /// </summary>
 public class UIManager : MonoBehaviour
 {
@@ -18,7 +18,7 @@ public class UIManager : MonoBehaviour
     public GameObject ExistingOperationMenu;
 
     /// <summary>
-    /// ±³°üUI½çÃæ
+    /// ï¿½ï¿½ï¿½ï¿½UIï¿½ï¿½ï¿½ï¿½
     /// </summary>
     public GameObject BagPanel{ get=>_bagPanel; private set=>_bagPanel=value; }
     [SerializeField]private GameObject _bagPanel;
@@ -74,6 +74,14 @@ public class UIManager : MonoBehaviour
                 reverseUIActive(_activeUIList[^1]);
             }
         }
+
+        // if(Input.GetMouseButtonDown(0))
+        // {
+        //     if(ExistingOperationMenu != null)
+        //     {
+        //         Destroy(ExistingOperationMenu);
+        //     }
+        // }
     }
 
     private void reverseUIActive(GameObject ui)
