@@ -7,8 +7,11 @@ using UnityEngine.UI;
 
 public class CraftWayUI : MonoBehaviour
 { 
-    private GameObject _craftWayItemImage;
-    private GameObject _catalystItemUI;
+    private static GameObject _craftWayItemImage;
+    private static GameObject _catalystItemUI;
+    private static Sprite _craftNone;
+    private static Sprite _craftPartly;
+    private static Sprite _craftSatisfied;
 
     public CraftWayData CraftWayData
     {
@@ -22,15 +25,23 @@ public class CraftWayUI : MonoBehaviour
     private CraftWayData _craftWayData;
     private List<GameObject> _itemList;
 
+    private Image _backgroundImage;
     private Transform _equalsIcon;
     private Transform _targetIcon;
 
     private void Awake()
     {
-        _craftWayItemImage = Resources.Load<GameObject>("UI/CraftItemImage");
-        _catalystItemUI = Resources.Load<GameObject>("UI/CatalystItemUI");
+        if (_craftWayItemImage==null|| _catalystItemUI==null)
+        {
+            _craftWayItemImage = Resources.Load<GameObject>("UI/CraftItemImage");
+            _catalystItemUI = Resources.Load<GameObject>("UI/CatalystItemUI");
+            _craftNone = Resources.Load<Sprite>("UI/Sprite/CraftNone");
+            _craftPartly = Resources.Load<Sprite>("UI/Sprite/CraftPartly");
+            _craftSatisfied = Resources.Load<Sprite>("UI/Sprite/CraftSatisfied");
+        }
         _equalsIcon = transform.Find("EqualsTo");
         _targetIcon = transform.Find("Target");
+        _backgroundImage = GetComponent<Image>();
     }
 
     private void upDateDisplay()
@@ -55,5 +66,10 @@ public class CraftWayUI : MonoBehaviour
         _targetIcon.GetChild(0).GetComponent<Image>().sprite = _craftWayData.ProductItem.ItemIcon;
         _targetIcon.GetChild(1).GetComponent<TMP_Text>().text = _craftWayData.ProductItem.ItemName;
         _targetIcon.SetAsLastSibling();
+    }
+
+    public void UpdateSatisfied()
+    {
+        
     }
 }

@@ -27,7 +27,6 @@ public class BackpackManager : MonoBehaviour
     }
     public void AddItem(Item item) 
     {
-        Debug.Log("AddItem");
         // 从背包中添加物品
         _itemList.Add(item);
         RefreshSlots();
@@ -65,5 +64,54 @@ public class BackpackManager : MonoBehaviour
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
             }
         }
+    }
+
+    /// <summary>
+    /// 确定背包内是否包含合成所需要物品
+    /// </summary>
+    /// <param name="craftWay">检测的目标合成路径</param>
+    /// <returns>若为-1则全部满足，否则返回满足物品个数</returns>
+    public int IsCraftSatisfied(CraftWayData craftWay)
+    {
+        int count = 0;
+        List<Item> testItemList = new List<Item>(_itemList);
+        foreach (ItemData costItem in craftWay.CostItems)
+        {
+            if(!testItemList.Remove(testItemList.Find(i=>i.ItemData.ItemName==costItem.ItemName)))
+                return count;
+            count++;
+        }
+        foreach (ItemData catalystItem in craftWay.CatalystItems)
+        {
+            if (!testItemList.Remove(testItemList.Find(i => i.ItemData.ItemName == catalystItem.ItemName)))
+                return count;
+            count++;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// 应用合成，在背包内销毁Cost Item并增加Product Item
+    /// </summary>
+    /// <param name="craftWay">要应用的目标合成路径</param>
+    /// <returns>若为-1则全部满足并成功应用，否则返回满足物品个数</returns>
+    public int DeployCraft(CraftWayData craftWay)
+    {
+        int count = 0;
+        List<Item> testItemList = new List<Item>(_itemList);
+        foreach (ItemData costItem in craftWay.CostItems)
+        {
+            if (!testItemList.Remove(testItemList.FindLast(i => i.ItemData.ItemName == costItem.ItemName)))
+                return count;
+            count++;
+        }
+        foreach (ItemData catalystItem in craftWay.CatalystItems)
+        {
+            if (!testItemList.Remove(testItemList.FindLast(i => i.ItemData.ItemName == catalystItem.ItemName)))
+                return count;
+            count++;
+        }
+        _itemList = testItemList;
+        return -1;
     }
 }
