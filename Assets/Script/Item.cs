@@ -15,11 +15,57 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 物品的拥有者信息
     /// </summary>
-    [SerializeField] private ItemOwnerInfo _itemlocation;
+    [SerializeField] public ItemOwnerInfo ItemLocation;
     /// <summary>
+    /// 物品的拾取距离
+    /// </summary>
+    [SerializeField] private float _pickUpDistance = 1;
+    /// <summary> 
     /// 物品的网络ID
     /// </summary>
-    private int _itemID; // TODO: NetworkIdentity
+    private uint _itemID;
+    void Awake()
+    {
+        _pickUpDistance = 1;
+        _itemID = gameObject.GetComponent<NetworkIdentity>().netId;
+        if(ItemLocation == null)
+        {
+            ItemLocation = new ItemOwnerInfo();
+        }
+    }
+    /// <summary>
+    /// 创建物品实例
+    /// </summary>
+    /// <param name="itemData_pth">Resources中要创建的物品的信息的路径</param>
+    /// <param name="owner">物品拥有者</param>
+    /// <param name="player">发出请求的玩家</param>
+    /// <returns></returns>
+    public static void Create(string itemData_pth, ItemOwner owner, GameObject player)
+    {
+        player.GetComponent<PlayerItemInteraction>().CreateItem(itemData_pth, owner, player);
+    }
+    /// <summary>
+    /// 初始化物品
+    /// </summary>
+    /// <param name="itemData">物品信息</param>
+    /// <param name="owner">物品拥有者</param>
+    /// <param name="playerId">玩家id</param>
+    public void Initialize(ItemData itemData, ItemOwner owner, uint playerId)
+    {
+        ItemData = itemData;
+        ItemLocation.Owner = owner;
+        ItemLocation.PlayerId = playerId;
+    }
+    /// <summary>
+    /// 销毁物品
+    /// </summary>
+    /// <param name="item">要销毁的物品</param>
+    /// <param name="player">发出请求的玩家</param>
+    public static void Destroy(Item item, GameObject player)
+    {
+        player.GetComponent<PlayerItemInteraction>().DestroyItem(item.gameObject);
+    }
+
     /// <summary>
     /// 更新物品的拥有者信息
     /// </summary>
@@ -27,19 +73,32 @@ public class Item : NetworkBehaviour
     /// <param name="playerId">若物品拥有者为玩家，则为玩家ID；否则为0</param>
     public void ItemLocationUpdate(ItemOwner owner, uint playerId)
     {
-        _itemlocation.Owner = owner;
-        _itemlocation.PlayerId = playerId;
+        ItemLocation.Owner = owner;
+        ItemLocation.PlayerId = playerId;
+    }
+    /// <summary>
+    /// 判断物品是否可以被拾取
+    /// </summary>
+    /// <returns>如果物品可以被拾取，返回true；否则返回false</returns>
+    private bool CanBePickedUp()
+    {
+        if(ItemLocation.Owner != ItemOwner.World) return false;
+        if(UIManager.Instance.IsUIActivating == true) return false;
+        GameObject player = GameObject.FindWithTag("LocalPlayer");
+        if(Vector3.Distance(gameObject.transform.position, player.transform.position) > _pickUpDistance) return false;
+        return true;
     }
     /// <summary>
     /// 右键点击物品拾取物品到背包
     /// </summary>
     private void OnMouseOver()
     {
-        if(Input.GetMouseButtonDown(1))
+        if(Input.GetMouseButtonDown(1) && CanBePickedUp())
         {
             GameObject player = GameObject.FindWithTag("LocalPlayer");
-            player.GetComponent<PlayerItemInteraction>().PickUpItem(gameObject);
-            BackpackManager.Instance.AddItem(gameObject.GetComponent<Item>());
+            Item item = gameObject.GetComponent<Item>();
+            player.GetComponent<PlayerItemInteraction>().PickUpItem(item.gameObject);
+            BackpackManager.Instance.AddItem(item);
         }
     }
 }

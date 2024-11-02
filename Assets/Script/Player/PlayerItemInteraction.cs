@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEditor;
+using Mirror.BouncyCastle.Asn1.X509;
 /// <summary>
 /// 玩家与物品的交互类，挂载在player的GameObject上。执行[Command]方法。
 /// </summary>
@@ -14,7 +16,6 @@ public class PlayerItemInteraction : NetworkBehaviour
     [Command]
     public void PickUpItem(GameObject currentObj)
     {
-        Item item = currentObj.GetComponent<Item>();
         ItemStatusChange(currentObj, false, ItemOwner.PlayerBackpack, Vector3.zero, gameObject.GetComponent<NetworkIdentity>().netId);
     }
     /// <summary>
@@ -24,8 +25,35 @@ public class PlayerItemInteraction : NetworkBehaviour
     [Command]
     public void DropItem(GameObject currentObj)
     {
-        Item item = currentObj.GetComponent<Item>();
         ItemStatusChange(currentObj, true, ItemOwner.World, gameObject.GetComponent<NetworkIdentity>().transform.position, 0);        
+    }
+    /// <summary>
+    /// 服务器处理玩家创建物品事件。
+    /// </summary>
+    /// <param name="itemData_pth">Resources中要创建的物品信息路径</param>
+    /// <param name="owner">物品拥有者</param>
+    /// <param name="player">发出请求的玩家</param>
+    [Command]
+    public void CreateItem(string itemData_pth, ItemOwner owner, GameObject player)
+    {
+        ItemData itemData = Resources.Load<ItemData>(itemData_pth);
+        GameObject instance = Instantiate(Resources.Load<GameObject>("Items/General_Item"), Vector3.zero, Quaternion.identity);
+        instance.GetComponent<SpriteRenderer>().enabled = false;
+        instance.GetComponent<SpriteRenderer>().sprite = itemData.ItemIcon;
+        Item newItem = instance.AddComponent<Item>();
+        NetworkIdentity playerIdentity = player.GetComponent<NetworkIdentity>();
+        newItem.Initialize(itemData, owner, playerIdentity.netId);
+        NetworkServer.Spawn(instance);
+        TargetNotifyItemCreated(playerIdentity.connectionToClient, instance);
+    }
+    /// <summary>
+    /// 服务器处理玩家销毁物品事件。
+    /// </summary>
+    /// <param name="currentObj">要销毁的GameObject</param>
+    [Command]
+    public void DestroyItem(GameObject currentObj)
+    {
+        NetworkServer.Destroy(currentObj);
     }
     /// <summary>
     /// 服务器处理玩家使用物品事件。
@@ -60,8 +88,12 @@ public class PlayerItemInteraction : NetworkBehaviour
     [ClientRpc]
     private void ObjectWorldDisplay(GameObject obj, bool isDisplay, Vector3 position)
     {
-        Debug.Log("ObjectWorldDisplay");
         obj.transform.position = position;
         obj.GetComponent<SpriteRenderer>().enabled = isDisplay;
+    }
+    [TargetRpc]
+    private void TargetNotifyItemCreated(NetworkConnectionToClient player, GameObject instance)
+    {
+        BackpackManager.Instance.AddItem(instance.GetComponent<Item>());
     }
 }

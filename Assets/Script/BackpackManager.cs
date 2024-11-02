@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Mirror;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -40,12 +41,42 @@ public class BackpackManager : MonoBehaviour
         RefreshSlots();
     }
     /// <summary>
+    /// 创建物品并添加到背包中
+    /// </summary>
+    /// <param name="itemdata_pth">Resources中要创建的物品的信息的路径</param>
+    private void CreateItem(string itemdata_pth)
+    {
+        GameObject player = GameObject.FindWithTag("LocalPlayer");
+        ItemOwner owner = ItemOwner.PlayerBackpack;
+        Vector3 position = Vector3.zero;
+        Item.Create(itemdata_pth, owner, player);
+    }
+    /// <summary>
+    /// 销毁物品
+    /// </summary>
+    /// <param name="item">要销毁的物品</param>
+    private void DestroyItem(Item item)
+    {
+        GameObject player = GameObject.FindWithTag("LocalPlayer");
+        RemoveItem(item);
+        Item.Destroy(item, player);
+    }
+    /// <summary>
     /// 向背包中添加物品
     /// </summary>
     /// <param name="item">要添加的物品</param>
     public void AddItem(Item item) 
     {
         _itemList.Add(item);
+        RefreshSlots();
+    }
+    /// <summary>
+    /// 从背包中移除物品
+    /// </summary>
+    /// <param name="item">要移除的物品</param>
+    private void RemoveItem(Item item)
+    {
+        _itemList.Remove(item);
         RefreshSlots();
     }
     /// <summary>
@@ -63,11 +94,10 @@ public class BackpackManager : MonoBehaviour
     /// 丢弃背包中的物品到世界
     /// </summary>
     /// <param name="item">要丢弃的物品</param>
-    public void RemoveItem(Item item)
+    public void DropItem(Item item)
     {
+        RemoveItem(item);
         GameObject player = GameObject.FindWithTag("LocalPlayer");
-        _itemList.Remove(item);
-        RefreshSlots();
         player.GetComponent<PlayerItemInteraction>().DropItem(item.gameObject);
     }
     /// <summary>
