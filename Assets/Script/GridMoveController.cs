@@ -198,6 +198,13 @@ public class GridMoveController : MonoBehaviour
                     return; // 如果被门阻挡，直接返回，不进行后面的操作
                 }
 
+                float requiredActionPoint = 0.5f * (pathArray.Length - 1);
+                if (!GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().CheckForEnoughActionPoint(requiredActionPoint))
+                {
+                    Debug.Log("ActionPoint is not enough.");
+                    return; // 如果当前体力值不够，直接返回
+                }
+
                 foreach (var pathPoint in pathArray)
                 {
                     // 将世界坐标转换为GlassTilemap中的网格坐标
@@ -214,6 +221,9 @@ public class GridMoveController : MonoBehaviour
                 // 调用网络同步方法,改变位置并生成对应动画
                 Player.SetPosition(targetWorldPosition, _targetCellPosition, pathArray);
                 StartCoroutine(setMoveCD(duration));
+
+                //移动消耗体力
+                GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().DecreaseActionPoint(requiredActionPoint);
             }
         }
     }

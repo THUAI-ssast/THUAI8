@@ -66,17 +66,23 @@ public class PlayerHealth : NetworkBehaviour
     /// </summary>
     public HealthGUI LegHealthGUI;
 
+    /// <summary>
+    /// 位于左下角的客户端玩家信息面板
+    /// </summary>
+    public PlayerInfoUI LocalPlayerInfoPanel;
 
     // Start is called before the first frame update 
     void Start()
     {
-        // 赋予初始血量
-        HeadHealth = BodyHealth = LegHealth = HeadMaxHealth = BodyMaxHealth = LegMaxHealth = 10;
-        // 获取玩家名字
         if (isLocalPlayer) 
         {
-           CmdSetName(PlayerPrefs.GetString("Name"));
+            // 获取玩家名字
+            CmdSetName(PlayerPrefs.GetString("Name"));
+            // 获取本地玩家信息面板
+            LocalPlayerInfoPanel = UIManager.Instance.MainCanvas.transform.Find("PlayerInfoPanel").gameObject.GetComponent<PlayerInfoUI>();
         }
+        // 赋予初始血量
+        HeadHealth = BodyHealth = LegHealth = HeadMaxHealth = BodyMaxHealth = LegMaxHealth = 10;
     }
 
 
@@ -89,6 +95,10 @@ public class PlayerHealth : NetworkBehaviour
     {
         // 找到对应的血条更新显示
         HeadHealthGUI.UpdateHealthGUILength(HeadMaxHealth, newHealth);
+        if (isLocalPlayer)
+        {
+            LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, HeadMaxHealth, BodyPart.Head);
+        }
     }
 
     /// <summary>
@@ -100,6 +110,10 @@ public class PlayerHealth : NetworkBehaviour
     {
         // 找到对应的血条更新显示
         BodyHealthGUI.UpdateHealthGUILength(BodyMaxHealth, newHealth);
+        if (isLocalPlayer)
+        {
+            LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, BodyMaxHealth, BodyPart.Body);
+        }
     }
 
     /// <summary>
@@ -111,7 +125,11 @@ public class PlayerHealth : NetworkBehaviour
     {
         // 找到对应的血条更新显示
         LegHealthGUI.UpdateHealthGUILength(LegMaxHealth, newHealth);
-    } 
+        if (isLocalPlayer)
+        {
+            LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, LegMaxHealth, BodyPart.Leg);
+        }
+    }
 
     /// <summary>
     /// Command函数，在客户端被调用，但在服务端执行。

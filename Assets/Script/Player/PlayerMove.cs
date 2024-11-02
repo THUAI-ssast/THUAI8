@@ -59,7 +59,6 @@ public class PlayerMove : NetworkBehaviour
     /// <param name="worldPosition">目标位置的世界坐标</param>
     /// <param name="tilePosition">目标位置的Tilemap坐标</param>
     /// <param name="path">移动路径，使用世界坐标，用于生成移动动画</param>
-    /// <returns>是否成功移动</returns>
     [Command]
     public void SetPosition(Vector3 worldPosition, Vector3Int tilePosition, Vector3[] path)
     {
