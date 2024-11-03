@@ -28,6 +28,10 @@ public class UIManager : MonoBehaviour
 
     private List<GameObject> _activeUIList = new List<GameObject>();
 
+    public bool AllowTabOperation = false;
+
+    [SerializeField] private GameObject _resourceUIPanel;
+
     private void Awake()
     {
         if (Instance)
@@ -55,6 +59,8 @@ public class UIManager : MonoBehaviour
         }
         _craftPanel.SetActive(false);
         _bagPanel.SetActive(false);
+
+        _resourceUIPanel.SetActive(false);
 
         _bagPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
@@ -90,13 +96,13 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // if(Input.GetMouseButtonDown(0))
-        // {
-        //     if(ExistingOperationMenu != null)
-        //     {
-        //         Destroy(ExistingOperationMenu);
-        //     }
-        // }
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (AllowTabOperation)
+            {
+                reverseUIActive(_resourceUIPanel);
+            }
+        }
     }
 
     private void reverseUIActive(GameObject ui)

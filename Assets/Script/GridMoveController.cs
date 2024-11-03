@@ -17,6 +17,8 @@ public class GridMoveController : MonoBehaviour
     public Tile doorTileHorizontal;
     public Tile doorTileVertical;
 
+    public Tile resourcePoint;
+
     // A* 寻路相关
     private Seeker _pathSeeker;
     private Transform _pathTarget;
@@ -41,6 +43,8 @@ public class GridMoveController : MonoBehaviour
 
     private Vector3Int? _lastAdjacentDoor; // 相邻门的位置
 
+    private bool _isAtResourcePoint = false;
+
     private void Start()
     {
         Instance = this;
@@ -60,8 +64,10 @@ public class GridMoveController : MonoBehaviour
 
     private void Update()
     {
-        if (!UIManager.Instance.IsUIActivating&&_isMovable&&Player!=null)
+        if (!UIManager.Instance.IsUIActivating && _isMovable && Player != null)
             tryMove();
+
+        CheckResourcePoint();
 
         // 鼠标右键点击门
         if (Input.GetKeyDown(KeyCode.Mouse1) && _lastAdjacentDoor.HasValue)
@@ -75,6 +81,18 @@ public class GridMoveController : MonoBehaviour
                 Player.CmdRotateDoor(doorPosition);
             }
         }
+    }
+
+    /// <summary>
+    /// 检查player是否在resource point上。
+    /// </summary>
+    private void CheckResourcePoint()
+    {
+        Vector3Int playerPosition = _groundTilemap.WorldToCell(Player.transform.position);
+        TileBase tileAtPlayerPosition = _stuffTilemap.GetTile(playerPosition);
+        _isAtResourcePoint = (tileAtPlayerPosition == resourcePoint);
+
+        UIManager.Instance.AllowTabOperation = _isAtResourcePoint;
     }
 
     /// <summary>
