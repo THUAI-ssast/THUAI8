@@ -19,7 +19,6 @@ public class GridMoveController : MonoBehaviour
 
     // A* 寻路相关
     private Seeker _pathSeeker;
-    private Transform _pathTarget;
     private AstarPath _pathBaker;
 
     // 所用Tilemaps
@@ -89,7 +88,6 @@ public class GridMoveController : MonoBehaviour
         var finderObj = Instantiate(Resources.Load<GameObject>(("PathFinder")), Player.transform);
         _pathBaker = finderObj.GetComponent<AstarPath>();
         _pathSeeker = finderObj.GetComponent<Seeker>();
-        _pathTarget = finderObj.transform.GetChild(0);
         updateGraph();
         _gridLine.position = position + new Vector3(0.5f, 0.5f);
     }
@@ -128,7 +126,6 @@ public class GridMoveController : MonoBehaviour
         if (_targetCellPosition != Vector3Int.back)
         {
             var targetWorldPosition = _groundTilemap.CellToWorld(_targetCellPosition) + _cellBias;
-            _pathTarget.position = targetWorldPosition - Player.transform.position;
             _pathSeeker.StartPath(_groundTilemap.CellToWorld(Player.TilePosition) + _cellBias, targetWorldPosition, onPathComplete);
         }
     }
@@ -198,6 +195,13 @@ public class GridMoveController : MonoBehaviour
                     return; // 如果被门阻挡，直接返回，不进行后面的操作
                 }
 
+                float requiredActionPoint = 0.5f * (pathArray.Length - 1);
+                if (!GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().CheckForEnoughActionPoint(requiredActionPoint))
+                {
+                    Debug.Log("ActionPoint is not enough.");
+                    return; // 如果当前体力值不够，直接返回
+                }
+
                 foreach (var pathPoint in pathArray)
                 {
                     // 将世界坐标转换为GlassTilemap中的网格坐标
@@ -214,6 +218,9 @@ public class GridMoveController : MonoBehaviour
                 // 调用网络同步方法,改变位置并生成对应动画
                 Player.SetPosition(targetWorldPosition, _targetCellPosition, pathArray);
                 StartCoroutine(setMoveCD(duration));
+
+                //移动消耗体力
+                GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().DecreaseActionPoint(requiredActionPoint);
             }
         }
     }

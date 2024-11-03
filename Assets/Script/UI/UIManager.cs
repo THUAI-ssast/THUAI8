@@ -26,7 +26,13 @@ public class UIManager : MonoBehaviour
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
 
+
     private List<GameObject> _activeUIList = new List<GameObject>();
+
+    /// <summary>
+    /// BattleScene中的Canvas，供其他GameObject直接使用
+    /// </summary>
+    [SerializeField] public GameObject MainCanvas;
 
     private void Awake()
     {
@@ -75,11 +81,7 @@ public class UIManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            reverseUIActive(_bagPanel);
-            if(_bagPanel.activeSelf == false && ExistingOperationMenu != null)
-            {
-                Destroy(ExistingOperationMenu);
-            }
+            ReverseBagPanel();
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -113,10 +115,19 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void setUIActive(GameObject ui, bool active)
+    public void setUIActive(GameObject ui, bool active)
     {
         if (ui.activeSelf == active)
             return;
         reverseUIActive(ui);
     }    
+
+    public void ReverseBagPanel()
+    {
+        reverseUIActive(_bagPanel);
+        if (_bagPanel.activeSelf == false && ExistingOperationMenu != null)
+        {
+            Destroy(ExistingOperationMenu);
+        }
+    }
 }

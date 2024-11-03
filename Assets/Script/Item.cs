@@ -26,7 +26,6 @@ public class Item : NetworkBehaviour
     private uint _itemID;
     void Awake()
     {
-        _pickUpDistance = 1;
         _itemID = gameObject.GetComponent<NetworkIdentity>().netId;
         if(ItemLocation == null)
         {
@@ -85,7 +84,7 @@ public class Item : NetworkBehaviour
         if(ItemLocation.Owner != ItemOwner.World) return false;
         if(UIManager.Instance.IsUIActivating == true) return false;
         GameObject player = GameObject.FindWithTag("LocalPlayer");
-        if(Vector3.Distance(gameObject.transform.position, player.transform.position) > _pickUpDistance) return false;
+        if (Vector3.Distance(gameObject.transform.position, player.transform.position) > _pickUpDistance) return false;
         return true;
     }
     /// <summary>
