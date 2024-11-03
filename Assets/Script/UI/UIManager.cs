@@ -22,8 +22,16 @@ public class UIManager : MonoBehaviour
     public GameObject BagPanel{ get=>_bagPanel; private set=>_bagPanel=value; }
     [SerializeField]private GameObject _bagPanel;
     private GameObject _craftPanel;
+    private Transform _craftContent;
+    private GameObject _craftWayUIPrefab;
+
 
     private List<GameObject> _activeUIList = new List<GameObject>();
+
+    /// <summary>
+    /// BattleScene中的Canvas，供其他GameObject直接使用
+    /// </summary>
+    [SerializeField] public GameObject MainCanvas;
 
     private void Awake()
     {
@@ -39,7 +47,19 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
+        _craftWayUIPrefab = Resources.Load<GameObject>("UI/CraftWayUI");
         _craftPanel = _bagPanel.transform.Find("CraftPanel").gameObject;
+        _craftContent = _craftPanel.transform.Find("Scroll View/Viewport/Content");
+
+        //初始化craft way ui 需要其父物体active
+        _bagPanel.SetActive(true);
+        _craftPanel.SetActive(true);
+        foreach (CraftWayData craftWayData in Resources.LoadAll<CraftWayData>("ScriptableObject/CraftWay"))
+        {
+            Instantiate(_craftWayUIPrefab,_craftContent).GetComponent<CraftWayUI>().CraftWayData = craftWayData;
+        }
+        _craftPanel.SetActive(false);
+        _bagPanel.SetActive(false);
 
         _bagPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
@@ -52,18 +72,15 @@ public class UIManager : MonoBehaviour
 
         _craftPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() => reverseUIActive(_craftPanel));
-        
+        _craftPanel.transform.Find("ApplyButton").GetComponent<Button>().onClick
+            .AddListener(() => BackpackManager.Instance.DeployCraft(CraftWayUI.SelectedCraftWay));
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            reverseUIActive(_bagPanel);
-            if(_bagPanel.activeSelf == false && ExistingOperationMenu != null)
-            {
-                Destroy(ExistingOperationMenu);
-            }
+            ReverseBagPanel();
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -97,10 +114,19 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void setUIActive(GameObject ui, bool active)
+    public void setUIActive(GameObject ui, bool active)
     {
         if (ui.activeSelf == active)
             return;
         reverseUIActive(ui);
     }    
+
+    public void ReverseBagPanel()
+    {
+        reverseUIActive(_bagPanel);
+        if (_bagPanel.activeSelf == false && ExistingOperationMenu != null)
+        {
+            Destroy(ExistingOperationMenu);
+        }
+    }
 }

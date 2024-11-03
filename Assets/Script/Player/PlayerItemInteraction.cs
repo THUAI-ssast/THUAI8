@@ -37,7 +37,7 @@ public class PlayerItemInteraction : NetworkBehaviour
     public void CreateItem(string itemData_pth, ItemOwner owner, GameObject player)
     {
         ItemData itemData = Resources.Load<ItemData>(itemData_pth);
-        GameObject instance = Instantiate(Resources.Load<GameObject>("Items/General_Item"), Vector3.zero, Quaternion.identity);
+        GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), Vector3.zero, Quaternion.identity);
         instance.GetComponent<SpriteRenderer>().enabled = false;
         instance.GetComponent<SpriteRenderer>().sprite = itemData.ItemIcon;
         Item newItem = instance.AddComponent<Item>();
