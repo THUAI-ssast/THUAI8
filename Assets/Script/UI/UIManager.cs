@@ -23,6 +23,8 @@ public class UIManager : MonoBehaviour
     public GameObject BagPanel{ get=>_bagPanel; private set=>_bagPanel=value; }
     [SerializeField]private GameObject _bagPanel;
     private GameObject _craftPanel;
+    private Transform _craftContent;
+    private GameObject _craftWayUIPrefab;
 
 
     private List<GameObject> _activeUIList = new List<GameObject>();
@@ -46,7 +48,19 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
+        _craftWayUIPrefab = Resources.Load<GameObject>("UI/CraftWayUI");
         _craftPanel = _bagPanel.transform.Find("CraftPanel").gameObject;
+        _craftContent = _craftPanel.transform.Find("Scroll View/Viewport/Content");
+
+        //初始化craft way ui 需要其父物体active
+        _bagPanel.SetActive(true);
+        _craftPanel.SetActive(true);
+        foreach (CraftWayData craftWayData in Resources.LoadAll<CraftWayData>("ScriptableObject/CraftWay"))
+        {
+            Instantiate(_craftWayUIPrefab,_craftContent).GetComponent<CraftWayUI>().CraftWayData = craftWayData;
+        }
+        _craftPanel.SetActive(false);
+        _bagPanel.SetActive(false);
 
         _bagPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
@@ -59,6 +73,8 @@ public class UIManager : MonoBehaviour
 
         _craftPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() => reverseUIActive(_craftPanel));
+        _craftPanel.transform.Find("ApplyButton").GetComponent<Button>().onClick
+            .AddListener(() => BackpackManager.Instance.DeployCraft(CraftWayUI.SelectedCraftWay));
     }
 
     void Update()
