@@ -26,7 +26,6 @@ public class Item : NetworkBehaviour
     private uint _itemID;
     void Awake()
     {
-        _pickUpDistance = 1;
         _itemID = gameObject.GetComponent<NetworkIdentity>().netId;
         if(ItemLocation == null)
         {
