@@ -19,7 +19,6 @@ public class GridMoveController : MonoBehaviour
 
     // A* 寻路相关
     private Seeker _pathSeeker;
-    private Transform _pathTarget;
     private AstarPath _pathBaker;
 
     // 所用Tilemaps
@@ -89,7 +88,6 @@ public class GridMoveController : MonoBehaviour
         var finderObj = Instantiate(Resources.Load<GameObject>(("PathFinder")), Player.transform);
         _pathBaker = finderObj.GetComponent<AstarPath>();
         _pathSeeker = finderObj.GetComponent<Seeker>();
-        _pathTarget = finderObj.transform.GetChild(0);
         updateGraph();
         _gridLine.position = position + new Vector3(0.5f, 0.5f);
     }
@@ -128,7 +126,6 @@ public class GridMoveController : MonoBehaviour
         if (_targetCellPosition != Vector3Int.back)
         {
             var targetWorldPosition = _groundTilemap.CellToWorld(_targetCellPosition) + _cellBias;
-            _pathTarget.position = targetWorldPosition - Player.transform.position;
             _pathSeeker.StartPath(_groundTilemap.CellToWorld(Player.TilePosition) + _cellBias, targetWorldPosition, onPathComplete);
         }
     }

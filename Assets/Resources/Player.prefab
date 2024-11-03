@@ -707,7 +707,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &4897570260609921451
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -794,6 +794,7 @@ MonoBehaviour:
   HeadHealthGUI: {fileID: 8616757558008134107}
   BodyHealthGUI: {fileID: 7636452280903846559}
   LegHealthGUI: {fileID: 5501111243302458364}
+  LocalPlayerInfoPanel: {fileID: 0}
 --- !u!114 &964630081668010627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -821,8 +822,8 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  ActionPoint: 0
   MaxActionPoint: 0
+  LocalPlayerInfoPanel: {fileID: 0}
 --- !u!1 &5150403107971421765
 GameObject:
   m_ObjectHideFlags: 0

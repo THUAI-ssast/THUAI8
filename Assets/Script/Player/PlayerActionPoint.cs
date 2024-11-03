@@ -40,7 +40,7 @@ public class PlayerActionPoint : NetworkBehaviour
         }
         // 初始化体力值上限和体力值
         MaxActionPoint = 20;
-        _currentActionPoint = 0.5f;
+        _currentActionPoint = 15;
     }
 
     /// <summary>
