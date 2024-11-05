@@ -28,7 +28,8 @@ public class UIManager : MonoBehaviour
 
     private List<GameObject> _activeUIList = new List<GameObject>();
 
-    public bool AllowTabOperation = false;
+    public bool allowTabOperation = false;
+    public GameObject currentResourceUIPanel;
 
     [SerializeField] private GameObject _resourceUIPanel;
 
@@ -98,9 +99,9 @@ public class UIManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            if (AllowTabOperation)
+            if (allowTabOperation && currentResourceUIPanel != null)
             {
-                reverseUIActive(_resourceUIPanel);
+                reverseUIActive(currentResourceUIPanel);
             }
         }
     }

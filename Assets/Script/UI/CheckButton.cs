@@ -6,7 +6,7 @@ using TMPro;
 
 public class CheckButton : MonoBehaviour
 {
-    private string newText = "Resources Can Be Checked";
+    private string newText = "Resources Checkable";
 
     private Button button;
     private TextMeshProUGUI buttonText;
