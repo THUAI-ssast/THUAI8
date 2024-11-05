@@ -65,7 +65,7 @@ public class Item : NetworkBehaviour
     {
         player.GetComponent<PlayerItemInteraction>().DestroyItem(item.gameObject);
     }
-
+    
     /// <summary>
     /// 更新物品的拥有者信息
     /// </summary>

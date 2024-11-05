@@ -93,7 +93,7 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetMouseButtonDown(1))
         {
             if (allowTabOperation && currentResourceUIPanel != null)
             {
