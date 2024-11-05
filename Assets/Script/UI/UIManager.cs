@@ -31,8 +31,6 @@ public class UIManager : MonoBehaviour
     public bool allowTabOperation = false;
     public GameObject currentResourceUIPanel;
 
-    [SerializeField] private GameObject _resourceUIPanel;
-
     private void Awake()
     {
         if (Instance)
@@ -60,8 +58,6 @@ public class UIManager : MonoBehaviour
         }
         _craftPanel.SetActive(false);
         _bagPanel.SetActive(false);
-
-        _resourceUIPanel.SetActive(false);
 
         _bagPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
