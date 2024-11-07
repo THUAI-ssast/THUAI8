@@ -9,48 +9,51 @@ using DG.Tweening;
 public class PlayerActionPoint : NetworkBehaviour
 {
     /// <summary>
-    /// мФ╪р╣длЕа╕ж╣
+    /// О©╫О©╫р╣О©╫О©╫О©╫О©╫О©╫ж╣
     /// </summary>
-    [SyncVar(hook = nameof(ActionPointChange))] private float _currentActionPoint;
+    [SyncVar(hook = nameof(ActionPointChange))] private float _currentActionPoint = 15;
+
+    public float CurrentActionPoint { get => _currentActionPoint; }
 
     /// <summary>
-    /// мФ╪р╣длЕа╕ж╣иооч
+    /// О©╫О©╫р╣О©╫О©╫О©╫О©╫О©╫ж╣О©╫О©╫О©╫О©╫
     /// </summary>
-    [SerializeField] public float MaxActionPoint;
+    [SerializeField] private float _maxActionPoint = 20;
+
+    public float MaxActionPoint { get => _maxActionPoint; }
 
     /// <summary>
-    /// н╩сзвСоб╫г╣д©м╩╖╤кмФ╪рпео╒цФ╟Е
+    /// н╩О©╫О©╫О©╫О©╫О©╫б╫г╣д©м╩О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫о╒О©╫О©╫О©╫
     /// </summary>
     public PlayerInfoUI LocalPlayerInfoPanel;
 
     /// <summary>
-    /// сцсзотй╬лЕа╕╡╩вЦ╣д╬╞╦Фпео╒╣дп╜Ёл
+    /// О©╫О©╫О©╫О©╫О©╫О©╫й╬О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫д╬О©╫О©╫О©╫О©╫О©╫о╒О©╫О©╫п╜О©╫О©╫
     /// </summary>
     private Coroutine displayCoroutine;
 
     /// <summary>
-    /// ЁУй╪╩╞мФ╪рлЕа╕ж╣
+    /// О©╫О©╫й╪О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ж╣
     /// </summary>
     void Start()
     {
-        // ╩Ях║пео╒цФ╟Е
+        // О©╫О©╫х║О©╫О©╫о╒О©╫О©╫О©╫
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel = UIManager.Instance.MainCanvas.transform.Find("PlayerInfoPanel").gameObject.GetComponent<PlayerInfoUI>();
+            LocalPlayerInfoPanel.UpdateActionPoint(_currentActionPoint, MaxActionPoint);
         }
-        // ЁУй╪╩╞лЕа╕ж╣иооч╨млЕа╕ж╣
-        MaxActionPoint = 20;
-        _currentActionPoint = 15;
+        // О©╫О©╫й╪О©╫О©╫О©╫О©╫О©╫О©╫ж╣О©╫О©╫О©╫ч╨О©╫О©╫О©╫О©╫О©╫ж╣
     }
 
     /// <summary>
-    /// hook╨╞йЩё╛╣╠ActionPoint╦д╠Д╨Свт╤╞╠╩╣Всц
+    /// hookО©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ActionPointО©╫д╠О©╫О©╫О©╫т╤О©╫О©╫О©╫О©╫О©╫О©╫О©╫
     /// </summary>
     /// <param name="oldActionPoint"></param>
     /// <param name="newActionPoint"></param>
     public void ActionPointChange(float oldActionPoint, float newActionPoint)
     {
-        // ╦ЭпбвСоб╫г╣дпео╒цФ╟Е
+        // О©╫О©╫О©╫О©╫О©╫О©╫О©╫б╫г╣О©╫О©╫О©╫о╒О©╫О©╫О©╫
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel.UpdateActionPoint(newActionPoint, MaxActionPoint);
@@ -58,11 +61,11 @@ public class PlayerActionPoint : NetworkBehaviour
     }
 
     /// <summary>
-    /// сцсзеп╤о╣╠г╟лЕа╕йг╥ЯвЦ╧╩
+    /// О©╫О©╫О©╫О©╫О©╫п╤о╣О©╫г╟О©╫О©╫О©╫О©╫О©╫г╥О©╫О©╫Ц╧╩
     /// </summary>
-    /// <param name="requiredActionPoint">╢Ссз0╣дйЩё╛╢З╠М╡ывВпХр╙╣длЕа╕ж╣</param>
-    /// <param name="isDisplayUI">тзлЕа╕╡╩вЦй╠йг╥ЯоРмФ╪ротй╬╬╞╦Фё╛д╛хойгtrue</param>
-    /// <returns>╣╠г╟лЕа╕йг╥ЯвЦртмЙЁи╡ывВё╛true╢З╠МлЕа╕вЦ╧╩</returns>
+    /// <param name="requiredActionPoint">О©╫О©╫О©╫О©╫0О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫р╙О©╫О©╫О©╫О©╫О©╫О©╫ж╣</param>
+    /// <param name="isDisplayUI">О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫й╠О©╫г╥О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫й╬О©╫О©╫О©╫Фё╛д╛О©╫О©╫О©╫О©╫true</param>
+    /// <returns>О©╫О©╫г╟О©╫О©╫О©╫О©╫О©╫г╥О©╫О©╫О©╫О©╫О©╫О©╫О©╫и╡О©╫О©╫О©╫О©╫О©╫trueО©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫Ц╧╩</returns>
     public bool CheckForEnoughActionPoint(float requiredActionPoint, bool isDisplayUI = true)
     {
         bool isEnough = (_currentActionPoint - requiredActionPoint) >= 0;
@@ -78,28 +81,29 @@ public class PlayerActionPoint : NetworkBehaviour
     }
 
     /// <summary>
-    /// тЖ╪смФ╪р╣длЕа╕ё╛вН╦ътЖ╪сжалЕа╕иооч
+    /// О©╫О©╫О©╫О©╫О©╫О©╫р╣О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
     /// </summary>
-    /// <param name="increase">╢Ссз0╣дйЩё╛╠Мй╬р╙тЖ╪с╣длЕа╕ж╣</param>
+    /// <param name="increase">О©╫О©╫О©╫О©╫0О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫й╬р╙О©╫О©╫О©╫с╣О©╫О©╫О©╫О©╫О©╫ж╣</param>
     public void IncreaseActionPoint(float increase)
     {
-        ChangeActionPoint(increase);
+        CmdChangeActionPoint(increase);
     }
 
     /// <summary>
-    /// ╪УиымФ╪р╣длЕа╕ё╛хТлЕа╕╡╩вЦтР╡╩╩А╪УиылЕа╕ж╣║ётз╣Всц╦ц╥╫╥╗ж╝г╟с╕╣ВсцCheckForEnoughPoint╫ЬпплЕа╕йг╥ЯвЦ╧╩╣деп╤о
+    /// О©╫О©╫О©╫О©╫О©╫О©╫р╣О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫Р╡╩╩О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ж╣О©╫О©╫О©╫з╣О©╫О©╫ц╦ц╥О©╫О©╫О©╫ж╝г╟с╕О©╫О©╫О©╫О©╫CheckForEnoughPointО©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫г╥О©╫О©╫Ц╧╩О©╫О©╫О©╫п╤О©╫
     /// </summary>
-    /// <param name="decrease">╢Ссз0╣дйЩё╛╠Мй╬р╙╪Уиы╣длЕа╕ж╣</param>
+    /// <param name="decrease">О©╫О©╫О©╫О©╫0О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫й╬р╙О©╫О©╫О©╫ы╣О©╫О©╫О©╫О©╫О©╫ж╣</param>
     public void DecreaseActionPoint(float decrease)
     {
-        ChangeActionPoint(-decrease);
+        CmdChangeActionPoint(-decrease);
     }
 
     /// <summary>
-    /// ╦д╠ДмФ╪рлЕа╕╣дмЁр╩╫с©з║ё
+    /// О©╫д╠О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫мЁр╩О©╫с©з║О©╫
     /// </summary>
-    /// <param name="increase">р╙╦д╠Д╣длЕа╕ж╣ё╨╣╠increase╢Ссз0й╠ё╛тЖ╪соЮс╕╣длЕа╕ж╣ё╛вН╦ътЖ╪сжалЕа╕ж╣иоочё╩╣╠increaseп║сз0й╠ё╛╪УиыоЮс╕╣длЕа╕ж╣</param>
-    private void ChangeActionPoint(float increase)
+    /// <param name="increase">р╙О©╫д╠О©╫О©╫О©╫О©╫О©╫О©╫ж╣О©╫О©╫О©╫О©╫increaseО©╫О©╫О©╫О©╫0й╠О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫с╕О©╫О©╫О©╫О©╫О©╫О©╫ж╣О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ж╣О©╫О©╫О©╫чёО©╫О©╫О©╫increaseп║О©╫О©╫0й╠О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫с╕О©╫О©╫О©╫О©╫О©╫О©╫ж╣</param>
+    [Command]
+    private void CmdChangeActionPoint(float increase)
     {
         float tempActionPoint = _currentActionPoint + increase;
         if (tempActionPoint > MaxActionPoint)
@@ -113,7 +117,7 @@ public class PlayerActionPoint : NetworkBehaviour
     }
 
     /// <summary>
-    /// ╣╞ЁЖUIлАй╬мФ╪рлЕа╕ж╣╡╩вЦ
+    /// О©╫О©╫О©╫О©╫UIО©╫О©╫й╬О©╫О©╫О©╫О©╫О©╫О©╫О©╫ж╣О©╫О©╫О©╫О©╫
     /// </summary>
     private IEnumerator DisplayAPNotEnoughWarning()
     {

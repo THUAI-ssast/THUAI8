@@ -54,6 +54,7 @@ public class UIManager : MonoBehaviour
         //初始化craft way ui 需要其父物体active
         _bagPanel.SetActive(true);
         _craftPanel.SetActive(true);
+        CraftWayUI.ClearItemList();
         foreach (CraftWayData craftWayData in Resources.LoadAll<CraftWayData>("ScriptableObject/CraftWay"))
         {
             Instantiate(_craftWayUIPrefab,_craftContent).GetComponent<CraftWayUI>().CraftWayData = craftWayData;

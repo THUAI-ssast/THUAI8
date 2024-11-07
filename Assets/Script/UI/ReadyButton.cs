@@ -20,7 +20,7 @@ public class ReadyButton : MonoBehaviour
     }
     public void OnButtonClick()
     {
-        Debug.Log("OnClick.");
+        // Debug.Log("OnClick.");
         if(RoundManager.Instance.State == RoundManager.RoundState.NotReady)
         {   
             RoundManager.Instance.State = RoundManager.RoundState.PreReady;

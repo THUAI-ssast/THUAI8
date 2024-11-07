@@ -97,7 +97,7 @@ public class RoundManager : NetworkBehaviour
     {
         if(State == RoundState.NotReady)
         {
-            Debug.Log(_timeText);
+            // Debug.Log(_timeText);
             _round.transform.GetChild(0).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = _timeText;
         }
     }
@@ -122,7 +122,8 @@ public class RoundManager : NetworkBehaviour
         _round.transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().color = new Color32(203, 255, 252, 255);// blue
         _round.transform.GetChild(0).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = null;
         _round.transform.GetChild(0).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().fontSize = 20;
-        // TODO:增加体力
+        GameObject player = GameObject.FindWithTag("LocalPlayer");
+        player.GetComponent<PlayerActionPoint>().IncreaseActionPoint(2);
     }
     IEnumerator EndRoundUI()
     {

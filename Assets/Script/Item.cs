@@ -11,11 +11,11 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 一类物品的数据
     /// </summary>
-    [SerializeField] public ItemData ItemData;
+    public ItemData ItemData;
     /// <summary>
     /// 物品的拥有者信息
     /// </summary>
-    [SerializeField] public ItemOwnerInfo ItemLocation;
+    public ItemOwnerInfo ItemLocation;
     /// <summary>
     /// 物品的拾取距离
     /// </summary>
