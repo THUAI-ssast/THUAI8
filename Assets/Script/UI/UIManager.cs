@@ -7,18 +7,17 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ����ս������������UI��չʾ��������Ϊ
+/// 管理战斗场景内所有UI的展示、交互行为
 /// </summary>
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
     public bool IsUIActivating => _activeUIList.Count > 0;
-    public bool MenuActivating = false;
     public GameObject ExistingOperationMenu;
 
     /// <summary>
-    /// ����UI����
+    /// 背包UI界面
     /// </summary>
     public GameObject BagPanel{ get=>_bagPanel; private set=>_bagPanel=value; }
     [SerializeField]private GameObject _bagPanel;
@@ -55,6 +54,7 @@ public class UIManager : MonoBehaviour
         //初始化craft way ui 需要其父物体active
         _bagPanel.SetActive(true);
         _craftPanel.SetActive(true);
+        CraftWayUI.ClearItemList();
         foreach (CraftWayData craftWayData in Resources.LoadAll<CraftWayData>("ScriptableObject/CraftWay"))
         {
             Instantiate(_craftWayUIPrefab,_craftContent).GetComponent<CraftWayUI>().CraftWayData = craftWayData;

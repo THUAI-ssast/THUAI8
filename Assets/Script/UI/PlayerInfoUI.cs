@@ -4,52 +4,52 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// ×óÏÂ½ÇÍæ¼ÒÐÅÏ¢Ãæ°åUI
+/// ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½UI
 /// </summary>
 public class PlayerInfoUI : MonoBehaviour
 {
     /// <summary>
-    /// ÐÅÏ¢Ãæ°åÖÐµÄÌåÁ¦Öµ²¿·Ö
+    /// ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [SerializeField] private GameObject APPanel;
     /// <summary>
-    /// ÐÅÏ¢Ãæ°åÖÐµÄÍ·²¿ÑªÁ¿²¿·Ö
+    /// ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ðµï¿½Í·ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [SerializeField] private GameObject HeadHPPanel;
     /// <summary>
-    /// ÐÅÏ¢Ãæ°åÖÐµÄÉíÌåÑªÁ¿²¿·Ö
+    /// ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [SerializeField] private GameObject BodyHPPanel;
     /// <summary>
-    /// ÐÅÏ¢Ãæ°åÖÐµÄÍÈ²¿ÑªÁ¿²¿·Ö
+    /// ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½È²ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     [SerializeField] private GameObject LegHPPanel;
 
     // Start is called before the first frame update
     void Start()
     {
-        // ÏÔÊ¾Íæ¼ÒÃû×Ö
+        // ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         transform.Find("NameText").gameObject.GetComponent<TextMeshProUGUI>().text = PlayerPrefs.GetString("Name");
     }
 
     /// <summary>
-    /// ¸üÐÂÐÅÏ¢Ãæ°åÖÐµÄÌåÁ¦Öµ²¿·Ö
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    /// <param name="newActionPoint">¸üÐÂºóµÄÌåÁ¦Öµ</param>
-    /// <param name="maxActionPoint">ÌåÁ¦ÖµÉÏÏÞ</param>
+    /// <param name="newActionPoint">ï¿½ï¿½ï¿½Âºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ</param>
+    /// <param name="maxActionPoint">ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½</param>
     public void UpdateActionPoint(float newActionPoint, float maxActionPoint)
-    {
+    {  
         APPanel.transform.Find("Bar").GetComponent<UnityEngine.UI.Image>().fillAmount = newActionPoint/ maxActionPoint;
         Debug.Log(newActionPoint / maxActionPoint);
         APPanel.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = newActionPoint.ToString();
     }
 
     /// <summary>
-    /// ¸üÐÂÐÅÏ¢Ãæ°åÖÐµÄÑªÁ¿²¿·Ö£¬°üÀ¨Í·²¿¡¢ÉíÌåºÍÍÈ²¿
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ðµï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È²ï¿½
     /// </summary>
-    /// <param name="newHealth">¸üÐÂºóµÄÑªÁ¿</param>
-    /// <param name="maxHealth">ÑªÁ¿ÉÏÏÞ</param>
-    /// <param name="bodyPart">BodyPartÀàÐÍµÄÃ¶¾Ù±äÁ¿£¬ÓÃÓÚÖ¸¶¨¸üÐÂµÄÑªÁ¿ÊôÓÚÍ·²¿¡¢ÉíÌåºÍÍÈ²¿ÖÐµÄÄÄÒ»¸ö</param>
+    /// <param name="newHealth">ï¿½ï¿½ï¿½Âºï¿½ï¿½Ñªï¿½ï¿½</param>
+    /// <param name="maxHealth">Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+    /// <param name="bodyPart">BodyPartï¿½ï¿½ï¿½Íµï¿½Ã¶ï¿½Ù±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È²ï¿½ï¿½Ðµï¿½ï¿½ï¿½Ò»ï¿½ï¿½</param>
     public void UpdateHealthPoint(float newHealth, float maxHealth, BodyPart bodyPart)
     {
         GameObject HPPanel;
@@ -73,7 +73,7 @@ public class PlayerInfoUI : MonoBehaviour
 }
 
 /// <summary>
-/// ÉíÌå²¿Î»Ã¶¾ÙÀà
+/// ï¿½ï¿½ï¿½å²¿Î»Ã¶ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 public enum BodyPart
 {
