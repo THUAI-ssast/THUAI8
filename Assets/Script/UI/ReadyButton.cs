@@ -30,24 +30,16 @@ public class ReadyButton : MonoBehaviour
         {   
             RoundManager.Instance.State = RoundManager.RoundState.PreReady;
             gameObject.GetComponent<Image>().color = new Color32(181, 242, 139, 255); // green
-            gameObject.transform.GetComponent<VerticalLayoutGroup>().padding.top = 10;
-            gameObject.transform.GetChild(1).gameObject.SetActive(true);
-            gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>().fontSize = 14;
-            gameObject.transform.GetChild(0).gameObject.SetActive(true);
-            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 14;
-            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "准备\n结束";
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 18;
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "确认\n结束";
             return ;
         }
         if(RoundManager.Instance.State == RoundManager.RoundState.PreReady)
         {
             RoundManager.Instance.State = RoundManager.RoundState.Ready;
             gameObject.GetComponent<Image>().color = new Color32(255, 217, 103, 255); // yellow
-            gameObject.transform.GetComponent<VerticalLayoutGroup>().padding.top = 10;
-            gameObject.transform.GetChild(1).gameObject.SetActive(true);
-            gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>().fontSize = 14;
-            gameObject.transform.GetChild(0).gameObject.SetActive(true);
             gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 14;
-            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = $"等待其他\n玩家";
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "等待\n其他玩家";
             GameObject player = GameObject.FindWithTag("LocalPlayer");
             player.GetComponent<PlayerRound>().CmdReady(true);
             return ;
@@ -56,9 +48,8 @@ public class ReadyButton : MonoBehaviour
         {
             RoundManager.Instance.State = RoundManager.RoundState.NotReady;
             gameObject.GetComponent<Image>().color = new Color32(203, 255, 252, 255); // blue
-            gameObject.transform.GetComponent<VerticalLayoutGroup>().padding.top = 0;
-            gameObject.transform.GetChild(0).gameObject.SetActive(false);
-            gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>().fontSize = 20;
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 18;
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "结束\n回合";
             GameObject player = GameObject.FindWithTag("LocalPlayer");
             player.GetComponent<PlayerRound>().CmdReady(false);
             return ;

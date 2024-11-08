@@ -12,8 +12,6 @@ public class PlayerRound : NetworkBehaviour
     [Command]
     public void CmdReady(bool isReady)
     {
-        Debug.Log("CmdReady");
-        Debug.Log("isReady: " + isReady);
         RoundManager.Instance.Ready(GetComponent<NetworkIdentity>().netId, isReady);
     }
 }

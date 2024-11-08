@@ -39,13 +39,21 @@ public class RoundManager : NetworkBehaviour
     /// </summary>
     private float _timer;
     /// <summary>
+    /// 已准备玩家列表
+    /// </summary>
+    private List<uint> _readyPlayer = new List<uint>();
+    /// <summary>
     /// 回合计时器文本
     /// </summary>
     [SyncVar] private string _timeText;
     /// <summary>
-    /// 已准备玩家列表
+    /// 已准备玩家数量
     /// </summary>
-    [SyncVar] private List<uint> _readyPlayer = new List<uint>();
+    [SyncVar(hook = nameof(UpdateReadyButtonUIReady))]  private int _readyPlayerCount;
+    /// <summary>
+    /// 局内玩家数量
+    /// </summary>
+    [SyncVar(hook = nameof(UpdateReadyButtonUIAll))] private int _playerCount;
     private void Awake()
     {
         if (Instance)
@@ -69,15 +77,16 @@ public class RoundManager : NetworkBehaviour
             StartCoroutine(RoundTimer());
         }
     }
+    /// <summary>
+    /// 回合初始化设置。
+    /// </summary>
     void InitRoundSetting()
     {
         State = RoundState.NotReady;
         _round.transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().color = new Color32(203, 255, 252, 255);// blue
-        _round.transform.GetChild(0).GetComponent<VerticalLayoutGroup>().padding.top = 0;
-        _round.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-        _round.transform.GetChild(0).GetChild(1).gameObject.SetActive(true);
-        _round.transform.GetChild(0).GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = null;
-        _round.transform.GetChild(0).GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().fontSize = 20;
+        _round.transform.GetChild(0).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().fontSize = 18;
+        _round.transform.GetChild(0).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = "结束\n回合";
+        _round.transform.GetChild(3).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = null;
     }
     /// <summary>
     /// 玩家准备状态变化。从[Command]中调用，仅在服务器上执行。
@@ -88,7 +97,7 @@ public class RoundManager : NetworkBehaviour
     {
         if(isReady == true) _readyPlayer.Add(playerID);
         else _readyPlayer.Remove(playerID);
-        Debug.Log("ReadyPlayer: " + _readyPlayer.Count);
+        _readyPlayerCount = _readyPlayer.Count;
     }
     /// <summary>
     /// 世界回合循环流程。准备玩家数等于连接玩家数量或计时器结束时，结束回合。
@@ -96,14 +105,13 @@ public class RoundManager : NetworkBehaviour
     /// <returns></returns>
     IEnumerator RoundTimer()
     {
-        Debug.Log("EnterGame");
         StartRound();
         yield return new WaitForSeconds(2);
         while (true)
         {
-            if (_readyPlayer.Count == NetworkServer.connections.Count)
+            _playerCount = NetworkServer.connections.Count;
+            if (_readyPlayer.Count == _playerCount)
             {
-                Debug.Log("Ready to end");
                 EndRoundOnServer();
                 yield return new WaitForSeconds(2);
                 StartRound();
@@ -151,7 +159,7 @@ public class RoundManager : NetworkBehaviour
     [ClientRpc]
     void UpdateTimeUI()
     {
-        _round.transform.GetChild(0).GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = _timeText;
+        _round.transform.GetChild(3).GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = _timeText;
     }
     /// <summary>
     /// 客户端开始回合UI显示。
@@ -168,7 +176,6 @@ public class RoundManager : NetworkBehaviour
     IEnumerator StartRoundUI()
     {
         _round.transform.GetChild(1).gameObject.SetActive(true);
-        Debug.Log("回合开始");
         yield return new WaitForSeconds(1);
         _round.transform.GetChild(1).gameObject.SetActive(false);
     }
@@ -190,8 +197,33 @@ public class RoundManager : NetworkBehaviour
     IEnumerator EndRoundUI()
     {
         _round.transform.GetChild(2).gameObject.SetActive(true);
-        Debug.Log("回合结束");
         yield return new WaitForSeconds(1);
         _round.transform.GetChild(2).gameObject.SetActive(false);
+    }
+    /// <summary>
+    /// 准备玩家数量的hook函数，进行准备按钮的UI更新。
+    /// </summary>
+    /// <param name="oldReadyPlayer">要求格式</param>
+    /// <param name="newReadyPlayer">要求格式</param>
+    private void UpdateReadyButtonUIReady(int oldReadyPlayer, int newReadyPlayer)
+    {
+        GameObject readyButton = _round.transform.GetChild(0).gameObject;
+        if(State == RoundState.Ready)
+        {
+            readyButton.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = $"等待\n其他玩家\n({newReadyPlayer}/{_playerCount})";
+        }
+    }
+    /// <summary>
+    /// 局内玩家总数的hook函数，进行准备按钮的UI更新。
+    /// </summary>
+    /// <param name="oldPlayerCount">要求格式</param>
+    /// <param name="newPlayerCount">要求格式</param>
+    private void UpdateReadyButtonUIAll(int oldPlayerCount, int newPlayerCount)
+    {
+        GameObject readyButton = _round.transform.GetChild(0).gameObject;
+        if(State == RoundState.Ready)
+        {
+            readyButton.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = $"等待\n其他玩家\n({_readyPlayerCount}/{newPlayerCount})";
+        }
     }
 }

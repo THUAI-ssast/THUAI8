@@ -92,7 +92,7 @@ public class Item : NetworkBehaviour
     /// 右键点击物品拾取物品到背包
     /// </summary>
     private void OnMouseOver()
-    {
+    {  
         if(Input.GetMouseButtonDown(1) && CanBePickedUp())
         {
             GameObject player = GameObject.FindWithTag("LocalPlayer");
