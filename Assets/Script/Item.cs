@@ -11,11 +11,11 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 一类物品的数据
     /// </summary>
-    [SerializeField] public ItemData ItemData;
+    public ItemData ItemData;
     /// <summary>
     /// 物品的拥有者信息
     /// </summary>
-    [SerializeField] public ItemOwnerInfo ItemLocation;
+    public ItemOwnerInfo ItemLocation;
     /// <summary>
     /// 物品的拾取距离
     /// </summary>
@@ -26,7 +26,6 @@ public class Item : NetworkBehaviour
     private uint _itemID;
     void Awake()
     {
-        _pickUpDistance = 1;
         _itemID = gameObject.GetComponent<NetworkIdentity>().netId;
         if(ItemLocation == null)
         {
@@ -85,7 +84,7 @@ public class Item : NetworkBehaviour
         if(ItemLocation.Owner != ItemOwner.World) return false;
         if(UIManager.Instance.IsUIActivating == true) return false;
         GameObject player = GameObject.FindWithTag("LocalPlayer");
-        if(Vector3.Distance(gameObject.transform.position, player.transform.position) > _pickUpDistance) return false;
+        if (Vector3.Distance(gameObject.transform.position, player.transform.position) > _pickUpDistance) return false;
         return true;
     }
     /// <summary>

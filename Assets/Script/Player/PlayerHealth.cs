@@ -5,123 +5,154 @@ using UnityEngine;
 using UnityEngine.XR;
 
 /// <summary>
-/// ¸ÃÀàÖÐ±£´æÁËÍæ¼ÒµÄÃû×Ö¡¢ÑªÁ¿ÉÏÏÞºÍµ±Ç°ÑªÁ¿£¬ÒÔ¼°´¦ÀíÑªÁ¿±ä»¯Âß¼­µÄ·½·¨
+/// ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½Ö¡ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ÞºÍµï¿½Ç°Ñªï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½Ñªï¿½ï¿½ï¿½ä»¯ï¿½ß¼ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
 /// </summary>
 public class PlayerHealth : NetworkBehaviour
 {
     /// <summary>
-    /// Íæ¼ÒµÄÃû×Ö
+    /// ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    [SyncVar] public string Name;
+    [SyncVar] private string _name;
+
+    public string Name { get => _name; }
     
     /// <summary>
-    /// Íæ¼ÒµÄ×ÜÑªÁ¿ÉÏÏÞ
+    /// ï¿½ï¿½Òµï¿½ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    public float TotalMaxHealth { get => HeadMaxHealth + BodyMaxHealth + LegMaxHealth; }
+    public float TotalMaxHealth { get => _headMaxHealth + _bodyMaxHealth + _legMaxHealth; }
     /// <summary>
-    /// Íæ¼ÒµÄÍ·²¿ÑªÁ¿ÉÏÏÞ
+    /// ï¿½ï¿½Òµï¿½Í·ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    public float HeadMaxHealth;
+    private float _headMaxHealth = 10;
     /// <summary>
-    /// Íæ¼ÒµÄÉíÌåÑªÁ¿ÉÏÏÞ
+    /// ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    public float BodyMaxHealth;
+    private float _bodyMaxHealth = 10;
     /// <summary>
-    /// Íæ¼ÒµÄÍÈ²¿ÑªÁ¿ÉÏÏÞ
+    /// ï¿½ï¿½Òµï¿½ï¿½È²ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    public float LegMaxHealth;
+    private float _legMaxHealth = 10;
+
+    public float HeadMaxHealth { get => _headMaxHealth; }
+    public float BodyMaxHealth { get => _bodyMaxHealth; }
+    public float LegMaxHealth { get => _legMaxHealth; }
 
     /// <summary>
-    /// Íæ¼ÒµÄµ±Ç°×ÜÑªÁ¿
+    /// ï¿½ï¿½ÒµÄµï¿½Ç°ï¿½ï¿½Ñªï¿½ï¿½
     /// </summary>
-    public float TotalHealth { get => HeadHealth + BodyHealth + LegHealth; }
+    public float TotalHealth { get => _headHealth + _bodyHealth + _legHealth; }
     /// <summary>
-    /// Íæ¼ÒµÄµ±Ç°Í·²¿ÑªÁ¿£¬±ä»¯Ê±»áµ÷ÓÃHeadHealthChangeº¯Êý
+    /// ï¿½ï¿½ÒµÄµï¿½Ç°Í·ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ä»¯Ê±ï¿½ï¿½ï¿½ï¿½ï¿½HeadHealthChangeï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    [SyncVar(hook = nameof(HeadHealthChange))] public float HeadHealth;
+    [SyncVar(hook = nameof(HeadHealthChange))] private float _headHealth = 10;
     /// <summary>
-    /// Íæ¼ÒµÄµ±Ç°ÉíÌåÑªÁ¿£¬±ä»¯Ê±»áµ÷ÓÃBodyHealthChangeº¯Êý
+    /// ï¿½ï¿½ÒµÄµï¿½Ç°ï¿½ï¿½ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ä»¯Ê±ï¿½ï¿½ï¿½ï¿½ï¿½BodyHealthChangeï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    [SyncVar(hook = nameof(BodyHealthChange))] public float BodyHealth;
+    [SyncVar(hook = nameof(BodyHealthChange))] private float _bodyHealth = 10;
     /// <summary>
-    /// Íæ¼ÒµÄµ±Ç°ÍÈ²¿ÑªÁ¿£¬±ä»¯Ê±»áµ÷ÓÃLegHealthChangeº¯Êý
+    /// ï¿½ï¿½ÒµÄµï¿½Ç°ï¿½È²ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ä»¯Ê±ï¿½ï¿½ï¿½ï¿½ï¿½LegHealthChangeï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    [SyncVar(hook = nameof(LegHealthChange))] public float LegHealth;
+    [SyncVar(hook = nameof(LegHealthChange))] private float _legHealth = 10;
+
+    public float HeadHealth { get => _headHealth; }
+    public float BodyHealth { get => _bodyHealth; }
+    public float LegHealth { get => _legHealth; }
 
     /// <summary>
-    /// ¶ÔÓ¦µÄÍæ¼Ò¶ÔÏóTransform
+    /// ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Ò¶ï¿½ï¿½ï¿½Transform
     /// </summary>
     public Transform TargetPlayer;
 
     /// <summary>
-    /// Íæ¼ÒµÄÍ·²¿ÑªÌõUI
+    /// ï¿½ï¿½Òµï¿½Í·ï¿½ï¿½Ñªï¿½ï¿½UI
     /// </summary>
     public HealthGUI HeadHealthGUI;
     /// <summary>
-    /// Íæ¼ÒµÄÉíÌåÑªÌõUI
+    /// ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½Ñªï¿½ï¿½UI
     /// </summary>
     public HealthGUI BodyHealthGUI;
     /// <summary>
-    /// Íæ¼ÒµÄÍÈ²¿ÑªÌõUI
+    /// ï¿½ï¿½Òµï¿½ï¿½È²ï¿½Ñªï¿½ï¿½UI
     /// </summary>
     public HealthGUI LegHealthGUI;
 
+    /// <summary>
+    /// Î»ï¿½ï¿½ï¿½ï¿½ï¿½Â½ÇµÄ¿Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½
+    /// </summary>
+    private PlayerInfoUI LocalPlayerInfoPanel;
 
     // Start is called before the first frame update 
     void Start()
     {
-        // ¸³Óè³õÊ¼ÑªÁ¿
-        HeadHealth = BodyHealth = LegHealth = HeadMaxHealth = BodyMaxHealth = LegMaxHealth = 10;
-        // »ñÈ¡Íæ¼ÒÃû×Ö
+        Debug.Log(TargetPlayer.gameObject.tag);
         if (isLocalPlayer) 
         {
-           CmdSetName(PlayerPrefs.GetString("Name"));
+            // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            CmdSetName(PlayerPrefs.GetString("Name"));
+            // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½
+            LocalPlayerInfoPanel = UIManager.Instance.MainCanvas.transform.Find("PlayerInfoPanel").gameObject.GetComponent<PlayerInfoUI>();
+            LocalPlayerInfoPanel.UpdateHealthPoint(_headHealth, _headMaxHealth, BodyPart.Head);
+            LocalPlayerInfoPanel.UpdateHealthPoint(_bodyHealth, _bodyMaxHealth, BodyPart.Body);
+            LocalPlayerInfoPanel.UpdateHealthPoint(_legHealth, _legMaxHealth, BodyPart.Leg);
         }
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼Ñªï¿½ï¿½
     }
 
 
     /// <summary>
-    /// hookº¯Êý£¬µ±HeadHealth¸Ä±äºó×Ô¶¯±»µ÷ÓÃ
+    /// hookï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HeadHealthï¿½Ä±ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     /// <param name="oldHealth"></param>
     /// <param name="newHealth"></param>
     public void HeadHealthChange(float oldHealth, float newHealth)
     {
-        // ÕÒµ½¶ÔÓ¦µÄÑªÌõ¸üÐÂÏÔÊ¾
-        HeadHealthGUI.UpdateHealthGUILength(HeadMaxHealth, newHealth);
+        // ï¿½Òµï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
+        HeadHealthGUI.UpdateHealthGUILength(_headMaxHealth, newHealth);
+        if (isLocalPlayer)
+        {
+            LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _headMaxHealth, BodyPart.Head);
+        }
     }
 
     /// <summary>
-    /// hookº¯Êý£¬µ±BodyHealth¸Ä±äºó×Ô¶¯±»µ÷ÓÃ
+    /// hookï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½BodyHealthï¿½Ä±ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     /// <param name="oldHealth"></param>
     /// <param name="newHealth"></param>
     public void BodyHealthChange(float oldHealth, float newHealth)
     {
-        // ÕÒµ½¶ÔÓ¦µÄÑªÌõ¸üÐÂÏÔÊ¾
-        BodyHealthGUI.UpdateHealthGUILength(BodyMaxHealth, newHealth);
+        // ï¿½Òµï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
+        BodyHealthGUI.UpdateHealthGUILength(_bodyMaxHealth, newHealth);
+        if (isLocalPlayer)
+        {
+            LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _bodyMaxHealth, BodyPart.Body);
+        }
     }
 
     /// <summary>
-    /// hookº¯Êý£¬µ±LegHealth¸Ä±äºó×Ô¶¯±»µ÷ÓÃ
+    /// hookï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½LegHealthï¿½Ä±ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
     /// <param name="oldHealth"></param>
     /// <param name="newHealth"></param>
     public void LegHealthChange(float oldHealth, float newHealth)
     {
-        // ÕÒµ½¶ÔÓ¦µÄÑªÌõ¸üÐÂÏÔÊ¾
-        LegHealthGUI.UpdateHealthGUILength(LegMaxHealth, newHealth);
-    } 
+        // ï¿½Òµï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Ñªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
+        LegHealthGUI.UpdateHealthGUILength(_legMaxHealth, newHealth);
+        if (isLocalPlayer)
+        {
+            LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _legMaxHealth, BodyPart.Leg);
+        }
+    }
 
     /// <summary>
-    /// Commandº¯Êý£¬ÔÚ¿Í»§¶Ë±»µ÷ÓÃ£¬µ«ÔÚ·þÎñ¶ËÖ´ÐÐ¡£
-    /// Ïò·þÎñ¶ËÍ¬²½Íæ¼ÒµÄÃû×Ö
+    /// Commandï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿Í»ï¿½ï¿½Ë±ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½Ö´ï¿½Ð¡ï¿½
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½
     /// </summary>
-    /// <param name="name">Íæ¼ÒµÄÃû×Ö</param>
+    /// <param name="name">ï¿½ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½</param>
     [Command]
     private void CmdSetName(string name)
     {
-        Name = name;
+        _name = name;
     }
 
 }

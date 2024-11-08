@@ -51,10 +51,13 @@ public class BackpackManager : MonoBehaviour
     private IEnumerator initItems_debug()
     {
         yield return new WaitForSeconds(1);
-        CreateItem("ScriptableObject/Items/木板");
-        CreateItem("ScriptableObject/Items/锤石");
-        CreateItem("ScriptableObject/Items/木棒");
-        CreateItem("ScriptableObject/Items/金属破片");
+        if (GameObject.FindWithTag("LocalPlayer") != null)
+        {
+            CreateItem("ScriptableObject/Items/木板");
+            CreateItem("ScriptableObject/Items/锤石");
+            CreateItem("ScriptableObject/Items/木棒");
+            CreateItem("ScriptableObject/Items/金属破片");
+        }
 
         //yield return new WaitForSeconds(1);
         //DeployCraft(Resources.Load<CraftWayData>("ScriptableObject/CraftWay/锤子"));
@@ -140,6 +143,10 @@ public class BackpackManager : MonoBehaviour
         {
             if (i < _itemList.Count)
             {
+                // Debug.Log(i);
+                // Debug.Log(slots.childCount);
+                // Debug.Log(_itemList.Count);
+                // Debug.Log(_itemList[i].ItemData.ItemName);
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().sprite = _itemList[i].ItemData.ItemIcon;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
                 slots.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(_itemList[i]);

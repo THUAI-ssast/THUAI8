@@ -15,6 +15,10 @@ public class CraftWayUI : MonoBehaviour
     /// 所有的CraftWayUI
     /// </summary>
     private static List<CraftWayUI> _uiList = new List<CraftWayUI>();
+    public static void ClearItemList()
+    {
+        _uiList.Clear();
+    }
 
     /// <summary>
     /// 当前选中的合成路线数据，点击应用合成时会被deploy
@@ -45,6 +49,7 @@ public class CraftWayUI : MonoBehaviour
 
     private CraftWayData _craftWayData;
     private List<GameObject> _itemList;
+
 
     private Image _backgroundImage;
     private Transform _equalsIcon;
@@ -105,4 +110,5 @@ public class CraftWayUI : MonoBehaviour
             ? _craftSatisfied
             : _craftDefault;
     }
+
 }

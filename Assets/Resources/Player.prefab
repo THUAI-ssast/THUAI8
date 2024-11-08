@@ -440,6 +440,8 @@ GameObject:
   - component: {fileID: 8253318966244606278}
   - component: {fileID: 3452802782792660116}
   - component: {fileID: 964630081668010627}
+  - component: {fileID: 9117921275203122768}
+  - component: {fileID: 846298515162133792}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -706,7 +708,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &4897570260609921451
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -783,12 +785,12 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   Name: 
-  HeadMaxHealth: 0
-  BodyMaxHealth: 0
-  LegMaxHealth: 0
-  HeadHealth: 0
-  BodyHealth: 0
-  LegHealth: 0
+  HeadMaxHealth: 10
+  BodyMaxHealth: 10
+  LegMaxHealth: 10
+  HeadHealth: 10
+  BodyHealth: 10
+  LegHealth: 10
   TargetPlayer: {fileID: 890865523763040685}
   HeadHealthGUI: {fileID: 8616757558008134107}
   BodyHealthGUI: {fileID: 7636452280903846559}
@@ -805,6 +807,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41f84591ce72545258ea98cb7518d8b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &9117921275203122768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4470334930336716649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07cc049f9bdb2f34999fd5dd463da361, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  MaxActionPoint: 20
+  LocalPlayerInfoPanel: {fileID: 0}
+--- !u!114 &846298515162133792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4470334930336716649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ebc0f155a7dedf4a82743c99488d2e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1 &5150403107971421765
 GameObject:
   m_ObjectHideFlags: 0
