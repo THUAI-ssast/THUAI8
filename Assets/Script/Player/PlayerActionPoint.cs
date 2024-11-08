@@ -9,51 +9,50 @@ using DG.Tweening;
 public class PlayerActionPoint : NetworkBehaviour
 {
     /// <summary>
-    /// ��ҵ�����ֵ
+    /// 玩家的体力值
     /// </summary>
     [SyncVar(hook = nameof(ActionPointChange))] private float _currentActionPoint = 15;
 
     public float CurrentActionPoint { get => _currentActionPoint; }
 
     /// <summary>
-    /// ��ҵ�����ֵ����
+    /// 玩家的体力值上限
     /// </summary>
     [SerializeField] private float _maxActionPoint = 20;
 
     public float MaxActionPoint { get => _maxActionPoint; }
 
     /// <summary>
-    /// λ�����½ǵĿͻ��������Ϣ���
+    /// 位于左下角的客户端玩家信息面板
     /// </summary>
     public PlayerInfoUI LocalPlayerInfoPanel;
 
     /// <summary>
-    /// ������ʾ��������ľ�����Ϣ��Э��
+    /// 用于显示体力不足的警告信息的协程
     /// </summary>
     private Coroutine displayCoroutine;
 
     /// <summary>
-    /// ��ʼ���������ֵ
+    /// 初始化玩家体力值
     /// </summary>
     void Start()
     {
-        // ��ȡ��Ϣ���
+        // 获取信息面板
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel = UIManager.Instance.MainCanvas.transform.Find("PlayerInfoPanel").gameObject.GetComponent<PlayerInfoUI>();
             LocalPlayerInfoPanel.UpdateActionPoint(_currentActionPoint, MaxActionPoint);
         }
-        // ��ʼ������ֵ���޺�����ֵ
     }
 
     /// <summary>
-    /// hook��������ActionPoint�ı���Զ�������
+    /// hook函数，当ActionPoint改变后自动被调用
     /// </summary>
     /// <param name="oldActionPoint"></param>
     /// <param name="newActionPoint"></param>
     public void ActionPointChange(float oldActionPoint, float newActionPoint)
     {
-        // �������½ǵ���Ϣ���
+        // 更新左下角的信息面板
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel.UpdateActionPoint(newActionPoint, MaxActionPoint);
@@ -61,11 +60,11 @@ public class PlayerActionPoint : NetworkBehaviour
     }
 
     /// <summary>
-    /// �����жϵ�ǰ�����Ƿ��㹻
+    /// 用于判断当前体力是否足够
     /// </summary>
-    /// <param name="requiredActionPoint">����0����������������Ҫ������ֵ</param>
-    /// <param name="isDisplayUI">����������ʱ�Ƿ��������ʾ���棬Ĭ����true</param>
-    /// <returns>��ǰ�����Ƿ�������ɲ�����true���������㹻</returns>
+    /// <param name="requiredActionPoint">大于0的数，代表操作需要的体力值</param>
+    /// <param name="isDisplayUI">在体力不足时是否向玩家显示警告，默认是true</param>
+    /// <returns>当前体力是否足以完成操作，true代表体力足够</returns>
     public bool CheckForEnoughActionPoint(float requiredActionPoint, bool isDisplayUI = true)
     {
         bool isEnough = (_currentActionPoint - requiredActionPoint) >= 0;
@@ -81,27 +80,27 @@ public class PlayerActionPoint : NetworkBehaviour
     }
 
     /// <summary>
-    /// ������ҵ������������������������
+    /// 增加玩家的体力，最高增加至体力上限
     /// </summary>
-    /// <param name="increase">����0��������ʾҪ���ӵ�����ֵ</param>
+    /// <param name="increase">大于0的数，表示要增加的体力值</param>
     public void IncreaseActionPoint(float increase)
     {
         CmdChangeActionPoint(increase);
     }
 
     /// <summary>
-    /// ������ҵ������������������򲻻��������ֵ���ڵ��ø÷���֮ǰӦ����CheckForEnoughPoint���������Ƿ��㹻���ж�
+    /// 减少玩家的体力，若体力不足则不会减少体力值。在调用该方法之前应调用CheckForEnoughPoint进行体力是否足够的判断
     /// </summary>
-    /// <param name="decrease">����0��������ʾҪ���ٵ�����ֵ</param>
+    /// <param name="decrease">大于0的数，表示要减少的体力值</param>
     public void DecreaseActionPoint(float decrease)
     {
         CmdChangeActionPoint(-decrease);
     }
 
     /// <summary>
-    /// �ı����������ͳһ�ӿڡ�
+    /// 改变玩家体力的统一接口。
     /// </summary>
-    /// <param name="increase">Ҫ�ı������ֵ����increase����0ʱ��������Ӧ������ֵ���������������ֵ���ޣ���increaseС��0ʱ��������Ӧ������ֵ</param>
+    /// <param name="increase">要改变的体力值：当increase大于0时，增加相应的体力值，最高增加至体力值上限；当increase小于0时，减少相应的体力值</param>
     [Command]
     private void CmdChangeActionPoint(float increase)
     {
@@ -117,7 +116,7 @@ public class PlayerActionPoint : NetworkBehaviour
     }
 
     /// <summary>
-    /// ����UI��ʾ�������ֵ����
+    /// 弹出UI提示玩家体力值不足
     /// </summary>
     private IEnumerator DisplayAPNotEnoughWarning()
     {

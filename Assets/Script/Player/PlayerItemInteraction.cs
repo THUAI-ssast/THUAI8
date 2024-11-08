@@ -34,13 +34,20 @@ public class PlayerItemInteraction : NetworkBehaviour
     /// <param name="owner">物品拥有者</param>
     /// <param name="player">发出请求的玩家</param>
     [Command]
-    public void CreateItem(string itemData_pth, ItemOwner owner, GameObject player)
+    public void CreateItem(string itemData_pth, ItemOwner owner, GameObject player, GameObject place)
     {
         GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), Vector3.zero, Quaternion.identity);
         NetworkServer.Spawn(instance);
         NetworkIdentity playerIdentity = player.GetComponent<NetworkIdentity>();
         RpcInitInstanceOnClients(instance, itemData_pth, owner, playerIdentity.netId);
-        TargetNotifyItemCreated(playerIdentity.connectionToClient, instance);
+        if(place == null)
+        {
+            TargetNotifyItemCreatedInBackpack(playerIdentity.connectionToClient, instance);
+        }
+        else
+        {
+            TargetNotifyItemCreatedInRP(playerIdentity.connectionToClient, instance, place);
+        }
     }
     /// <summary>
     /// 服务器处理玩家销毁物品事件。
@@ -90,26 +97,19 @@ public class PlayerItemInteraction : NetworkBehaviour
     [ClientRpc]
     private void RpcInitInstanceOnClients(GameObject instance, string itemData_pth, ItemOwner owner, uint playerId)
     {
-        // Debug.Log("RpcInitInstanceOnClients");
-        // Component[] components = instance.GetComponents<Component>();
-        // foreach (Component component in components)
-        // {
-        //     Debug.Log("Component: " + component.GetType().Name);
-        // }
         ItemData itemData = Resources.Load<ItemData>(itemData_pth);
         instance.GetComponent<SpriteRenderer>().enabled = false;
         instance.GetComponent<SpriteRenderer>().sprite = itemData.ItemIcon;
         instance.GetComponent<Item>().Initialize(itemData, owner, playerId);
     }
     [TargetRpc]
-    private void TargetNotifyItemCreated(NetworkConnectionToClient player, GameObject instance)
+    private void TargetNotifyItemCreatedInBackpack(NetworkConnectionToClient player, GameObject instance)
     {
-        // Debug.Log("TargetNotifyItemCreated");
-        // Component[] components = instance.GetComponents<Component>();
-        // foreach (Component component in components)
-        // {
-        //     Debug.Log("Component: " + component.GetType().Name);
-        // }
         BackpackManager.Instance.AddItem(instance.GetComponent<Item>());
+    }
+    [TargetRpc]
+    private void TargetNotifyItemCreatedInRP(NetworkConnectionToClient player, GameObject instance, GameObject rp)
+    {
+        // TODO: 添加instance的Item进入rp的物品列表
     }
 }
