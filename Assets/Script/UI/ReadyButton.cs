@@ -7,10 +7,13 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 准备按钮类，管理准备按钮的行为。
+/// </summary>
 public class ReadyButton : MonoBehaviour
 {
     /// <summary>
-    /// 准备按钮的状态, 0为未准备，1为中间状态（进行准备/取消准备），2为已准备
+    /// 初始化准备按钮，初始为浅蓝色。
     /// </summary>
     void Start()
     {
@@ -18,45 +21,43 @@ public class ReadyButton : MonoBehaviour
         button.onClick.AddListener(OnButtonClick);
         gameObject.GetComponent<Image>().color= new Color32(203, 255, 252, 255); // blue
     }
+    /// <summary>
+    /// 点击准备按钮的行为。循环： 未准备 -> 准备中 -> 已准备 -> 未准备 。
+    /// </summary>
     public void OnButtonClick()
     {
-        // Debug.Log("OnClick.");
         if(RoundManager.Instance.State == RoundManager.RoundState.NotReady)
         {   
             RoundManager.Instance.State = RoundManager.RoundState.PreReady;
             gameObject.GetComponent<Image>().color = new Color32(181, 242, 139, 255); // green
-            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 20;
+            gameObject.transform.GetChild(1).gameObject.SetActive(false);
+            gameObject.transform.GetChild(0).gameObject.SetActive(true);
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 16;
             gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "准备\n结束";
             return ;
         }
         if(RoundManager.Instance.State == RoundManager.RoundState.PreReady)
         {
-            if(RoundManager.Instance.IsReady == false)
-            {
-                RoundManager.Instance.State = RoundManager.RoundState.Ready;
-                gameObject.GetComponent<Image>().color = new Color32(255, 217, 103, 255); // yellow
-                gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "等待\n其他玩家";
-                gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 14;
-                GameObject player = GameObject.FindWithTag("LocalPlayer");
-                player.GetComponent<PlayerRound>().CmdReady(true);
-                return ;
-            }
-            else
-            {
-                RoundManager.Instance.State = RoundManager.RoundState.NotReady;
-                gameObject.GetComponent<Image>().color = new Color32(203, 255, 252, 255); // blue
-                gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 20;
-                GameObject player = GameObject.FindWithTag("LocalPlayer");
-                player.GetComponent<PlayerRound>().CmdReady(false);
-                return ;
-            }
+            RoundManager.Instance.State = RoundManager.RoundState.Ready;
+            gameObject.GetComponent<Image>().color = new Color32(255, 217, 103, 255); // yellow
+            gameObject.transform.GetComponent<VerticalLayoutGroup>().padding.top = 10;
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "等待\n其他玩家";
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 14;
+            gameObject.transform.GetChild(1).gameObject.SetActive(true);
+            gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>().fontSize = 14;
+            GameObject player = GameObject.FindWithTag("LocalPlayer");
+            player.GetComponent<PlayerRound>().CmdReady(true);
+            return ;
         }
         if(RoundManager.Instance.State == RoundManager.RoundState.Ready)
         {
-            RoundManager.Instance.State = RoundManager.RoundState.PreReady;
-            gameObject.GetComponent<Image>().color = new Color32(181, 242, 139, 255); // green
-            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 20;
-            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "取消\n准备";
+            RoundManager.Instance.State = RoundManager.RoundState.NotReady;
+            gameObject.GetComponent<Image>().color = new Color32(203, 255, 252, 255); // blue
+            gameObject.transform.GetComponent<VerticalLayoutGroup>().padding.top = 0;
+            gameObject.transform.GetChild(0).gameObject.SetActive(false);
+            gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>().fontSize = 20;
+            GameObject player = GameObject.FindWithTag("LocalPlayer");
+            player.GetComponent<PlayerRound>().CmdReady(false);
             return ;
         }
     }
