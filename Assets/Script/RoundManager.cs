@@ -75,6 +75,7 @@ public class RoundManager : NetworkBehaviour
         _round.transform.GetChild(0).GetComponent<UnityEngine.UI.Image>().color = new Color32(203, 255, 252, 255);// blue
         _round.transform.GetChild(0).GetComponent<VerticalLayoutGroup>().padding.top = 0;
         _round.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+        _round.transform.GetChild(0).GetChild(1).gameObject.SetActive(true);
         _round.transform.GetChild(0).GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = null;
         _round.transform.GetChild(0).GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().fontSize = 20;
     }

@@ -30,9 +30,11 @@ public class ReadyButton : MonoBehaviour
         {   
             RoundManager.Instance.State = RoundManager.RoundState.PreReady;
             gameObject.GetComponent<Image>().color = new Color32(181, 242, 139, 255); // green
-            gameObject.transform.GetChild(1).gameObject.SetActive(false);
+            gameObject.transform.GetComponent<VerticalLayoutGroup>().padding.top = 10;
+            gameObject.transform.GetChild(1).gameObject.SetActive(true);
+            gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>().fontSize = 14;
             gameObject.transform.GetChild(0).gameObject.SetActive(true);
-            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 16;
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 14;
             gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "准备\n结束";
             return ;
         }
@@ -41,10 +43,11 @@ public class ReadyButton : MonoBehaviour
             RoundManager.Instance.State = RoundManager.RoundState.Ready;
             gameObject.GetComponent<Image>().color = new Color32(255, 217, 103, 255); // yellow
             gameObject.transform.GetComponent<VerticalLayoutGroup>().padding.top = 10;
-            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "等待\n其他玩家";
-            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 14;
             gameObject.transform.GetChild(1).gameObject.SetActive(true);
             gameObject.transform.GetChild(1).GetComponent<TextMeshProUGUI>().fontSize = 14;
+            gameObject.transform.GetChild(0).gameObject.SetActive(true);
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().fontSize = 14;
+            gameObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = $"等待其他\n玩家";
             GameObject player = GameObject.FindWithTag("LocalPlayer");
             player.GetComponent<PlayerRound>().CmdReady(true);
             return ;
