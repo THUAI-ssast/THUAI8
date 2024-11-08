@@ -22,6 +22,7 @@ public class ResourcePoint : NetworkBehaviour
 
     private void OnMouseOver()
     {
+        Debug.Log("----------------------------");
         player = GameObject.FindWithTag("LocalPlayer");
         if (player != null)
         {
