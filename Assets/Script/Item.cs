@@ -38,10 +38,11 @@ public class Item : NetworkBehaviour
     /// <param name="itemData_pth">Resources中要创建的物品的信息的路径</param>
     /// <param name="owner">物品拥有者</param>
     /// <param name="player">发出请求的玩家</param>
+    /// <param name="place">物品创建到哪里。若为null，则为背包；否则为资源点的引用</param>
     /// <returns></returns>
-    public static void Create(string itemData_pth, ItemOwner owner, GameObject player)
+    public static void Create(string itemData_pth, ItemOwner owner, GameObject player, GameObject place)
     {
-        player.GetComponent<PlayerItemInteraction>().CreateItem(itemData_pth, owner, player);
+        player.GetComponent<PlayerItemInteraction>().CreateItem(itemData_pth, owner, player, place);
     }
     /// <summary>
     /// 初始化物品
@@ -91,7 +92,7 @@ public class Item : NetworkBehaviour
     /// 右键点击物品拾取物品到背包
     /// </summary>
     private void OnMouseOver()
-    {
+    {  
         if(Input.GetMouseButtonDown(1) && CanBePickedUp())
         {
             GameObject player = GameObject.FindWithTag("LocalPlayer");

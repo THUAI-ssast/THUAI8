@@ -74,7 +74,7 @@ public class BackpackManager : MonoBehaviour
         GameObject player = GameObject.FindWithTag("LocalPlayer");
         ItemOwner owner = ItemOwner.PlayerBackpack;
         Vector3 position = Vector3.zero;
-        Item.Create(itemdata_pth, owner, player);
+        Item.Create(itemdata_pth, owner, player, null);
     }
 
     /// <summary>
