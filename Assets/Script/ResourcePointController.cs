@@ -6,30 +6,36 @@ using UnityEngine.Tilemaps;
 public class ResourcePointController : MonoBehaviour
 {
     public GameObject ResourceUIPanelPrefab;
-    public Tile ResourcePointTile; // 设置为资源点
-    private Tilemap _furnitureTilemap;
-    private float _epsilon = 0.05f;
-    private GameObject _player;
-    private Dictionary<Vector3Int, GameObject> _resourcePointUIs = new Dictionary<Vector3Int, GameObject>(); // 存储每个资源点的UI
 
-    // Start is called before the first frame update
+    private GameObject _resourceUIPanelInstance;
+    private Tilemap _furnitureTilemap;
+    private GameObject _player;
+    private List<Item> _itemList;
+    private Dictionary<string, float> _itemProbabilityDictionary;
+    private float _epsilon = 0.05f;
+
     void Start()
     {
-        _furnitureTilemap = GetComponent<Tilemap>();
+        _furnitureTilemap = transform.parent.GetComponent<Tilemap>();
+        _itemList = new List<Item>();
+        InitializeItemProbability();
+        StartCoroutine(initItems_debug());
+        Debug.Log(_itemList.Count);
     }
 
-    // Update is called once per frame
     void Update()
     {
+        Debug.Log(_itemList.Count);
         _player = GameObject.FindWithTag("LocalPlayer");
 
         if (Input.GetKeyDown(KeyCode.Mouse1) && _player != null)
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int targetCellPos = _furnitureTilemap.WorldToCell(mousePos);
-            TileBase tile = _furnitureTilemap.GetTile(targetCellPos);
+            Vector3 realPosition = _furnitureTilemap.CellToWorld(targetCellPos);
+            bool isClickingThis = realPosition + new Vector3(0.5f, 0.5f, 0) == transform.position;
 
-            if (tile == ResourcePointTile)
+            if (isClickingThis)
             {
                 Vector3 playerPosBias = _player.transform.position;
                 playerPosBias.x -= 0.5f;
@@ -43,53 +49,67 @@ public class ResourcePointController : MonoBehaviour
 
                 if (isAdjacentInX || isAdjacentInY)
                 {
-                    ToggleResourcePointUI(targetCellPos);
+                    ToggleResourcePointUI();
                 }
             }
         }
+    }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+    private IEnumerator initItems_debug()
+    {
+        yield return new WaitForSeconds(1);
+        if (GameObject.FindWithTag("LocalPlayer") != null)
         {
-            HideAllResourceUIs();
+            CreateItem("ScriptableObject/Items/木板");
+            CreateItem("ScriptableObject/Items/锤石");
+            CreateItem("ScriptableObject/Items/木棒");
+            CreateItem("ScriptableObject/Items/金属破片");
         }
     }
 
-    private void ToggleResourcePointUI(Vector3Int resourcePointPosition)
+    private void CreateItem(string itemdata_pth)
     {
-        if (_resourcePointUIs.ContainsKey(resourcePointPosition))
+        GameObject player = GameObject.FindWithTag("LocalPlayer");
+        ItemOwner owner = ItemOwner.World;
+        Vector3 position = Vector3.zero;
+        Item.Create(itemdata_pth, owner, player, gameObject);
+    }
+
+    private void ToggleResourcePointUI()
+    {
+        if (_resourceUIPanelInstance == null)
         {
-            GameObject resourceUIPanel = _resourcePointUIs[resourcePointPosition];
-            if (resourceUIPanel.activeSelf)
-            {
-                UIManager.Instance.RemoveActiveUI(resourceUIPanel);
-                resourceUIPanel.SetActive(false);
-            }
-            else
-            {
-                UIManager.Instance.AddActiveUI(resourceUIPanel);
-                resourceUIPanel.SetActive(true);
-            }
+            _resourceUIPanelInstance = Instantiate(ResourceUIPanelPrefab);
+            _resourceUIPanelInstance.transform.SetParent(GameObject.Find("Canvas").transform, false);
+            _resourceUIPanelInstance.transform.position = Camera.main.WorldToScreenPoint(transform.position);
+        }
+
+        if (_resourceUIPanelInstance.activeSelf)
+        {
+            UIManager.Instance.RemoveActiveUI(_resourceUIPanelInstance);
+            _resourceUIPanelInstance.SetActive(false);
         }
         else
         {
-            // 创建新的UI面板并关联到该资源点
-            GameObject resourceUIPanel = Instantiate(ResourceUIPanelPrefab);
-            resourceUIPanel.transform.SetParent(GameObject.Find("Canvas").transform, false); // 将UI面板置于Canvas下
-            resourceUIPanel.transform.position = Camera.main.WorldToScreenPoint(_furnitureTilemap.CellToWorld(resourcePointPosition));
-
-            UIManager.Instance.AddActiveUI(resourceUIPanel);
-
-            // 将UI面板存储在字典中以便再次访问
-            _resourcePointUIs.Add(resourcePointPosition, resourceUIPanel);
+            UIManager.Instance.AddActiveUI(_resourceUIPanelInstance);
+            _resourceUIPanelInstance.SetActive(true);
         }
     }
 
-
-    public void HideAllResourceUIs()
+    private void InitializeItemProbability()
     {
-        foreach (var ui in _resourcePointUIs.Values)
+        _itemProbabilityDictionary = new Dictionary<string, float>();
+
+        _itemProbabilityDictionary.Add("ScriptableObject/Items/刀片", 0.2f);
+        _itemProbabilityDictionary.Add("ScriptableObject/Items/木板", 0.5f);
+        _itemProbabilityDictionary.Add("ScriptableObject/Items/金属破片", 0.3f);
+    }
+
+    public void AddItemToResourcePoint(Item item)
+    {
+        if (!_itemList.Contains(item))
         {
-            ui.SetActive(false);
+            _itemList.Add(item);
         }
     }
 }

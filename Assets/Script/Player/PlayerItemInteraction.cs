@@ -108,8 +108,9 @@ public class PlayerItemInteraction : NetworkBehaviour
         BackpackManager.Instance.AddItem(instance.GetComponent<Item>());
     }
     [TargetRpc]
-    private void TargetNotifyItemCreatedInRP(NetworkConnectionToClient player, GameObject instance, GameObject rp)
+    private void TargetNotifyItemCreatedInRP(NetworkConnectionToClient player, GameObject instance, GameObject resourcepoint)
     {
-        // TODO: 添加instance的Item进入rp的物品列表
+        // TODO: 添加instance的Item进入resourcepoint的物品列表
+        resourcepoint.GetComponent<ResourcePointController>().AddItemToResourcePoint(instance.GetComponent<Item>());
     }
 }

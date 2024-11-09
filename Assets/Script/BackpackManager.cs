@@ -58,11 +58,6 @@ public class BackpackManager : MonoBehaviour
             CreateItem("ScriptableObject/Items/木棒");
             CreateItem("ScriptableObject/Items/金属破片");
         }
-
-        //yield return new WaitForSeconds(1);
-        //DeployCraft(Resources.Load<CraftWayData>("ScriptableObject/CraftWay/锤子"));
-        //yield return new WaitForSeconds(1);
-        //DeployCraft(Resources.Load<CraftWayData>("ScriptableObject/CraftWay/狼牙棒"));
     }
 
     /// <summary>
