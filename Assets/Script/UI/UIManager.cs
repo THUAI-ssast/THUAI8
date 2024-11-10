@@ -91,14 +91,6 @@ public class UIManager : MonoBehaviour
                 reverseUIActive(_activeUIList[^1]);
             }
         }
-
-        // if(Input.GetMouseButtonDown(0))
-        // {
-        //     if(ExistingOperationMenu != null)
-        //     {
-        //         Destroy(ExistingOperationMenu);
-        //     }
-        // }
     }
 
     private void reverseUIActive(GameObject ui)
@@ -114,6 +106,21 @@ public class UIManager : MonoBehaviour
             _activeUIList.Add(ui);
         }
     }
+
+    public void AddActiveUI(GameObject ui)
+    {
+        if (!_activeUIList.Contains(ui))
+        {
+            _activeUIList.Add(ui);
+        }
+    }
+
+    public void RemoveActiveUI(GameObject ui)
+    {
+        if (_activeUIList.Contains(ui))
+        _activeUIList.Remove(ui);
+    }
+
 
     public void setUIActive(GameObject ui, bool active)
     {

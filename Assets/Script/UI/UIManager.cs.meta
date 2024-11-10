@@ -3,7 +3,10 @@ guid: b5622f57e5999e64a87de04bdf5fe206
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - ExistingOperationMenu: {instanceID: 0}
+  - _bagPanel: {instanceID: 0}
+  - _resourceUIPanel: {fileID: 1671041166531252213, guid: 8d7795fe7850a4d4a9dc6162d60aaa71, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

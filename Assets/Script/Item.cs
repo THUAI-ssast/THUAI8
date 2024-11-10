@@ -37,15 +37,22 @@ public class Item : NetworkBehaviour
     /// </summary>
     /// <param name="itemData_pth">Resources中要创建的物品的信息的路径</param>
     /// <param name="owner">物品拥有者</param>
-    /// <param name="player">发出请求的玩家</param>
-    /// <param name="place">物品创建到哪里。若为null，则为背包；否则为资源点的引用</param>
+    /// <param name="player">若不为null，则为发出请求的玩家；否则从服务器调用</param>
+    /// <param name="place">物品创建到哪里。若为null，则为玩家背包；否则从服务器调用，为资源点的引用</param>
     /// <returns></returns>
     public static void Create(string itemData_pth, ItemOwner owner, GameObject player, GameObject place)
     {
-        player.GetComponent<PlayerItemInteraction>().CreateItem(itemData_pth, owner, player, place);
+        if (player == null)
+        {
+            PlayerItemInteraction.RamdomPlayer.CreateItemForClient(itemData_pth, owner,place);
+        }
+        else
+        {
+            player.GetComponent<PlayerItemInteraction>().CreateItem(itemData_pth, owner, player);
+        }
     }
     /// <summary>
-    /// 初始化物品
+    /// 初始化Item
     /// </summary>
     /// <param name="itemData">物品信息</param>
     /// <param name="owner">物品拥有者</param>
@@ -65,7 +72,7 @@ public class Item : NetworkBehaviour
     {
         player.GetComponent<PlayerItemInteraction>().DestroyItem(item.gameObject);
     }
-
+    
     /// <summary>
     /// 更新物品的拥有者信息
     /// </summary>
