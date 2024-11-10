@@ -39,7 +39,6 @@ public class PlayerInfoUI : MonoBehaviour
     public void UpdateActionPoint(float newActionPoint, float maxActionPoint)
     {  
         APPanel.transform.Find("Bar").GetComponent<UnityEngine.UI.Image>().fillAmount = newActionPoint/ maxActionPoint;
-        Debug.Log(newActionPoint / maxActionPoint);
         APPanel.transform.Find("Value").GetComponent<TextMeshProUGUI>().text = newActionPoint.ToString();
     }
 

@@ -4,11 +4,17 @@ using UnityEngine;
 using Mirror;
 using UnityEditor;
 using Mirror.BouncyCastle.Asn1.X509;
+using TMPro;
 /// <summary>
 /// 玩家与物品的交互类，挂载在player的GameObject上。执行[Command]方法。
 /// </summary>
 public class PlayerItemInteraction : NetworkBehaviour
 {
+    public static PlayerItemInteraction RamdomPlayer;
+    private void Awake()
+    {
+        RamdomPlayer = this;
+    }
     /// <summary>
     /// 服务器处理玩家拾取物品到背包事件。
     /// </summary>
@@ -34,20 +40,39 @@ public class PlayerItemInteraction : NetworkBehaviour
     /// <param name="owner">物品拥有者</param>
     /// <param name="player">发出请求的玩家</param>
     [Command]
-    public void CreateItem(string itemData_pth, ItemOwner owner, GameObject player, GameObject place)
+    public void CreateItem(string itemData_pth, ItemOwner owner, GameObject player)
     {
         GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), Vector3.zero, Quaternion.identity);
         NetworkServer.Spawn(instance);
         NetworkIdentity playerIdentity = player.GetComponent<NetworkIdentity>();
-        RpcInitInstanceOnClients(instance, itemData_pth, owner, playerIdentity.netId);
-        if(place == null)
-        {
-            TargetNotifyItemCreatedInBackpack(playerIdentity.connectionToClient, instance);
-        }
-        else
-        {
-            TargetNotifyItemCreatedInRP(playerIdentity.connectionToClient, instance, place);
-        }
+        RpcInitInstanceOnClients(instance, itemData_pth, owner, playerIdentity.netId,null);
+        TargetNotifyItemCreatedInBackpack(playerIdentity.connectionToClient, instance);
+    }
+    
+    public void CreateItemForClient(string itemData_pth, ItemOwner owner, GameObject resourcePoint)
+    {
+        GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), Vector3.zero, Quaternion.identity);
+        NetworkServer.Spawn(instance);
+        RpcInitInstanceOnClients(instance, itemData_pth, owner, 0, resourcePoint);
+    }
+    /// <summary>
+    /// 由服务器调用，令每个客户端初始化Item状态和GameObject状态
+    /// </summary>
+    /// <param name="instance">Item的GameObject</param>
+    /// <param name="itemData_pth">Resources中要创建的物品的信息的路径</param>
+    /// <param name="owner">物品拥有者</param>
+    /// <param name="playerId">玩家id</param>
+    [ClientRpc]
+    public void RpcInitInstanceOnClients(GameObject instance, string itemData_pth, ItemOwner owner, uint playerId,GameObject resourcePoint)
+    {
+        ItemData itemData = Resources.Load<ItemData>(itemData_pth);
+        var spriteRenderer = instance.GetComponent<SpriteRenderer>();
+        spriteRenderer.enabled = false;
+        spriteRenderer.sprite = itemData.ItemIcon;
+        var item = instance.GetComponent<Item>();
+        item.Initialize(itemData, owner, playerId);
+        if (resourcePoint)
+            resourcePoint.GetComponent<ResourcePointController>().AddItemToResourcePoint(item);
     }
     /// <summary>
     /// 服务器处理玩家销毁物品事件。
@@ -68,7 +93,12 @@ public class PlayerItemInteraction : NetworkBehaviour
         Item item = currentObj.GetComponent<Item>();
         ItemStatusChange(currentObj, false, ItemOwner.PlayerSuit, Vector3.zero, 0);
         item.ItemData.UseItem();
-    } 
+    }
+    [Command]
+    public void PickUpItemFromRP(GameObject rp, GameObject instance)
+    {
+        rp.GetComponent<ResourcePointController>().RemoveItemFromResourcePoint(instance.GetComponent<Item>());
+    }
     /// <summary>
     /// 由客户端执行，更新物品状态。
     /// </summary>
@@ -94,23 +124,11 @@ public class PlayerItemInteraction : NetworkBehaviour
         obj.transform.position = position;
         obj.GetComponent<SpriteRenderer>().enabled = isDisplay;
     }
-    [ClientRpc]
-    private void RpcInitInstanceOnClients(GameObject instance, string itemData_pth, ItemOwner owner, uint playerId)
-    {
-        ItemData itemData = Resources.Load<ItemData>(itemData_pth);
-        instance.GetComponent<SpriteRenderer>().enabled = false;
-        instance.GetComponent<SpriteRenderer>().sprite = itemData.ItemIcon;
-        instance.GetComponent<Item>().Initialize(itemData, owner, playerId);
-    }
+
     [TargetRpc]
     private void TargetNotifyItemCreatedInBackpack(NetworkConnectionToClient player, GameObject instance)
     {
         BackpackManager.Instance.AddItem(instance.GetComponent<Item>());
     }
-    [TargetRpc]
-    private void TargetNotifyItemCreatedInRP(NetworkConnectionToClient player, GameObject instance, GameObject resourcepoint)
-    {
-        // TODO: 添加instance的Item进入resourcepoint的物品列表
-        resourcepoint.GetComponent<ResourcePointController>().AddItemToResourcePoint(instance.GetComponent<Item>());
-    }
+
 }

@@ -10,17 +10,18 @@ public class CheckButton : MonoBehaviour
     private Button button;
     private TextMeshProUGUI buttonText;
 
-    private GameObject[] resourceItems;
+    private GameObject _slots;
+    private GameObject ResourcePoint;
 
     void Start()
     {
+        ResourcePoint = transform.parent.parent.parent.gameObject;
+        
         button = GetComponent<Button>();
         buttonText = GetComponentInChildren<TextMeshProUGUI>();
-
-        resourceItems = GameObject.FindGameObjectsWithTag("ResourceUIItem");
-
-        SetResourceUIItemsActive(false);
-
+        buttonText.text = $"Cost {ResourcePoint.GetComponent<ResourcePointController>().RequiredActionPoint} AP to Check";
+        _slots = transform.parent.GetChild(0).GetChild(0).GetChild(0).gameObject;
+        _slots.SetActive(false);
         button.onClick.AddListener(ChangeTextAndDisable);
     }
 
@@ -29,14 +30,7 @@ public class CheckButton : MonoBehaviour
         buttonText.text = newText;
         button.interactable = false;
 
-        SetResourceUIItemsActive(true);
-    }
-
-    void SetResourceUIItemsActive(bool isActive)
-    {
-        foreach (var item in resourceItems)
-        {
-            item.SetActive(isActive);
-        }
+        _slots.SetActive(true);
+        GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().DecreaseActionPoint(ResourcePoint.GetComponent<ResourcePointController>().RequiredActionPoint);
     }
 }

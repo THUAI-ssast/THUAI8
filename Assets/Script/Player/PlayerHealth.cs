@@ -84,7 +84,6 @@ public class PlayerHealth : NetworkBehaviour
     // Start is called before the first frame update 
     void Start()
     {
-        Debug.Log(TargetPlayer.gameObject.tag);
         if (isLocalPlayer) 
         {
             // 获取玩家名字

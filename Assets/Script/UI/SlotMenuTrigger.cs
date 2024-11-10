@@ -89,7 +89,7 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
                 _layout.GetChild(1).GetComponent<Button>().onClick.AddListener(() => 
                 {
                     BackpackManager.Instance.DropItem(_slotItem);
-                    Destroy(_operationMenu);
+                    Destroy(_operationMenu);    
                 });
             }
         }

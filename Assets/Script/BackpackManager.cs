@@ -138,17 +138,14 @@ public class BackpackManager : MonoBehaviour
         {
             if (i < _itemList.Count)
             {
-                // Debug.Log(i);
-                // Debug.Log(slots.childCount);
-                // Debug.Log(_itemList.Count);
-                // Debug.Log(_itemList[i].ItemData.ItemName);
+                slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = true;
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().sprite = _itemList[i].ItemData.ItemIcon;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
                 slots.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(_itemList[i]);
             }
             else
             {
-                slots.GetChild(i).GetChild(0).GetComponent<Image>().sprite = null;
+                slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
             }
         }
