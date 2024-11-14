@@ -92,9 +92,13 @@ public class PlayerActionPoint : NetworkBehaviour
     /// 减少玩家的体力，若体力不足则不会减少体力值。在调用该方法之前应调用CheckForEnoughPoint进行体力是否足够的判断
     /// </summary>
     /// <param name="decrease">大于0的数，表示要减少的体力值</param>
-    public void DecreaseActionPoint(float decrease)
+    /// <param name="isDisplayUI">在体力不足时是否向玩家显示警告，默认是true</param>
+    public bool DecreaseActionPoint(float decrease, bool isDisplayUI = true)
     {
+        if (CheckForEnoughActionPoint(decrease, isDisplayUI))
+            return false;
         CmdChangeActionPoint(-decrease);
+        return true;
     }
 
     /// <summary>

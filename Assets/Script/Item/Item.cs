@@ -19,12 +19,12 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 物品的拾取距离
     /// </summary>
-    [SerializeField] private float _pickUpDistance = 1;
+    [SerializeField] protected float _pickUpDistance = 1.5f;
     /// <summary> 
     /// 物品的网络ID
     /// </summary>
-    private uint _itemID;
-    void Awake()
+    protected uint _itemID;
+    protected void Awake()
     {
         _itemID = gameObject.GetComponent<NetworkIdentity>().netId;
         if(ItemLocation == null)
@@ -87,7 +87,7 @@ public class Item : NetworkBehaviour
     /// 判断物品是否可以被拾取
     /// </summary>
     /// <returns>如果物品可以被拾取，返回true；否则返回false</returns>
-    private bool CanBePickedUp()
+    protected bool CanBePickedUp()
     {
         if(ItemLocation.Owner != ItemOwner.World) return false;
         if(UIManager.Instance.IsUIActivating == true) return false;
@@ -98,7 +98,7 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 右键点击物品拾取物品到背包
     /// </summary>
-    private void OnMouseOver()
+    protected void OnMouseOver()
     {  
         if(Input.GetMouseButtonDown(1) && CanBePickedUp())
         {
