@@ -1,3 +1,4 @@
+using System;
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ public class PlayerHealth : NetworkBehaviour
         Legs
     }
 
-    private Dictionary<BodyPosition, ArmorItem> _armorEquipments = new Dictionary<BodyPosition, ArmorItem>();
+    private Dictionary<BodyPosition, Item> _armorEquipments = new Dictionary<BodyPosition, Item>();
 
     /// <summary>
     /// 玩家的总血量上限
@@ -192,14 +193,14 @@ public class PlayerHealth : NetworkBehaviour
     }
 
     /// <summary>
-    /// 供外部调用的攻击函数，攻击方消耗体力用指定武器攻击目标的某一部位，扣除对应的血量和武器/防具耐久度；
+    /// 供外部调用的攻击函数，攻击方消耗体力用指定武器攻击目标的某一部位，扣除对应的血量(保留2位小数)和武器/防具耐久度；
     /// 若体力不足则不会扣除血量并提示体力不足
     /// </summary>
     /// <param name="attacker">攻击的发起方，会扣除对应的体力</param>
     /// <param name="target">被攻击的目标</param>
     /// <param name="position">被攻击的部位，会扣除对应部位血量和防具耐久</param>
     /// <param name="weapon">攻击所使用的武器，会扣除对应的武器耐久度</param>
-    public static void Attack(PlayerActionPoint attacker, PlayerHealth target,BodyPosition position, WeaponItem weapon)
+    public static void Attack(PlayerActionPoint attacker, PlayerHealth target,BodyPosition position, Item weapon)
     {
         WeaponItemData weaponData = weapon.ItemData as WeaponItemData;
         if (weaponData == null)
@@ -209,11 +210,11 @@ public class PlayerHealth : NetworkBehaviour
     }
 
     /// <summary>
-    /// 受到武器的伤害，会根据对应部位、武器和防具计算伤害，扣除对应的血量和武器/防具耐久度
+    /// 受到武器的伤害，会根据对应部位、武器和防具计算伤害(保留2位小数)，扣除对应的血量和武器/防具耐久度
     /// </summary>
     /// <param name="position">受击位置</param>
     /// <param name="weaponItem">攻击方使用的武器</param>
-    private void TakeWeaponDamage(BodyPosition position, WeaponItem weaponItem)
+    private void TakeWeaponDamage(BodyPosition position, Item weaponItem)
     {
         //武器伤害计算公式为：Dmg(伤害)= Tch(机制乘区)*Bdy(部位乘区)*Bsc(基础伤害)
         WeaponItemData weaponData = weaponItem.ItemData as WeaponItemData;
@@ -224,14 +225,12 @@ public class PlayerHealth : NetworkBehaviour
         //部位乘区，默认为1
         if (weaponData.BodyDamageDictionary.ContainsKey(position))
             damage *= weaponData.BodyDamageDictionary.Get(position);
-        //TODO:weaponItem.DecreaseDurability
+        PlayerItemInteraction.RandomPlayer.DecreaseDurability(weaponItem.gameObject);
         //机制乘区，默认为1，仅当对应部位有护甲&&护甲对武器伤害类型有特殊乘区时启用
-        if (_armorEquipments.TryGetValue(position, out var armorItem))
+        if (_armorEquipments.TryGetValue(position, out var armorItem) && armorItem.ItemData is ArmorItemData armorData)
         {
-            //TODO:armorItem.DecreaseDurability
-            ArmorItemData armorData;
-            if ((armorData = armorItem.ItemData as ArmorItemData) &&
-                armorData.DamageTypeDictionary.ContainsKey(weaponData.AttackDamageType))
+            PlayerItemInteraction.RandomPlayer.DecreaseDurability(armorItem.gameObject);
+            if (armorData.DamageTypeDictionary.ContainsKey(weaponData.AttackDamageType))
             {
                 damage *= armorData.DamageTypeDictionary.Get(weaponData.AttackDamageType);
             }
@@ -251,7 +250,7 @@ public class PlayerHealth : NetworkBehaviour
     }
 
     /// <summary>
-    /// 改变血量的同一接口，每个部位血量范围为0到MaxHealth，低于0会触发死亡
+    /// 改变血量的同一接口(保留2位小数)，每个部位血量范围为0到MaxHealth，低于0会触发死亡
     /// </summary>
     /// <param name="bodyPosition">血量改变部位，需要使用(int)BodyPosition.xxx</param>
     /// <param name="healthChange">血量改变量，正数回血，负数扣血</param>
@@ -262,13 +261,13 @@ public class PlayerHealth : NetworkBehaviour
         switch (pos)
         {
             case BodyPosition.Head:
-                _headHealth = Mathf.Clamp(_headHealth + healthChange, 0, HeadMaxHealth);
+                _headHealth = (float)Math.Round(Mathf.Clamp(_headHealth + healthChange, 0, HeadMaxHealth), 2);
                 break;
             case BodyPosition.MainBody:
-                _bodyHealth = Mathf.Clamp(_bodyHealth + healthChange, 0, BodyMaxHealth);
+                _bodyHealth = (float)Math.Round(Mathf.Clamp(_bodyHealth + healthChange, 0, BodyMaxHealth),2);
                 break;
             case BodyPosition.Legs:
-                _legHealth = Mathf.Clamp(_legHealth + healthChange, 0, LegMaxHealth);
+                _legHealth = (float)Math.Round(Mathf.Clamp(_legHealth + healthChange, 0, LegMaxHealth),2);
                 break;
         }
 

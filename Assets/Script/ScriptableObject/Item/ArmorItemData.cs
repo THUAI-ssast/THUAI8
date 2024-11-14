@@ -12,4 +12,5 @@ public class ArmorItemData : ItemData
 
     public SerializableDictionary<WeaponItemData.DamageType, float> DamageTypeDictionary =
         new SerializableDictionary<WeaponItemData.DamageType, float>();
+
 }

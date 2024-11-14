@@ -10,10 +10,10 @@ using TMPro;
 /// </summary>
 public class PlayerItemInteraction : NetworkBehaviour
 {
-    public static PlayerItemInteraction RamdomPlayer;
+    public static PlayerItemInteraction RandomPlayer;
     private void Awake()
     {
-        RamdomPlayer = this;
+        RandomPlayer = this;
     }
     /// <summary>
     /// 服务器处理玩家拾取物品到背包事件。
@@ -83,6 +83,34 @@ public class PlayerItemInteraction : NetworkBehaviour
     {
         NetworkServer.Destroy(currentObj);
     }
+    /// <summary>
+    /// 减少耐久度的统一接口，若耐久度为0则销毁。
+    /// 请通过对应物品拥有者的playerInteractive.DecreaseDurability()使用
+    /// </summary>
+    /// <param name="itemObject">需要减少耐久度的物体</param>
+    [Command]
+    public void DecreaseDurability(GameObject itemObject)
+    {
+        RpcDecreaseItemDurability(itemObject);
+    }
+    /// <summary>
+    /// DecreaseDurability的附属同步函数
+    /// </summary>
+    /// <param name="itemObject"></param>
+    [ClientRpc]
+    private void RpcDecreaseItemDurability(GameObject itemObject)
+    {
+        var item = itemObject.GetComponent<Item>();
+        if (item!=null&&item.CurrentDurability!=-1)
+        {
+            item.DecreaseDurability();
+            if (item.ItemLocation.Owner==ItemOwner.PlayerBackpack)
+            {
+                BackpackManager.Instance.RefreshSlots();
+            }
+        }
+    }
+
     /// <summary>
     /// 服务器处理玩家使用物品事件。
     /// </summary>

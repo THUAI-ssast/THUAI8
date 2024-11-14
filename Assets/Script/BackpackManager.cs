@@ -16,6 +16,8 @@ public class BackpackManager : MonoBehaviour
     /// </summary>
     [SerializeField] private GameObject _bagPanel;
 
+    private Transform _slotsTransform;
+
     /// <summary>
     /// 单例模式
     /// </summary>
@@ -43,6 +45,7 @@ public class BackpackManager : MonoBehaviour
     /// </summary>
     void Start()
     {
+        _slotsTransform = _bagPanel.transform.Find("ItemsPanel/Scroll View/Viewport/Slots");
         RefreshSlots();
         StartCoroutine(initItems_debug());
     }
@@ -57,7 +60,10 @@ public class BackpackManager : MonoBehaviour
             CreateItem("ScriptableObject/Items/锤石");
             CreateItem("ScriptableObject/Items/木棒");
             CreateItem("ScriptableObject/Items/金属破片");
+            CreateItem("ScriptableObject/Items/Armor/纸质护甲");
+            CreateItem("ScriptableObject/Items/Weapons/小刀");
         }
+        
     }
 
     /// <summary>
@@ -98,10 +104,10 @@ public class BackpackManager : MonoBehaviour
     /// 从背包中移除物品
     /// </summary>
     /// <param name="item">要移除的物品</param>
-    private void RemoveItem(Item item)
+    public void RemoveItem(Item item)
     {
-        _itemList.Remove(item);
-        RefreshSlots();
+        if (_itemList.Remove(item))
+            RefreshSlots();
     }
 
     /// <summary>
@@ -111,8 +117,9 @@ public class BackpackManager : MonoBehaviour
     public void UseItem(Item item)
     {
         GameObject player = GameObject.FindWithTag("LocalPlayer");
-        player.GetComponent<PlayerItemInteraction>().UseItem(item.gameObject);
-        _itemList.Remove(item);
+        //player.GetComponent<PlayerItemInteraction>().UseItem(item.gameObject);
+        //_itemList.Remove(item);
+        player.GetComponent<PlayerItemInteraction>().DecreaseDurability(item.gameObject);
         RefreshSlots();
     }
 
@@ -131,9 +138,10 @@ public class BackpackManager : MonoBehaviour
     /// <summary>
     /// 刷新背包中的物品槽，更新物品显示状态，包括图标、名称等。
     /// </summary>
-    private void RefreshSlots()
+    public void RefreshSlots()
     {
-        Transform slots = _bagPanel.transform.Find("ItemsPanel/Scroll View/Viewport/Slots");
+        Transform slots = _slotsTransform;
+        _itemList.RemoveAll(i => i == null);
         for (int i = 0; i < slots.childCount; i++)
         {
             if (i < _itemList.Count)
@@ -141,12 +149,17 @@ public class BackpackManager : MonoBehaviour
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = true;
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().sprite = _itemList[i].ItemData.ItemIcon;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
+                slots.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>().text = _itemList[i].MaxDurability != -1
+                    ? $"{_itemList[i].CurrentDurability}/{_itemList[i].MaxDurability}"
+                    : "";
+
                 slots.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(_itemList[i]);
             }
             else
             {
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                slots.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>().text = "";
             }
         }
 
@@ -192,7 +205,7 @@ public class BackpackManager : MonoBehaviour
     /// <returns>若大于等于100则全部满足并成功应用，否则返回满足物品个数</returns>
     public int DeployCraft(CraftWayData craftWay)
     {
-        if (craftWay==null)
+        if (craftWay == null)
             return 0;
         int count = 0;
         List<Item> testItemList = new List<Item>(_itemList);
@@ -208,12 +221,11 @@ public class BackpackManager : MonoBehaviour
                 count++;
                 destroyList.Add(item);
             }
-            
         }
 
         foreach (ItemData catalystItem in craftWay.CatalystItems)
         {
-            if (testItemList.Find(i => i.ItemData.ItemName == catalystItem.ItemName)==null)
+            if (testItemList.Find(i => i.ItemData.ItemName == catalystItem.ItemName) == null)
                 isSatisfied = false;
             else
                 count++;

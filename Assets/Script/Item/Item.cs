@@ -1,8 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
+
 /// <summary>
 /// 物品类，表示一个物品，挂载在物品的GameObject上。
 /// </summary>
@@ -20,6 +23,12 @@ public class Item : NetworkBehaviour
     /// 物品的拾取距离
     /// </summary>
     [SerializeField] protected float _pickUpDistance = 1.5f;
+
+    /// <summary>
+    /// 物体耐久度，若无耐久度则为-1，有耐久度的物体耐久度归零会损坏
+    /// </summary>
+    public int CurrentDurability { get; private set; } = -1;
+    public int MaxDurability { get; private set; } = -1;
     /// <summary> 
     /// 物品的网络ID
     /// </summary>
@@ -44,7 +53,7 @@ public class Item : NetworkBehaviour
     {
         if (player == null)
         {
-            PlayerItemInteraction.RamdomPlayer.CreateItemForClient(itemData_pth, owner,place);
+            PlayerItemInteraction.RandomPlayer.CreateItemForClient(itemData_pth, owner,place);
         }
         else
         {
@@ -62,6 +71,29 @@ public class Item : NetworkBehaviour
         ItemData = itemData;
         ItemLocation.Owner = owner;
         ItemLocation.PlayerId = playerId;
+        if (itemData is ArmorItemData armorItemData)
+        {
+            MaxDurability = armorItemData.Durability;
+        }else if (itemData is WeaponItemData weaponItemData)
+        {
+            MaxDurability = weaponItemData.Durability;
+        }
+        CurrentDurability = MaxDurability;
+    }
+
+    /// <summary>
+    /// 最终执行耐久度改变的函数，若想调用请通过对应物品拥有者的playerInteractive.DecreaseDurability();
+    /// </summary>
+    /// <param name="count">减少的耐久度，默认为1</param>
+    public void DecreaseDurability(int count = 1)
+    {
+        if (CurrentDurability==-1)
+            return;
+        CurrentDurability -= count;
+        if (CurrentDurability<=0)
+        {
+            Item.Destroy(this,PlayerItemInteraction.RandomPlayer.gameObject);
+        }
     }
     /// <summary>
     /// 销毁物品
@@ -107,6 +139,11 @@ public class Item : NetworkBehaviour
             player.GetComponent<PlayerItemInteraction>().PickUpItem(item.gameObject);
             BackpackManager.Instance.AddItem(item);
         }
+    }
+
+    private void OnDestroy()
+    {
+        BackpackManager.Instance.RemoveItem(this);
     }
 }
 /// <summary>
@@ -159,4 +196,5 @@ public class ItemOwnerInfo
             }
         }
     }
+
 }
