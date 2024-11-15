@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -81,6 +82,12 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
             _layout = _operationMenu.transform.GetChild(0);
             if(_slotItem != null)
             {
+                if (_slotItem.ItemData is ArmorItemData armorData)
+                {
+                    var tmpText = _layout.GetChild(0).GetComponentInChildren<TMP_Text>();
+                    tmpText.text = $"装备\n({PlayerHealth.BodyToChinese[armorData.EquipBodyPosition]})";
+                    tmpText.fontSize = 11;
+                }
                 _layout.GetChild(0).GetComponent<Button>().onClick.AddListener(() => 
                 {
                     BackpackManager.Instance.UseItem(_slotItem);

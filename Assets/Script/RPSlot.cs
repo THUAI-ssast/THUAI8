@@ -21,6 +21,7 @@ public class RPSlot : MonoBehaviour, IPointerClickHandler
             //_rp.GetComponent<ResourcePointController>().RemoveItemFromResourcePoint(_slotItem);
             GameObject player = GameObject.FindWithTag("LocalPlayer");
             player.GetComponent<PlayerItemInteraction>().PickUpItemFromRP(_rp, _slotItem.gameObject);
+            _slotItem.ItemLocation.Owner = ItemOwner.PlayerBackpack;
         }
     }
 }

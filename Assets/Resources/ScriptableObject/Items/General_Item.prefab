@@ -167,4 +167,4 @@ MonoBehaviour:
   ItemData: {fileID: 0}
   ItemLocation:
     _owner: 0
-  _pickUpDistance: 1
+  _pickUpDistance: 1.5

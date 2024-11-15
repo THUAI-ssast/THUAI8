@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da1d47110da67af408090f29d149749b, type: 3}
+  m_Script: {fileID: 11500000, guid: 55813a3426113f44b8c084c5781ed4dc, type: 3}
   m_Name: "\u72FC\u7259\u68D2"
   m_EditorClassIdentifier: 
   ItemName: "\u72FC\u7259\u68D2"
@@ -17,3 +17,11 @@ MonoBehaviour:
   ItemDesc: 
   ItemType: 0
   ItemValue: 0
+  Durability: 4
+  AttakAPCost: 1
+  BasicDamage: 2
+  BodyDamageDictionary:
+    _pairs:
+    - _key: 0
+      _value: 1.5
+  AttackDamageType: 1

@@ -1,8 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
+
 /// <summary>
 /// 物品类，表示一个物品，挂载在物品的GameObject上。
 /// </summary>
@@ -19,12 +22,18 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 物品的拾取距离
     /// </summary>
-    [SerializeField] private float _pickUpDistance = 1;
+    [SerializeField] protected float _pickUpDistance = 1.5f;
+
+    /// <summary>
+    /// 物体耐久度，若无耐久度则为-1，有耐久度的物体耐久度归零会损坏
+    /// </summary>
+    public int CurrentDurability { get; private set; } = -1;
+    public int MaxDurability { get; private set; } = -1;
     /// <summary> 
     /// 物品的网络ID
     /// </summary>
-    private uint _itemID;
-    void Awake()
+    protected uint _itemID;
+    protected void Awake()
     {
         _itemID = gameObject.GetComponent<NetworkIdentity>().netId;
         if(ItemLocation == null)
@@ -44,7 +53,7 @@ public class Item : NetworkBehaviour
     {
         if (player == null)
         {
-            PlayerItemInteraction.RamdomPlayer.CreateItemForClient(itemData_pth, owner,place);
+            PlayerItemInteraction.RandomPlayer.CreateItemForClient(itemData_pth, owner,place);
         }
         else
         {
@@ -62,6 +71,29 @@ public class Item : NetworkBehaviour
         ItemData = itemData;
         ItemLocation.Owner = owner;
         ItemLocation.PlayerId = playerId;
+        if (itemData is ArmorItemData armorItemData)
+        {
+            MaxDurability = armorItemData.Durability;
+        }else if (itemData is WeaponItemData weaponItemData)
+        {
+            MaxDurability = weaponItemData.Durability;
+        }
+        CurrentDurability = MaxDurability;
+    }
+
+    /// <summary>
+    /// 最终执行耐久度改变的函数，若想调用请通过对应物品拥有者的playerInteractive.DecreaseDurability();
+    /// </summary>
+    /// <param name="count">减少的耐久度，默认为1</param>
+    public void DecreaseDurability(int count = 1)
+    {
+        if (CurrentDurability==-1)
+            return;
+        CurrentDurability -= count;
+        if (CurrentDurability<=0)
+        {
+            Item.Destroy(this,PlayerItemInteraction.RandomPlayer.gameObject);
+        }
     }
     /// <summary>
     /// 销毁物品
@@ -87,7 +119,7 @@ public class Item : NetworkBehaviour
     /// 判断物品是否可以被拾取
     /// </summary>
     /// <returns>如果物品可以被拾取，返回true；否则返回false</returns>
-    private bool CanBePickedUp()
+    protected bool CanBePickedUp()
     {
         if(ItemLocation.Owner != ItemOwner.World) return false;
         if(UIManager.Instance.IsUIActivating == true) return false;
@@ -98,7 +130,7 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 右键点击物品拾取物品到背包
     /// </summary>
-    private void OnMouseOver()
+    protected void OnMouseOver()
     {  
         if(Input.GetMouseButtonDown(1) && CanBePickedUp())
         {
@@ -107,6 +139,15 @@ public class Item : NetworkBehaviour
             player.GetComponent<PlayerItemInteraction>().PickUpItem(item.gameObject);
             BackpackManager.Instance.AddItem(item);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (BackpackManager.Instance!=null)
+        {
+            BackpackManager.Instance.RemoveItem(this);
+        }
+        
     }
 }
 /// <summary>
@@ -159,4 +200,5 @@ public class ItemOwnerInfo
             }
         }
     }
+
 }

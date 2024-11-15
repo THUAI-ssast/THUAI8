@@ -30,10 +30,12 @@ public class RoundManager : NetworkBehaviour
     /// 定位回合UI
     /// </summary>
     [SerializeField] private GameObject _round;
+
+    [SerializeField] private float _apIncrease;
     /// <summary>
     /// 回合持续时间
     /// </summary>
-    private float _roundDuration = 20f;
+    [SerializeField]private float _roundDuration = 20f;
     /// <summary>
     /// 回合计时器
     /// </summary>
@@ -188,7 +190,7 @@ public class RoundManager : NetworkBehaviour
         StartCoroutine(EndRoundUI());
         InitRoundSetting();
         GameObject player = GameObject.FindWithTag("LocalPlayer");
-        player.GetComponent<PlayerActionPoint>().IncreaseActionPoint(2);
+        player.GetComponent<PlayerActionPoint>().IncreaseActionPoint(_apIncrease);
     }
     /// <summary>
     /// 客户端结束回合UI显示。

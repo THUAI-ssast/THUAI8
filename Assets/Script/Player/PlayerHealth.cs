@@ -1,6 +1,8 @@
+using System;
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -14,49 +16,175 @@ public class PlayerHealth : NetworkBehaviour
     /// </summary>
     [SyncVar] private string _name;
 
-    public string Name { get => _name; }
-    
+    public string Name => _name;
+
+    public enum BodyPosition
+    {
+        Head,
+        MainBody,
+        Legs
+    }
+
+    public static Dictionary<BodyPosition, string> BodyToChinese = new Dictionary<BodyPosition, string>()
+    {
+        { BodyPosition.Head, "头部" },
+        { BodyPosition.MainBody, "躯干" },
+        { BodyPosition.Legs, "腿部" }
+    };
+
+    private Dictionary<BodyPosition, Item> _armorEquipments = new Dictionary<BodyPosition, Item>();
+
+    public Item GetItemAt(BodyPosition position)
+    {
+        if (_armorEquipments.TryGetValue(position, out var armorItem))
+        {
+            return armorItem;
+        }
+
+        return null;
+    }
+
+    public Item EquipArmor(BodyPosition position, Item armorItem)
+    {
+        Item oldArmor = null;
+        if (armorItem.ItemData is ArmorItemData armorData && armorData.EquipBodyPosition == position)
+        {
+            if (_armorEquipments.TryGetValue(position, out var equipment))
+            {
+                oldArmor = equipment;
+            }
+
+            CmdChangeArmorEquipments((int)position, armorItem.gameObject);
+        }
+
+        return oldArmor;
+    }
+
+    public Item UnEquipArmor(BodyPosition position)
+    {
+        Item oldArmor = null;
+        if (_armorEquipments.TryGetValue(position, out var equipment))
+        {
+            oldArmor = equipment;
+            CmdRemoveArmorEquipments((int)position);
+        }
+
+        return oldArmor;
+    }
+
+    [Command]
+    private void CmdChangeArmorEquipments(int position, GameObject armorObject)
+    {
+        _armorEquipments[(BodyPosition)position] = armorObject.GetComponent<Item>();
+        RpcChangeArmorEquipments(position, armorObject);
+    }
+
+    [ClientRpc]
+    private void RpcChangeArmorEquipments(int position, GameObject armorObject)
+    {
+        _armorEquipments[(BodyPosition)position] = armorObject.GetComponent<Item>();
+        if (isLocalPlayer)
+        {
+            BackpackManager.Instance.RefreshArmorDisplay();
+        }
+    }
+
+    [Command]
+    private void CmdRemoveArmorEquipments(int position)
+    {
+        _armorEquipments.Remove((BodyPosition)position);
+        RpcRemoveArmorEquipments(position);
+    }
+
+    [ClientRpc]
+    private void RpcRemoveArmorEquipments(int position)
+    {
+        _armorEquipments.Remove((BodyPosition)position);
+        if (isLocalPlayer)
+        {
+            BackpackManager.Instance.RefreshArmorDisplay();
+        }
+    }
+
+
     /// <summary>
     /// 玩家的总血量上限
     /// </summary>
-    public float TotalMaxHealth { get => _headMaxHealth + _bodyMaxHealth + _legMaxHealth; }
+    public float TotalMaxHealth
+    {
+        get => _headMaxHealth + _bodyMaxHealth + _legMaxHealth;
+    }
+
     /// <summary>
     /// 玩家的头部血量上限
     /// </summary>
-    private float _headMaxHealth = 10;
+    private readonly float _headMaxHealth = 10;
+
     /// <summary>
     /// 玩家的身体血量上限
     /// </summary>
-    private float _bodyMaxHealth = 10;
+    private readonly float _bodyMaxHealth = 10;
+
     /// <summary>
     /// 玩家的腿部血量上限
     /// </summary>
-    private float _legMaxHealth = 10;
+    private readonly float _legMaxHealth = 10;
 
-    public float HeadMaxHealth { get => _headMaxHealth; }
-    public float BodyMaxHealth { get => _bodyMaxHealth; }
-    public float LegMaxHealth { get => _legMaxHealth; }
+    public float HeadMaxHealth
+    {
+        get => _headMaxHealth;
+    }
+
+    public float BodyMaxHealth
+    {
+        get => _bodyMaxHealth;
+    }
+
+    public float LegMaxHealth
+    {
+        get => _legMaxHealth;
+    }
 
     /// <summary>
     /// 玩家的当前总血量
     /// </summary>
-    public float TotalHealth { get => _headHealth + _bodyHealth + _legHealth; }
+    public float TotalHealth
+    {
+        get => _headHealth + _bodyHealth + _legHealth;
+    }
+
     /// <summary>
     /// 玩家的当前头部血量，变化时会调用HeadHealthChange函数
     /// </summary>
-    [SyncVar(hook = nameof(HeadHealthChange))] private float _headHealth = 10;
+    [SyncVar(hook = nameof(HeadHealthChange))]
+    private float _headHealth = 10;
+
     /// <summary>
     /// 玩家的当前身体血量，变化时会调用BodyHealthChange函数
     /// </summary>
-    [SyncVar(hook = nameof(BodyHealthChange))] private float _bodyHealth = 10;
+    [SyncVar(hook = nameof(BodyHealthChange))]
+    private float _bodyHealth = 10;
+
     /// <summary>
     /// 玩家的当前腿部血量，变化时会调用LegHealthChange函数
     /// </summary>
-    [SyncVar(hook = nameof(LegHealthChange))] private float _legHealth = 10;
+    [SyncVar(hook = nameof(LegHealthChange))]
+    private float _legHealth = 10;
 
-    public float HeadHealth { get => _headHealth; }
-    public float BodyHealth { get => _bodyHealth; }
-    public float LegHealth { get => _legHealth; }
+    public float HeadHealth
+    {
+        get => _headHealth;
+    }
+
+    public float BodyHealth
+    {
+        get => _bodyHealth;
+    }
+
+    public float LegHealth
+    {
+        get => _legHealth;
+    }
 
     /// <summary>
     /// 对应的玩家对象Transform
@@ -67,10 +195,12 @@ public class PlayerHealth : NetworkBehaviour
     /// 玩家的头部血条UI
     /// </summary>
     public HealthGUI HeadHealthGUI;
+
     /// <summary>
     /// 玩家的身体血条UI
     /// </summary>
     public HealthGUI BodyHealthGUI;
+
     /// <summary>
     /// 玩家的腿部血条UI
     /// </summary>
@@ -84,12 +214,13 @@ public class PlayerHealth : NetworkBehaviour
     // Start is called before the first frame update 
     void Start()
     {
-        if (isLocalPlayer) 
+        if (isLocalPlayer)
         {
             // 获取玩家名字
             CmdSetName(PlayerPrefs.GetString("Name"));
             // 获取本地玩家信息面板
-            LocalPlayerInfoPanel = UIManager.Instance.MainCanvas.transform.Find("PlayerInfoPanel").gameObject.GetComponent<PlayerInfoUI>();
+            LocalPlayerInfoPanel = UIManager.Instance.MainCanvas.transform.Find("PlayerInfoPanel").gameObject
+                .GetComponent<PlayerInfoUI>();
             LocalPlayerInfoPanel.UpdateHealthPoint(_headHealth, _headMaxHealth, BodyPart.Head);
             LocalPlayerInfoPanel.UpdateHealthPoint(_bodyHealth, _bodyMaxHealth, BodyPart.Body);
             LocalPlayerInfoPanel.UpdateHealthPoint(_legHealth, _legMaxHealth, BodyPart.Leg);
@@ -109,6 +240,8 @@ public class PlayerHealth : NetworkBehaviour
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _headMaxHealth, BodyPart.Head);
+            BackpackManager.Instance.HeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_headHealth}/{HeadMaxHealth}";
         }
     }
 
@@ -124,6 +257,8 @@ public class PlayerHealth : NetworkBehaviour
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _bodyMaxHealth, BodyPart.Body);
+            BackpackManager.Instance.BodyHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_bodyHealth}/{BodyMaxHealth}";
         }
     }
 
@@ -139,8 +274,77 @@ public class PlayerHealth : NetworkBehaviour
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _legMaxHealth, BodyPart.Leg);
+            BackpackManager.Instance.HeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_headHealth}/{HeadMaxHealth}";
         }
     }
+
+    /// <summary>
+    /// 供外部调用的攻击函数，攻击方消耗体力用指定武器攻击目标的某一部位，扣除对应的血量(保留2位小数)和武器/防具耐久度；
+    /// 若体力不足则不会扣除血量并提示体力不足
+    /// </summary>
+    /// <param name="attacker">攻击的发起方，会扣除对应的体力</param>
+    /// <param name="target">被攻击的目标</param>
+    /// <param name="position">被攻击的部位，会扣除对应部位血量和防具耐久</param>
+    /// <param name="weapon">攻击所使用的武器，会扣除对应的武器耐久度</param>
+    public static void Attack(PlayerActionPoint attacker, PlayerHealth target, BodyPosition position, Item weapon)
+    {
+        WeaponItemData weaponData = weapon.ItemData as WeaponItemData;
+        if (weaponData == null)
+            return;
+        if (attacker.DecreaseActionPoint(weaponData.AttakAPCost))
+            target.TakeWeaponDamage(attacker.GetComponent<PlayerItemInteraction>(),
+                target.GetComponent<PlayerItemInteraction>(), position, weapon);
+    }
+
+    [Command]
+    public void CmdAttack(GameObject attacker, GameObject target, int position, GameObject weapon)
+    {
+        Attack(attacker.GetComponent<PlayerActionPoint>(), target.GetComponent<PlayerHealth>(), (BodyPosition)position,
+            weapon.GetComponent<Item>());
+    }
+
+    /// <summary>
+    /// 受到武器的伤害，会根据对应部位、武器和防具计算伤害(保留2位小数)，扣除对应的血量和武器/防具耐久度
+    /// </summary>
+    /// <param name="attacker">攻击的发起方，会扣除对应的体力</param>
+    /// <param name="target">被攻击的目标</param>
+    /// <param name="position">受击位置</param>
+    /// <param name="weaponItem">攻击方使用的武器</param>
+    private void TakeWeaponDamage(PlayerItemInteraction attacker, PlayerItemInteraction target, BodyPosition position,
+        Item weaponItem)
+    {
+        //武器伤害计算公式为：Dmg(伤害)= Tch(机制乘区)*Bdy(部位乘区)*Bsc(基础伤害)
+        WeaponItemData weaponData = weaponItem.ItemData as WeaponItemData;
+        if (weaponData == null)
+            return;
+        //基础伤害
+        float damage = weaponData.BasicDamage;
+        //部位乘区，默认为1
+        if (weaponData.BodyDamageDictionary.ContainsKey(position))
+            damage *= weaponData.BodyDamageDictionary.Get(position);
+        attacker.DecreaseDurability(weaponItem.gameObject);
+        //清除已经被摧毁的防具
+        foreach (BodyPosition bodyPosition in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+        {
+            if (_armorEquipments.TryGetValue(bodyPosition,out var armor)&& armor==null)
+            {
+                _armorEquipments.Remove(bodyPosition);
+            }
+        }
+        //机制乘区，默认为1，仅当对应部位有护甲&&护甲对武器伤害类型有特殊乘区时启用
+        if (_armorEquipments.TryGetValue(position, out var armorItem) && armorItem.ItemData is ArmorItemData armorData)
+        {
+            target.DecreaseDurability(armorItem.gameObject);
+            if (armorData.DamageTypeDictionary.ContainsKey(weaponData.AttackDamageType))
+            {
+                damage *= armorData.DamageTypeDictionary.Get(weaponData.AttackDamageType);
+            }
+        }
+
+        ChangeHealth((int)position, -damage);
+    }
+
 
     /// <summary>
     /// Command函数，在客户端被调用，但在服务端执行。
@@ -153,4 +357,60 @@ public class PlayerHealth : NetworkBehaviour
         _name = name;
     }
 
+    /// <summary>
+    /// 改变血量的同一接口(保留2位小数)，每个部位血量范围为0到MaxHealth，低于0会触发死亡
+    /// </summary>
+    /// <param name="bodyPosition">血量改变部位，需要使用(int)BodyPosition.xxx</param>
+    /// <param name="healthChange">血量改变量，正数回血，负数扣血</param>
+    private void ChangeHealth(int bodyPosition, float healthChange)
+    {
+        if (isServer)
+        {
+            DeployChangeHealth(bodyPosition,healthChange);
+        }
+        else
+        {
+            CmdChangeHealth(bodyPosition,healthChange);
+        }
+    }
+    [Command]
+    private void CmdChangeHealth(int bodyPosition, float healthChange)
+    {
+        DeployChangeHealth(bodyPosition,healthChange);
+    }
+    private void DeployChangeHealth(int bodyPosition, float healthChange)
+    {
+        BodyPosition pos = (BodyPosition)bodyPosition;
+        switch (pos)
+        {
+            case BodyPosition.Head:
+                _headHealth = (float)Math.Round(Mathf.Clamp(_headHealth + healthChange, 0, HeadMaxHealth), 1);
+                break;
+            case BodyPosition.MainBody:
+                _bodyHealth = (float)Math.Round(Mathf.Clamp(_bodyHealth + healthChange, 0, BodyMaxHealth), 1);
+                break;
+            case BodyPosition.Legs:
+                _legHealth = (float)Math.Round(Mathf.Clamp(_legHealth + healthChange, 0, LegMaxHealth), 1);
+                break;
+        }
+
+        deathCheck();
+    }
+
+    /// <summary>
+    /// 死亡检测，若头部或躯干生命值等于0则触发死亡
+    /// </summary>
+    private void deathCheck()
+    {
+        if (_headHealth <= 0 || _bodyHealth <= 0)
+        {
+            RpcPlayerDie();
+        }
+    }
+
+    [ClientRpc]
+    public void RpcPlayerDie()
+    {
+        Debug.Log(_name + " Player is Dead!");
+    }
 }

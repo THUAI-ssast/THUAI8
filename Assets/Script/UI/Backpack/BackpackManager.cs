@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -16,6 +17,15 @@ public class BackpackManager : MonoBehaviour
     /// </summary>
     [SerializeField] private GameObject _bagPanel;
 
+    public Transform HeadHealthPanel;
+    public Transform LegsHealthPanel;
+    public Transform BodyHealthPanel;
+
+    private Dictionary<PlayerHealth.BodyPosition, ArmorSlot> _armorSlots =
+        new Dictionary<PlayerHealth.BodyPosition, ArmorSlot>();
+
+    private Transform _slotsTransform;
+
     /// <summary>
     /// 单例模式
     /// </summary>
@@ -25,6 +35,7 @@ public class BackpackManager : MonoBehaviour
     /// 背包中现有所有物品的列表，增删需更改列表。
     /// </summary>
     private List<Item> _itemList = new List<Item>();
+
 
     private void Awake()
     {
@@ -43,6 +54,13 @@ public class BackpackManager : MonoBehaviour
     /// </summary>
     void Start()
     {
+        _slotsTransform = _bagPanel.transform.Find("ItemsPanel/Scroll View/Viewport/Slots");
+        HeadHealthPanel = _bagPanel.transform.Find("HealthPanel/Head");
+        BodyHealthPanel = _bagPanel.transform.Find("HealthPanel/Body");
+        LegsHealthPanel = _bagPanel.transform.Find("HealthPanel/Legs");
+        _armorSlots[PlayerHealth.BodyPosition.Head] = HeadHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
+        _armorSlots[PlayerHealth.BodyPosition.MainBody] = BodyHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
+        _armorSlots[PlayerHealth.BodyPosition.Legs] = LegsHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
         RefreshSlots();
         StartCoroutine(initItems_debug());
     }
@@ -57,6 +75,9 @@ public class BackpackManager : MonoBehaviour
             CreateItem("ScriptableObject/Items/锤石");
             CreateItem("ScriptableObject/Items/木棒");
             CreateItem("ScriptableObject/Items/金属破片");
+            CreateItem("ScriptableObject/Items/Armor/纸质护甲");
+            CreateItem("ScriptableObject/Items/Armor/防刺服");
+            CreateItem("ScriptableObject/Items/Weapons/小刀");
         }
     }
 
@@ -98,10 +119,18 @@ public class BackpackManager : MonoBehaviour
     /// 从背包中移除物品
     /// </summary>
     /// <param name="item">要移除的物品</param>
-    private void RemoveItem(Item item)
+    public void RemoveItem(Item item)
     {
-        _itemList.Remove(item);
-        RefreshSlots();
+        if (_itemList.Remove(item))
+            RefreshSlots();
+        foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+        {
+            if (_armorSlots[position].GetItem() == item)
+            {
+                GameObject player = GameObject.FindWithTag("LocalPlayer");
+                _armorSlots[position].SetItem(null);
+            }
+        }
     }
 
     /// <summary>
@@ -111,10 +140,21 @@ public class BackpackManager : MonoBehaviour
     public void UseItem(Item item)
     {
         GameObject player = GameObject.FindWithTag("LocalPlayer");
-        player.GetComponent<PlayerItemInteraction>().UseItem(item.gameObject);
-        _itemList.Remove(item);
+        var playerInteraction = player.GetComponent<PlayerItemInteraction>();
+        if (item.ItemData is ArmorItemData armorData)
+        {
+            player.GetComponent<PlayerHealth>().EquipArmor(armorData.EquipBodyPosition, item);
+            _itemList.Remove(item);
+        }
+        else if (item.ItemData is WeaponItemData weaponData)
+        {
+            var target = GameObject.FindWithTag("Player");
+            player.GetComponent<PlayerHealth>().CmdAttack(player,target,(int)PlayerHealth.BodyPosition.MainBody,item.gameObject);
+        }
+
         RefreshSlots();
     }
+
 
     /// <summary>
     /// 丢弃背包中的物品到世界
@@ -131,9 +171,12 @@ public class BackpackManager : MonoBehaviour
     /// <summary>
     /// 刷新背包中的物品槽，更新物品显示状态，包括图标、名称等。
     /// </summary>
-    private void RefreshSlots()
+    public void RefreshSlots()
     {
-        Transform slots = _bagPanel.transform.Find("ItemsPanel/Scroll View/Viewport/Slots");
+        Transform slots = _slotsTransform;
+        if (slots == null)
+            return;
+        _itemList.RemoveAll(i => i == null);
         for (int i = 0; i < slots.childCount; i++)
         {
             if (i < _itemList.Count)
@@ -141,16 +184,60 @@ public class BackpackManager : MonoBehaviour
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = true;
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().sprite = _itemList[i].ItemData.ItemIcon;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
+                if (_itemList[i].MaxDurability != -1)
+                {
+                    slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = true;
+                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text =
+                        $"{_itemList[i].CurrentDurability}/{_itemList[i].MaxDurability}";
+                }
+                else
+                {
+                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                }
+
                 slots.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(_itemList[i]);
             }
             else
             {
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
+                slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
             }
         }
 
         CraftWayUI.UpdateSatisfiedAll();
+    }
+
+    public void DeleteArmorDisplay(Item armorItem)
+    {
+
+    }
+
+    public void RefreshArmorDisplay()
+    {
+        GameObject player = GameObject.FindWithTag("LocalPlayer");
+        if (player == null)
+            return;
+        var playerHealth = player.GetComponent<PlayerHealth>();
+        foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+        {
+            Item newArmor = playerHealth.GetItemAt(position);
+            var oldArmor = _armorSlots[position].SetItem(newArmor);
+            if (oldArmor != null)
+            {
+                //若有护甲变动，将原护甲放回背包，否则仅刷新显示
+                if (oldArmor!=newArmor)
+                {
+                    AddItem(oldArmor);
+                }
+                else
+                {
+                    _armorSlots[position].UpdateDisplay();
+                }
+                
+            }
+        }
     }
 
     /// <summary>
@@ -192,7 +279,7 @@ public class BackpackManager : MonoBehaviour
     /// <returns>若大于等于100则全部满足并成功应用，否则返回满足物品个数</returns>
     public int DeployCraft(CraftWayData craftWay)
     {
-        if (craftWay==null)
+        if (craftWay == null)
             return 0;
         int count = 0;
         List<Item> testItemList = new List<Item>(_itemList);
@@ -208,12 +295,11 @@ public class BackpackManager : MonoBehaviour
                 count++;
                 destroyList.Add(item);
             }
-            
         }
 
         foreach (ItemData catalystItem in craftWay.CatalystItems)
         {
-            if (testItemList.Find(i => i.ItemData.ItemName == catalystItem.ItemName)==null)
+            if (testItemList.Find(i => i.ItemData.ItemName == catalystItem.ItemName) == null)
                 isSatisfied = false;
             else
                 count++;

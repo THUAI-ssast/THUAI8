@@ -71,13 +71,25 @@ public class PlayerMove : NetworkBehaviour
         float firstAngle = (firstMoveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, firstMoveVector);
         Vector3 endMoveVector = path[^1] - path[^2];
         float angle = (endMoveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, endMoveVector);
-        _spriteDisplay.DORotate(new Vector3(0, 0, firstAngle), duration * 0.15f).SetEase(Ease.Linear).OnComplete(() =>
-            _spriteDisplay.DORotate(new Vector3(0, 0, angle), duration * 0.35f).SetEase(Ease.Linear));
+        setRotateAnimation(firstAngle,angle,duration);
 
         transform.DOPath(path, duration);
         SetTilePos(tilePosition);
         //_tilePosition = tilePosition; // 更新同步位置
         return;
+    }
+
+    /// <summary>
+    /// 同步玩家旋转的动画
+    /// </summary>
+    /// <param name="firstAngle">第一个旋转角</param>
+    /// <param name="angle">第二个旋转角</param>
+    /// <param name="duration"></param>
+    [ClientRpc]
+    private void setRotateAnimation(float firstAngle,float angle,float duration)
+    {
+        _spriteDisplay.DORotate(new Vector3(0, 0, firstAngle), duration * 0.15f).SetEase(Ease.Linear).OnComplete(() =>
+            _spriteDisplay.DORotate(new Vector3(0, 0, angle), duration * 0.35f).SetEase(Ease.Linear));
     }
 
     [ClientRpc]
