@@ -85,7 +85,7 @@ public class PlayerActionPoint : NetworkBehaviour
     /// <param name="increase">大于0的数，表示要增加的体力值</param>
     public void IncreaseActionPoint(float increase)
     {
-        CmdChangeActionPoint(increase);
+        ChangeActionPoint(increase);
     }
 
     /// <summary>
@@ -95,9 +95,9 @@ public class PlayerActionPoint : NetworkBehaviour
     /// <param name="isDisplayUI">在体力不足时是否向玩家显示警告，默认是true</param>
     public bool DecreaseActionPoint(float decrease, bool isDisplayUI = true)
     {
-        if (CheckForEnoughActionPoint(decrease, isDisplayUI))
+        if (!CheckForEnoughActionPoint(decrease, isDisplayUI))
             return false;
-        CmdChangeActionPoint(-decrease);
+        ChangeActionPoint(-decrease);
         return true;
     }
 
@@ -105,15 +105,31 @@ public class PlayerActionPoint : NetworkBehaviour
     /// 改变玩家体力的统一接口。
     /// </summary>
     /// <param name="increase">要改变的体力值：当increase大于0时，增加相应的体力值，最高增加至体力值上限；当increase小于0时，减少相应的体力值</param>
+    private void ChangeActionPoint(float increase)
+    {
+        if (isServer)
+        {
+            DeployChangeActionPoint(increase);
+        }
+        else
+        {
+            CmdChangeActionPoint(increase);
+        }
+    }
     [Command]
     private void CmdChangeActionPoint(float increase)
+    {
+        DeployChangeActionPoint(increase);
+    }
+
+    private void DeployChangeActionPoint(float increase)
     {
         float tempActionPoint = _currentActionPoint + increase;
         if (tempActionPoint > MaxActionPoint)
         {
             _currentActionPoint = MaxActionPoint;
         }
-        else if(tempActionPoint >= 0)
+        else if (tempActionPoint >= 0)
         {
             _currentActionPoint = tempActionPoint;
         }

@@ -36,10 +36,11 @@ public class PlayerHealth : NetworkBehaviour
 
     public Item GetItemAt(BodyPosition position)
     {
-        if (_armorEquipments.TryGetValue(position,out var armorItem))
+        if (_armorEquipments.TryGetValue(position, out var armorItem))
         {
             return armorItem;
         }
+
         return null;
     }
 
@@ -52,9 +53,10 @@ public class PlayerHealth : NetworkBehaviour
             {
                 oldArmor = equipment;
             }
-            CmdChangeArmorEquipments((int)position,armorItem.gameObject);
+
+            CmdChangeArmorEquipments((int)position, armorItem.gameObject);
         }
-        
+
         return oldArmor;
     }
 
@@ -66,13 +68,15 @@ public class PlayerHealth : NetworkBehaviour
             oldArmor = equipment;
             CmdRemoveArmorEquipments((int)position);
         }
+
         return oldArmor;
     }
 
     [Command]
     private void CmdChangeArmorEquipments(int position, GameObject armorObject)
     {
-        RpcChangeArmorEquipments(position,armorObject);
+        _armorEquipments[(BodyPosition)position] = armorObject.GetComponent<Item>();
+        RpcChangeArmorEquipments(position, armorObject);
     }
 
     [ClientRpc]
@@ -84,9 +88,11 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.RefreshArmorDisplay();
         }
     }
+
     [Command]
     private void CmdRemoveArmorEquipments(int position)
     {
+        _armorEquipments.Remove((BodyPosition)position);
         RpcRemoveArmorEquipments(position);
     }
 
@@ -99,6 +105,7 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.RefreshArmorDisplay();
         }
     }
+
 
     /// <summary>
     /// 玩家的总血量上限
@@ -218,7 +225,6 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(_bodyHealth, _bodyMaxHealth, BodyPart.Body);
             LocalPlayerInfoPanel.UpdateHealthPoint(_legHealth, _legMaxHealth, BodyPart.Leg);
         }
-
     }
 
 
@@ -291,6 +297,13 @@ public class PlayerHealth : NetworkBehaviour
                 target.GetComponent<PlayerItemInteraction>(), position, weapon);
     }
 
+    [Command]
+    public void CmdAttack(GameObject attacker, GameObject target, int position, GameObject weapon)
+    {
+        Attack(attacker.GetComponent<PlayerActionPoint>(), target.GetComponent<PlayerHealth>(), (BodyPosition)position,
+            weapon.GetComponent<Item>());
+    }
+
     /// <summary>
     /// 受到武器的伤害，会根据对应部位、武器和防具计算伤害(保留2位小数)，扣除对应的血量和武器/防具耐久度
     /// </summary>
@@ -311,6 +324,14 @@ public class PlayerHealth : NetworkBehaviour
         if (weaponData.BodyDamageDictionary.ContainsKey(position))
             damage *= weaponData.BodyDamageDictionary.Get(position);
         attacker.DecreaseDurability(weaponItem.gameObject);
+        //清除已经被摧毁的防具
+        foreach (BodyPosition bodyPosition in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+        {
+            if (_armorEquipments.TryGetValue(bodyPosition,out var armor)&& armor==null)
+            {
+                _armorEquipments.Remove(bodyPosition);
+            }
+        }
         //机制乘区，默认为1，仅当对应部位有护甲&&护甲对武器伤害类型有特殊乘区时启用
         if (_armorEquipments.TryGetValue(position, out var armorItem) && armorItem.ItemData is ArmorItemData armorData)
         {
@@ -321,8 +342,9 @@ public class PlayerHealth : NetworkBehaviour
             }
         }
 
-        CmdChangeHealth((int)position, damage);
+        ChangeHealth((int)position, -damage);
     }
+
 
     /// <summary>
     /// Command函数，在客户端被调用，但在服务端执行。
@@ -340,20 +362,35 @@ public class PlayerHealth : NetworkBehaviour
     /// </summary>
     /// <param name="bodyPosition">血量改变部位，需要使用(int)BodyPosition.xxx</param>
     /// <param name="healthChange">血量改变量，正数回血，负数扣血</param>
+    private void ChangeHealth(int bodyPosition, float healthChange)
+    {
+        if (isServer)
+        {
+            DeployChangeHealth(bodyPosition,healthChange);
+        }
+        else
+        {
+            CmdChangeHealth(bodyPosition,healthChange);
+        }
+    }
     [Command]
     private void CmdChangeHealth(int bodyPosition, float healthChange)
+    {
+        DeployChangeHealth(bodyPosition,healthChange);
+    }
+    private void DeployChangeHealth(int bodyPosition, float healthChange)
     {
         BodyPosition pos = (BodyPosition)bodyPosition;
         switch (pos)
         {
             case BodyPosition.Head:
-                _headHealth = (float)Math.Round(Mathf.Clamp(_headHealth + healthChange, 0, HeadMaxHealth), 2);
+                _headHealth = (float)Math.Round(Mathf.Clamp(_headHealth + healthChange, 0, HeadMaxHealth), 1);
                 break;
             case BodyPosition.MainBody:
-                _bodyHealth = (float)Math.Round(Mathf.Clamp(_bodyHealth + healthChange, 0, BodyMaxHealth), 2);
+                _bodyHealth = (float)Math.Round(Mathf.Clamp(_bodyHealth + healthChange, 0, BodyMaxHealth), 1);
                 break;
             case BodyPosition.Legs:
-                _legHealth = (float)Math.Round(Mathf.Clamp(_legHealth + healthChange, 0, LegMaxHealth), 2);
+                _legHealth = (float)Math.Round(Mathf.Clamp(_legHealth + healthChange, 0, LegMaxHealth), 1);
                 break;
         }
 

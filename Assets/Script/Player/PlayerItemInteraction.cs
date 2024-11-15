@@ -45,14 +45,21 @@ public class PlayerItemInteraction : NetworkBehaviour
         GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), Vector3.zero, Quaternion.identity);
         NetworkServer.Spawn(instance);
         NetworkIdentity playerIdentity = player.GetComponent<NetworkIdentity>();
+        instance.GetComponent<Item>().ItemData = Resources.Load<ItemData>(itemData_pth);
         RpcInitInstanceOnClients(instance, itemData_pth, owner, playerIdentity.netId,null);
         TargetNotifyItemCreatedInBackpack(playerIdentity.connectionToClient, instance);
     }
-    
+    /// <summary>
+    /// 只应该被server调用
+    /// </summary>
+    /// <param name="itemData_pth"></param>
+    /// <param name="owner"></param>
+    /// <param name="resourcePoint"></param>
     public void CreateItemForClient(string itemData_pth, ItemOwner owner, GameObject resourcePoint)
     {
         GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), Vector3.zero, Quaternion.identity);
         NetworkServer.Spawn(instance);
+        instance.GetComponent<Item>().ItemData = Resources.Load<ItemData>(itemData_pth);
         RpcInitInstanceOnClients(instance, itemData_pth, owner, 0, resourcePoint);
     }
     /// <summary>
@@ -65,6 +72,7 @@ public class PlayerItemInteraction : NetworkBehaviour
     [ClientRpc]
     public void RpcInitInstanceOnClients(GameObject instance, string itemData_pth, ItemOwner owner, uint playerId,GameObject resourcePoint)
     {
+        Debug.Log(itemData_pth);
         ItemData itemData = Resources.Load<ItemData>(itemData_pth);
         var spriteRenderer = instance.GetComponent<SpriteRenderer>();
         spriteRenderer.enabled = false;
@@ -78,18 +86,37 @@ public class PlayerItemInteraction : NetworkBehaviour
     /// 服务器处理玩家销毁物品事件。
     /// </summary>
     /// <param name="currentObj">要销毁的GameObject</param>
-    [Command]
     public void DestroyItem(GameObject currentObj)
+    {
+        if (isServer) 
+            NetworkServer.Destroy(currentObj);
+        else
+            CmdDestroyItem(currentObj);
+    }
+    [Command]
+    public void CmdDestroyItem(GameObject currentObj)
     {
         NetworkServer.Destroy(currentObj);
     }
+
     /// <summary>
     /// 减少耐久度的统一接口，若耐久度为0则销毁。
     /// 请通过对应物品拥有者的playerInteractive.DecreaseDurability()使用
     /// </summary>
     /// <param name="itemObject">需要减少耐久度的物体</param>
-    [Command]
     public void DecreaseDurability(GameObject itemObject)
+    {
+        if (isServer)
+        {
+            RpcDecreaseItemDurability(itemObject);
+        }
+        else
+        {
+            CmdDecreaseDurability(itemObject);
+        }
+    }
+    [Command]
+    public void CmdDecreaseDurability(GameObject itemObject)
     {
         RpcDecreaseItemDurability(itemObject);
     }
@@ -107,6 +134,7 @@ public class PlayerItemInteraction : NetworkBehaviour
             if (item.ItemLocation.Owner==ItemOwner.PlayerBackpack)
             {
                 BackpackManager.Instance.RefreshSlots();
+                BackpackManager.Instance.RefreshArmorDisplay();
             }
         }
     }

@@ -123,6 +123,14 @@ public class BackpackManager : MonoBehaviour
     {
         if (_itemList.Remove(item))
             RefreshSlots();
+        foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+        {
+            if (_armorSlots[position].GetItem() == item)
+            {
+                GameObject player = GameObject.FindWithTag("LocalPlayer");
+                _armorSlots[position].SetItem(null);
+            }
+        }
     }
 
     /// <summary>
@@ -140,7 +148,8 @@ public class BackpackManager : MonoBehaviour
         }
         else if (item.ItemData is WeaponItemData weaponData)
         {
-            playerInteraction.DecreaseDurability(item.gameObject);
+            var target = GameObject.FindWithTag("Player");
+            player.GetComponent<PlayerHealth>().CmdAttack(player,target,(int)PlayerHealth.BodyPosition.MainBody,item.gameObject);
         }
 
         RefreshSlots();
@@ -165,7 +174,7 @@ public class BackpackManager : MonoBehaviour
     public void RefreshSlots()
     {
         Transform slots = _slotsTransform;
-        if (slots==null)
+        if (slots == null)
             return;
         _itemList.RemoveAll(i => i == null);
         for (int i = 0; i < slots.childCount; i++)
@@ -200,6 +209,11 @@ public class BackpackManager : MonoBehaviour
         CraftWayUI.UpdateSatisfiedAll();
     }
 
+    public void DeleteArmorDisplay(Item armorItem)
+    {
+
+    }
+
     public void RefreshArmorDisplay()
     {
         GameObject player = GameObject.FindWithTag("LocalPlayer");
@@ -208,11 +222,20 @@ public class BackpackManager : MonoBehaviour
         var playerHealth = player.GetComponent<PlayerHealth>();
         foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
         {
-            Item armorItem = playerHealth.GetItemAt(position);
-            var oldArmor = _armorSlots[position].SetItem(armorItem);
+            Item newArmor = playerHealth.GetItemAt(position);
+            var oldArmor = _armorSlots[position].SetItem(newArmor);
             if (oldArmor != null)
             {
-                AddItem(oldArmor);
+                //若有护甲变动，将原护甲放回背包，否则仅刷新显示
+                if (oldArmor!=newArmor)
+                {
+                    AddItem(oldArmor);
+                }
+                else
+                {
+                    _armorSlots[position].UpdateDisplay();
+                }
+                
             }
         }
     }

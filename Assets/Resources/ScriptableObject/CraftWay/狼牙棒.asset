@@ -17,4 +17,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8d5ba779e561f634a91d1ba65cd6f822, type: 2}
   CatalystItems:
   - {fileID: 11400000, guid: 241c97ed3dc1e1e43b59884b55c70f58, type: 2}
-  ProductItem: {fileID: 11400000, guid: 3f332585b15c0c845aef77117a9a1a02, type: 2}
+  ProductItem: {fileID: 11400000, guid: 62e6dd93db0011f4dbff2527638bc9a2, type: 2}

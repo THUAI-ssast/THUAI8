@@ -33,8 +33,6 @@ public class ResourcePointController : NetworkBehaviour
 
     void Update()
     {
-        _player = GameObject.FindWithTag("LocalPlayer");
-
         if (Input.GetKeyDown(KeyCode.Mouse1) && _player != null && !UIManager.Instance.IsUIActivating)
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -60,6 +58,10 @@ public class ResourcePointController : NetworkBehaviour
                 }
             }
         }
+        else if(isClient)
+        {
+            _player = GameObject.FindWithTag("LocalPlayer");
+        }
     }
 
     private IEnumerator initItems_debug()
@@ -70,7 +72,15 @@ public class ResourcePointController : NetworkBehaviour
             float x = Random.Range(0f, 1f);
             if (x <= match.Value)
             {
-                CreateItem("ScriptableObject/Items/" + match.Key.name);
+                string directory = "ScriptableObject/Items/";
+                if (match.Key is WeaponItemData)
+                {
+                    directory += "Weapons/";
+                }else if (match.Key is ArmorItemData)
+                {
+                    directory += "Armor/";
+                }
+                CreateItem(directory + match.Key.name);
             }
         }
     }

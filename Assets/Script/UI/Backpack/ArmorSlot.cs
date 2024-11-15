@@ -30,6 +30,11 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
         return oldItem;
     }
 
+    public Item GetItem()
+    {
+        return _armorItem;
+    }
+
     public void UpdateDisplay()
     {
         if (_armorItem == null)
