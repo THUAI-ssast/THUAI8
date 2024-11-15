@@ -143,7 +143,11 @@ public class Item : NetworkBehaviour
 
     private void OnDestroy()
     {
-        BackpackManager.Instance.RemoveItem(this);
+        if (BackpackManager.Instance!=null)
+        {
+            BackpackManager.Instance.RemoveItem(this);
+        }
+        
     }
 }
 /// <summary>

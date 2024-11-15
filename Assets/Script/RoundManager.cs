@@ -35,7 +35,7 @@ public class RoundManager : NetworkBehaviour
     /// <summary>
     /// 回合持续时间
     /// </summary>
-    private float _roundDuration = 20f;
+    [SerializeField]private float _roundDuration = 20f;
     /// <summary>
     /// 回合计时器
     /// </summary>

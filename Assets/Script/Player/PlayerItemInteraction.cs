@@ -119,8 +119,6 @@ public class PlayerItemInteraction : NetworkBehaviour
     public void UseItem(GameObject currentObj)
     {
         Item item = currentObj.GetComponent<Item>();
-        ItemStatusChange(currentObj, false, ItemOwner.PlayerSuit, Vector3.zero, 0);
-        item.ItemData.UseItem();
     }
     [Command]
     public void PickUpItemFromRP(GameObject rp, GameObject instance)

@@ -2,6 +2,7 @@ using System;
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -24,7 +25,80 @@ public class PlayerHealth : NetworkBehaviour
         Legs
     }
 
+    public static Dictionary<BodyPosition, string> BodyToChinese = new Dictionary<BodyPosition, string>()
+    {
+        { BodyPosition.Head, "头部" },
+        { BodyPosition.MainBody, "躯干" },
+        { BodyPosition.Legs, "腿部" }
+    };
+
     private Dictionary<BodyPosition, Item> _armorEquipments = new Dictionary<BodyPosition, Item>();
+
+    public Item GetItemAt(BodyPosition position)
+    {
+        if (_armorEquipments.TryGetValue(position,out var armorItem))
+        {
+            return armorItem;
+        }
+        return null;
+    }
+
+    public Item EquipArmor(BodyPosition position, Item armorItem)
+    {
+        Item oldArmor = null;
+        if (armorItem.ItemData is ArmorItemData armorData && armorData.EquipBodyPosition == position)
+        {
+            if (_armorEquipments.TryGetValue(position, out var equipment))
+            {
+                oldArmor = equipment;
+            }
+            CmdChangeArmorEquipments((int)position,armorItem.gameObject);
+        }
+        
+        return oldArmor;
+    }
+
+    public Item UnEquipArmor(BodyPosition position)
+    {
+        Item oldArmor = null;
+        if (_armorEquipments.TryGetValue(position, out var equipment))
+        {
+            oldArmor = equipment;
+            CmdRemoveArmorEquipments((int)position);
+        }
+        return oldArmor;
+    }
+
+    [Command]
+    private void CmdChangeArmorEquipments(int position, GameObject armorObject)
+    {
+        RpcChangeArmorEquipments(position,armorObject);
+    }
+
+    [ClientRpc]
+    private void RpcChangeArmorEquipments(int position, GameObject armorObject)
+    {
+        _armorEquipments[(BodyPosition)position] = armorObject.GetComponent<Item>();
+        if (isLocalPlayer)
+        {
+            BackpackManager.Instance.RefreshArmorDisplay();
+        }
+    }
+    [Command]
+    private void CmdRemoveArmorEquipments(int position)
+    {
+        RpcRemoveArmorEquipments(position);
+    }
+
+    [ClientRpc]
+    private void RpcRemoveArmorEquipments(int position)
+    {
+        _armorEquipments.Remove((BodyPosition)position);
+        if (isLocalPlayer)
+        {
+            BackpackManager.Instance.RefreshArmorDisplay();
+        }
+    }
 
     /// <summary>
     /// 玩家的总血量上限
@@ -144,6 +218,7 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(_bodyHealth, _bodyMaxHealth, BodyPart.Body);
             LocalPlayerInfoPanel.UpdateHealthPoint(_legHealth, _legMaxHealth, BodyPart.Leg);
         }
+
     }
 
 
@@ -159,6 +234,8 @@ public class PlayerHealth : NetworkBehaviour
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _headMaxHealth, BodyPart.Head);
+            BackpackManager.Instance.HeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_headHealth}/{HeadMaxHealth}";
         }
     }
 
@@ -174,6 +251,8 @@ public class PlayerHealth : NetworkBehaviour
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _bodyMaxHealth, BodyPart.Body);
+            BackpackManager.Instance.BodyHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_bodyHealth}/{BodyMaxHealth}";
         }
     }
 
@@ -189,6 +268,8 @@ public class PlayerHealth : NetworkBehaviour
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _legMaxHealth, BodyPart.Leg);
+            BackpackManager.Instance.HeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_headHealth}/{HeadMaxHealth}";
         }
     }
 
@@ -200,21 +281,25 @@ public class PlayerHealth : NetworkBehaviour
     /// <param name="target">被攻击的目标</param>
     /// <param name="position">被攻击的部位，会扣除对应部位血量和防具耐久</param>
     /// <param name="weapon">攻击所使用的武器，会扣除对应的武器耐久度</param>
-    public static void Attack(PlayerActionPoint attacker, PlayerHealth target,BodyPosition position, Item weapon)
+    public static void Attack(PlayerActionPoint attacker, PlayerHealth target, BodyPosition position, Item weapon)
     {
         WeaponItemData weaponData = weapon.ItemData as WeaponItemData;
         if (weaponData == null)
             return;
         if (attacker.DecreaseActionPoint(weaponData.AttakAPCost))
-            target.TakeWeaponDamage(position,weapon);
+            target.TakeWeaponDamage(attacker.GetComponent<PlayerItemInteraction>(),
+                target.GetComponent<PlayerItemInteraction>(), position, weapon);
     }
 
     /// <summary>
     /// 受到武器的伤害，会根据对应部位、武器和防具计算伤害(保留2位小数)，扣除对应的血量和武器/防具耐久度
     /// </summary>
+    /// <param name="attacker">攻击的发起方，会扣除对应的体力</param>
+    /// <param name="target">被攻击的目标</param>
     /// <param name="position">受击位置</param>
     /// <param name="weaponItem">攻击方使用的武器</param>
-    private void TakeWeaponDamage(BodyPosition position, Item weaponItem)
+    private void TakeWeaponDamage(PlayerItemInteraction attacker, PlayerItemInteraction target, BodyPosition position,
+        Item weaponItem)
     {
         //武器伤害计算公式为：Dmg(伤害)= Tch(机制乘区)*Bdy(部位乘区)*Bsc(基础伤害)
         WeaponItemData weaponData = weaponItem.ItemData as WeaponItemData;
@@ -225,16 +310,17 @@ public class PlayerHealth : NetworkBehaviour
         //部位乘区，默认为1
         if (weaponData.BodyDamageDictionary.ContainsKey(position))
             damage *= weaponData.BodyDamageDictionary.Get(position);
-        PlayerItemInteraction.RandomPlayer.DecreaseDurability(weaponItem.gameObject);
+        attacker.DecreaseDurability(weaponItem.gameObject);
         //机制乘区，默认为1，仅当对应部位有护甲&&护甲对武器伤害类型有特殊乘区时启用
         if (_armorEquipments.TryGetValue(position, out var armorItem) && armorItem.ItemData is ArmorItemData armorData)
         {
-            PlayerItemInteraction.RandomPlayer.DecreaseDurability(armorItem.gameObject);
+            target.DecreaseDurability(armorItem.gameObject);
             if (armorData.DamageTypeDictionary.ContainsKey(weaponData.AttackDamageType))
             {
                 damage *= armorData.DamageTypeDictionary.Get(weaponData.AttackDamageType);
             }
         }
+
         CmdChangeHealth((int)position, damage);
     }
 
@@ -264,10 +350,10 @@ public class PlayerHealth : NetworkBehaviour
                 _headHealth = (float)Math.Round(Mathf.Clamp(_headHealth + healthChange, 0, HeadMaxHealth), 2);
                 break;
             case BodyPosition.MainBody:
-                _bodyHealth = (float)Math.Round(Mathf.Clamp(_bodyHealth + healthChange, 0, BodyMaxHealth),2);
+                _bodyHealth = (float)Math.Round(Mathf.Clamp(_bodyHealth + healthChange, 0, BodyMaxHealth), 2);
                 break;
             case BodyPosition.Legs:
-                _legHealth = (float)Math.Round(Mathf.Clamp(_legHealth + healthChange, 0, LegMaxHealth),2);
+                _legHealth = (float)Math.Round(Mathf.Clamp(_legHealth + healthChange, 0, LegMaxHealth), 2);
                 break;
         }
 
