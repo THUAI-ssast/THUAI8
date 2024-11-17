@@ -26,6 +26,7 @@ public class UIManager : MonoBehaviour
     }
 
     [SerializeField] private GameObject _bagPanel;
+    [SerializeField] private GameObject _battlePanel;
     private GameObject _craftPanel;
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
@@ -59,6 +60,7 @@ public class UIManager : MonoBehaviour
 
         //初始化craft way ui 需要其父物体active
         _bagPanel.SetActive(true);
+        _battlePanel.SetActive(true);
         _craftPanel.SetActive(true);
         CraftWayUI.ClearItemList();
         foreach (CraftWayData craftWayData in Resources.LoadAll<CraftWayData>("ScriptableObject/CraftWay"))
@@ -68,6 +70,7 @@ public class UIManager : MonoBehaviour
 
         _craftPanel.SetActive(false);
         _bagPanel.SetActive(false);
+        _battlePanel.SetActive(false);
 
         _bagPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
@@ -89,6 +92,11 @@ public class UIManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
         {
             ReverseBagPanel();
+        }
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ReverseBattlePanel();
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -140,6 +148,15 @@ public class UIManager : MonoBehaviour
     {
         reverseUIActive(_bagPanel);
         if (_bagPanel.activeSelf == false && ExistingOperationMenu != null)
+        {
+            Destroy(ExistingOperationMenu);
+        }
+    }
+
+    public void ReverseBattlePanel()
+    {
+        reverseUIActive(_battlePanel);
+        if (_battlePanel.activeSelf == false && ExistingOperationMenu != null)
         {
             Destroy(ExistingOperationMenu);
         }

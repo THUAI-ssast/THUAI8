@@ -16,6 +16,7 @@ public class BackpackManager : MonoBehaviour
     /// 定位背包UI
     /// </summary>
     [SerializeField] private GameObject _bagPanel;
+    [SerializeField] private GameObject _battlePanel;
 
     public Transform HeadHealthPanel;
     public Transform LegsHealthPanel;
@@ -25,6 +26,7 @@ public class BackpackManager : MonoBehaviour
         new Dictionary<PlayerHealth.BodyPosition, ArmorSlot>();
 
     private Transform _slotsTransform;
+    private Transform _battleSlotsTransform;
 
     /// <summary>
     /// 单例模式
@@ -61,6 +63,7 @@ public class BackpackManager : MonoBehaviour
         _armorSlots[PlayerHealth.BodyPosition.Head] = HeadHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
         _armorSlots[PlayerHealth.BodyPosition.MainBody] = BodyHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
         _armorSlots[PlayerHealth.BodyPosition.Legs] = LegsHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
+        _battleSlotsTransform = _battlePanel.transform.Find("BattleItemsPanel/Scroll View/Viewport/Slots");
         RefreshSlots();
         StartCoroutine(initItems_debug());
     }
@@ -168,46 +171,64 @@ public class BackpackManager : MonoBehaviour
         CraftWayUI.UpdateSatisfiedAll();
     }
 
-    /// <summary>
-    /// 刷新背包中的物品槽，更新物品显示状态，包括图标、名称等。
-    /// </summary>
     public void RefreshSlots()
     {
-        Transform slots = _slotsTransform;
-        if (slots == null)
+        UpdateSlots(_slotsTransform, true);
+        UpdateSlots(_battleSlotsTransform, false);
+    }
+
+    /// <summary>
+    /// 更新指定的物品槽内容
+    /// </summary>
+    /// <param name="slotsTransform">要更新的物品槽的 Transform</param>
+    /// <param name="updateCraftWayUI">是否更新 CraftWayUI</param>
+    private void UpdateSlots(Transform slotsTransform, bool updateCraftWayUI)
+    {
+        if (slotsTransform == null)
             return;
+
+        // 移除无效物品
         _itemList.RemoveAll(i => i == null);
-        for (int i = 0; i < slots.childCount; i++)
+
+        // 遍历更新槽位
+        for (int i = 0; i < slotsTransform.childCount; i++)
         {
             if (i < _itemList.Count)
             {
-                slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = true;
-                slots.GetChild(i).GetChild(0).GetComponent<Image>().sprite = _itemList[i].ItemData.ItemIcon;
-                slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
+                // 设置槽位内容
+                slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().enabled = true;
+                slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().sprite = _itemList[i].ItemData.ItemIcon;
+                slotsTransform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
+
                 if (_itemList[i].MaxDurability != -1)
                 {
-                    slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = true;
-                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text =
+                    slotsTransform.GetChild(i).GetChild(2).GetComponent<Image>().enabled = true;
+                    slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text =
                         $"{_itemList[i].CurrentDurability}/{_itemList[i].MaxDurability}";
                 }
                 else
                 {
-                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                    slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
                 }
 
-                slots.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(_itemList[i]);
+                slotsTransform.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(_itemList[i]);
             }
             else
             {
-                slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
-                slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
-                slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
-                slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                // 清空槽位内容
+                slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
+                slotsTransform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                slotsTransform.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
+                slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
             }
         }
 
-        CraftWayUI.UpdateSatisfiedAll();
+        if (updateCraftWayUI)
+        {
+            CraftWayUI.UpdateSatisfiedAll();
+        }
     }
+
 
     public void DeleteArmorDisplay(Item armorItem)
     {
