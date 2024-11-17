@@ -31,6 +31,10 @@ public class UIManager : MonoBehaviour
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
 
+    private bool _isOnBattle = false;
+
+    private Button _backButton;
+    private Image _battleUIImage;
 
     private List<GameObject> _activeUIList = new List<GameObject>();
 
@@ -81,6 +85,29 @@ public class UIManager : MonoBehaviour
         _bagPanel.transform.Find("CraftButton").GetComponent<Button>().onClick
             .AddListener(() => setUIActive(_craftPanel, true));
 
+        _battlePanel.transform.Find("BackButton").GetComponent<Button>().onClick
+            .AddListener(() =>
+            {
+                _backButton = _battlePanel.transform.GetChild(9).GetComponent<Button>();
+                _battleUIImage = _battlePanel.GetComponent<Image>();
+                // 遍历 _battleUI 中的所有子物体
+                foreach (Transform child in _battlePanel.transform)
+                {
+                    if (child != _backButton.transform) // 排除 _backButton
+                    {
+                        child.gameObject.SetActive(true); // 隐藏其他 UI 元素
+                    }
+                }
+                _backButton.gameObject.SetActive(false);
+
+                if (_battleUIImage != null)
+                {
+                    Color tempColor = _battleUIImage.color;
+                    tempColor.a = 100f; // 设置透明度为 0 (完全透明)，原本为100
+                    _battleUIImage.color = tempColor;
+                }
+            });
+
         _craftPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() => reverseUIActive(_craftPanel));
         _craftPanel.transform.Find("ApplyButton").GetComponent<Button>().onClick
@@ -89,7 +116,7 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) && !_isOnBattle)
         {
             ReverseBagPanel();
         }
@@ -156,6 +183,16 @@ public class UIManager : MonoBehaviour
     public void ReverseBattlePanel()
     {
         reverseUIActive(_battlePanel);
+
+        if (_battlePanel.activeSelf)
+        {
+            _isOnBattle = true;
+        }
+        else
+        {
+            _isOnBattle = false;
+        }
+
         if (_battlePanel.activeSelf == false && ExistingOperationMenu != null)
         {
             Destroy(ExistingOperationMenu);
