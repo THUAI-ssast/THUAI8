@@ -255,10 +255,11 @@ public class GridMoveController : MonoBehaviour
         return tile == doorTileHorizontal || tile == doorTileVertical;
     }
 
-    public void BreakGlass(Vector3Int cellPosition)
+    public void BreakGlass(Vector3Int cellPosition,PlayerSound playerSound)
     {
-        if (_glassTilemap.HasTile(cellPosition))
+        if (_glassTilemap.HasTile(cellPosition)&&_glassTilemap.GetTile(cellPosition)!=brokenGlassTile)
         {
+            playerSound.PlayGlassBreakSound();
             _glassTilemap.SetTile(cellPosition, brokenGlassTile);
         }
     }

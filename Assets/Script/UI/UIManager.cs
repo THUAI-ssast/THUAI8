@@ -19,8 +19,13 @@ public class UIManager : MonoBehaviour
     /// <summary>
     /// 背包UI界面
     /// </summary>
-    public GameObject BagPanel{ get=>_bagPanel; private set=>_bagPanel=value; }
-    [SerializeField]private GameObject _bagPanel;
+    public GameObject BagPanel
+    {
+        get => _bagPanel;
+        private set => _bagPanel = value;
+    }
+
+    [SerializeField] private GameObject _bagPanel;
     private GameObject _craftPanel;
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
@@ -51,14 +56,16 @@ public class UIManager : MonoBehaviour
         _craftPanel = _bagPanel.transform.Find("CraftPanel").gameObject;
         _craftContent = _craftPanel.transform.Find("Scroll View/Viewport/Content");
 
+
         //初始化craft way ui 需要其父物体active
         _bagPanel.SetActive(true);
         _craftPanel.SetActive(true);
         CraftWayUI.ClearItemList();
         foreach (CraftWayData craftWayData in Resources.LoadAll<CraftWayData>("ScriptableObject/CraftWay"))
         {
-            Instantiate(_craftWayUIPrefab,_craftContent).GetComponent<CraftWayUI>().CraftWayData = craftWayData;
+            Instantiate(_craftWayUIPrefab, _craftContent).GetComponent<CraftWayUI>().CraftWayData = craftWayData;
         }
+
         _craftPanel.SetActive(false);
         _bagPanel.SetActive(false);
 
@@ -118,7 +125,7 @@ public class UIManager : MonoBehaviour
     public void RemoveActiveUI(GameObject ui)
     {
         if (_activeUIList.Contains(ui))
-        _activeUIList.Remove(ui);
+            _activeUIList.Remove(ui);
     }
 
 
@@ -127,7 +134,7 @@ public class UIManager : MonoBehaviour
         if (ui.activeSelf == active)
             return;
         reverseUIActive(ui);
-    }    
+    }
 
     public void ReverseBagPanel()
     {

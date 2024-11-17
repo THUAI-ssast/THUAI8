@@ -10,7 +10,6 @@ using UnityEngine.UI;
 public class ResourcePointController : NetworkBehaviour
 {
     [SerializeField]private SerializableDictionary.Scripts.SerializableDictionary<ItemData, float> _serializedProbilityDictionary;
-    public GameObject ResourceUIPanelPrefab;
     private GameObject _resourceUIPanelInstance;
     private Tilemap _furnitureTilemap;
     private GameObject _player;
@@ -27,7 +26,7 @@ public class ResourcePointController : NetworkBehaviour
         _furnitureTilemap = transform.parent.GetComponent<Tilemap>();
         if(isServer)
         {
-            StartCoroutine(initItems_debug());
+            StartCoroutine(InitItems());
         }
     }
 
@@ -64,7 +63,7 @@ public class ResourcePointController : NetworkBehaviour
         }
     }
 
-    private IEnumerator initItems_debug()
+    private IEnumerator InitItems()
     {
         yield return new WaitForSeconds(1);
         foreach (var match in _serializedProbilityDictionary.Dictionary)
@@ -88,19 +87,11 @@ public class ResourcePointController : NetworkBehaviour
     private void CreateItem(string itemdata_pth)
     {
         ItemOwner owner = ItemOwner.World;
-        Vector3 position = Vector3.zero;
         Item.Create(itemdata_pth, owner, null, gameObject);
     }
 
     private void ToggleResourcePointUI()
     {
-        if (_resourceUIPanelInstance == null)
-        {
-            _resourceUIPanelInstance = Instantiate(ResourceUIPanelPrefab);
-            _resourceUIPanelInstance.transform.SetParent(GameObject.Find("Canvas").transform, false);
-            _resourceUIPanelInstance.transform.position = Camera.main.WorldToScreenPoint(transform.position);
-        }
-
         if (_resourceUIPanelInstance.activeSelf)
         {
             UIManager.Instance.RemoveActiveUI(_resourceUIPanelInstance);
