@@ -72,7 +72,6 @@ public class PlayerItemInteraction : NetworkBehaviour
     [ClientRpc]
     public void RpcInitInstanceOnClients(GameObject instance, string itemData_pth, ItemOwner owner, uint playerId,GameObject resourcePoint)
     {
-        Debug.Log(itemData_pth);
         ItemData itemData = Resources.Load<ItemData>(itemData_pth);
         var spriteRenderer = instance.GetComponent<SpriteRenderer>();
         spriteRenderer.enabled = false;

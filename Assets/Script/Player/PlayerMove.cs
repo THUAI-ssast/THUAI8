@@ -15,6 +15,8 @@ public class PlayerMove : NetworkBehaviour
 
     [SyncVar] private Vector3Int _tilePosition; // 用于同步的字段
 
+    private PlayerSound _playerSound;
+
     public Vector3Int TilePosition
     {
         get => _tilePosition;
@@ -26,6 +28,8 @@ public class PlayerMove : NetworkBehaviour
     {
         _pathLineRenderer = GetComponent<LineRenderer>();
         _spriteDisplay = transform.Find("SpriteDisplay");
+
+        _playerSound = GetComponent<PlayerSound>();
         if (this.isLocalPlayer)
         {
             GridMoveController.Instance.InitLocalPlayer(this);
@@ -108,7 +112,7 @@ public class PlayerMove : NetworkBehaviour
     [ClientRpc]
     private void RpcBreakGlass(Vector3Int cellPosition)
     {
-        GridMoveController.Instance.BreakGlass(cellPosition);
+        GridMoveController.Instance.BreakGlass(cellPosition,_playerSound);
     }
 
     // 同步门
