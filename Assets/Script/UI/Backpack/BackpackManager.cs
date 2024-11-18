@@ -21,6 +21,9 @@ public class BackpackManager : MonoBehaviour
     public Transform HeadHealthPanel;
     public Transform LegsHealthPanel;
     public Transform BodyHealthPanel;
+    private Transform _battleHeadHealthPanel;
+    private Transform _battleLegsHealthPanel;
+    private Transform _battleBodyHealthPanel;
 
     private Dictionary<PlayerHealth.BodyPosition, ArmorSlot> _armorSlots =
         new Dictionary<PlayerHealth.BodyPosition, ArmorSlot>();
@@ -60,10 +63,16 @@ public class BackpackManager : MonoBehaviour
         HeadHealthPanel = _bagPanel.transform.Find("HealthPanel/Head");
         BodyHealthPanel = _bagPanel.transform.Find("HealthPanel/Body");
         LegsHealthPanel = _bagPanel.transform.Find("HealthPanel/Legs");
+
         _armorSlots[PlayerHealth.BodyPosition.Head] = HeadHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
         _armorSlots[PlayerHealth.BodyPosition.MainBody] = BodyHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
         _armorSlots[PlayerHealth.BodyPosition.Legs] = LegsHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
+
         _battleSlotsTransform = _battlePanel.transform.Find("BattleItemsPanel/Scroll View/Viewport/Slots");
+        _battleHeadHealthPanel = _battlePanel.transform.Find("HealthPanel/Head");
+        _battleBodyHealthPanel = _battlePanel.transform.Find("HealthPanel/Body");
+        _battleLegsHealthPanel = _battlePanel.transform.Find("HealthPanel/Legs");
+
         RefreshSlots();
         StartCoroutine(initItems_debug());
     }
@@ -240,15 +249,20 @@ public class BackpackManager : MonoBehaviour
         GameObject player = GameObject.FindWithTag("LocalPlayer");
         if (player == null)
             return;
+
         var playerHealth = player.GetComponent<PlayerHealth>();
         foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
         {
             Item newArmor = playerHealth.GetItemAt(position);
             var oldArmor = _armorSlots[position].SetItem(newArmor);
+
+            // 更新 battlePanel 的显示
+            UpdateBattleArmorDisplay(position, newArmor);
+
             if (oldArmor != null)
             {
-                //若有护甲变动，将原护甲放回背包，否则仅刷新显示
-                if (oldArmor!=newArmor)
+                // 若有护甲变动，将原护甲放回背包，否则仅刷新显示
+                if (oldArmor != newArmor)
                 {
                     AddItem(oldArmor);
                 }
@@ -256,10 +270,66 @@ public class BackpackManager : MonoBehaviour
                 {
                     _armorSlots[position].UpdateDisplay();
                 }
-                
             }
         }
     }
+
+    /// <summary>
+    /// 更新 battlePanel 的 armor display
+    /// </summary>
+    /// <param name="position">身体部位位置</param>
+    /// <param name="newArmor">新装备的护甲</param>
+    private void UpdateBattleArmorDisplay(PlayerHealth.BodyPosition position, Item newArmor)
+    {
+        Transform battleHealthPanel = null;
+
+        switch (position)
+        {
+            case PlayerHealth.BodyPosition.Head:
+                battleHealthPanel = _battleHeadHealthPanel;
+                break;
+            case PlayerHealth.BodyPosition.MainBody:
+                battleHealthPanel = _battleBodyHealthPanel;
+                break;
+            case PlayerHealth.BodyPosition.Legs:
+                battleHealthPanel = _battleLegsHealthPanel;
+                break;
+        }
+
+        if (battleHealthPanel != null)
+        {
+            var battleArmorSlot = battleHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
+            battleArmorSlot.SetItem(newArmor);
+            battleArmorSlot.UpdateDisplay();
+        }
+    }
+
+
+    //public void RefreshArmorDisplay()
+    //{
+    //    GameObject player = GameObject.FindWithTag("LocalPlayer");
+    //    if (player == null)
+    //        return;
+    //    var playerHealth = player.GetComponent<PlayerHealth>();
+    //    foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+    //    {
+    //        Item newArmor = playerHealth.GetItemAt(position);
+    //        var oldArmor = _armorSlots[position].SetItem(newArmor);
+    //        if (oldArmor != null)
+    //        {
+    //            //若有护甲变动，将原护甲放回背包，否则仅刷新显示
+    //            if (oldArmor!=newArmor)
+    //            {
+    //                AddItem(oldArmor);
+    //            }
+    //            else
+    //            {
+    //                _armorSlots[position].UpdateDisplay();
+    //            }
+
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// 确定背包内是否包含合成所需要物品

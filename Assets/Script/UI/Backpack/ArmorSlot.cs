@@ -13,7 +13,7 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
     private TMP_Text _armorName;
     private TMP_Text _armorDurability;
 
-    void Start()
+    void Awake()
     {
         _displayImage = transform.Find("Image").GetComponent<Image>();
         _armorName = transform.Find("Name").GetComponent<TMP_Text>();

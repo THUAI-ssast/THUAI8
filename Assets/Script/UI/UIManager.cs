@@ -72,9 +72,9 @@ public class UIManager : MonoBehaviour
             Instantiate(_craftWayUIPrefab, _craftContent).GetComponent<CraftWayUI>().CraftWayData = craftWayData;
         }
 
-        _craftPanel.SetActive(false);
         _bagPanel.SetActive(false);
         _battlePanel.SetActive(false);
+        _craftPanel.SetActive(false);
 
         _bagPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
@@ -95,7 +95,7 @@ public class UIManager : MonoBehaviour
                 {
                     if (child != _backButton.transform) // 排除 _backButton
                     {
-                        child.gameObject.SetActive(true); // 隐藏其他 UI 元素
+                        child.gameObject.SetActive(true); // 显示其他 UI 元素
                     }
                 }
                 _backButton.gameObject.SetActive(false);
@@ -103,7 +103,7 @@ public class UIManager : MonoBehaviour
                 if (_battleUIImage != null)
                 {
                     Color tempColor = _battleUIImage.color;
-                    tempColor.a = 100f; // 设置透明度为 0 (完全透明)，原本为100
+                    tempColor.a = 100f; // 设置透明度为 100 (完全透明)，原本为 0
                     _battleUIImage.color = tempColor;
                 }
             });
