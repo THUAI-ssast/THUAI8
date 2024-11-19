@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class DoDamage : MonoBehaviour
+public class HealthPanelEnemy : MonoBehaviour
 {
-    public static DoDamage Instance;
+    public static HealthPanelEnemy Instance;
 
     private GameObject _localPlayer;
     private GameObject _enemyPlayer;
