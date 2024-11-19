@@ -198,4 +198,9 @@ public class UIManager : MonoBehaviour
             Destroy(ExistingOperationMenu);
         }
     }
+
+    public GameObject getBattlePanel()
+    {
+        return _battlePanel;
+    }
 }

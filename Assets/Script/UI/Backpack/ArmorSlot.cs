@@ -61,6 +61,12 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
     /// <param name="eventData"></param>
     public void OnPointerClick(PointerEventData eventData)
     {
+        // _battlePanel 页面不允许卸下装备
+        if (UIManager.Instance.getBattlePanel().activeSelf)
+        {
+            return;
+        }
+
         if (eventData.button == PointerEventData.InputButton.Right && _armorItem != null &&
             _armorItem.ItemData is ArmorItemData armorData)
         {
