@@ -212,6 +212,8 @@ public class UIManager : MonoBehaviour
         {
             Destroy(ExistingOperationMenu);
         }
+
+        BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     public void DestroyCurrentFollowImage()

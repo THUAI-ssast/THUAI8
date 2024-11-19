@@ -250,6 +250,7 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.BattleHeadHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{this.GetComponent<PlayerHealth>().HeadHealth}/{this.GetComponent<PlayerHealth>().HeadMaxHealth}";
         }
+        BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     /// <summary>
@@ -274,6 +275,7 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.BattleBodyHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{this.GetComponent<PlayerHealth>().BodyHealth}/{this.GetComponent<PlayerHealth>().BodyMaxHealth}";
         }
+        BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     /// <summary>
@@ -298,6 +300,7 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.BattleLegsHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{this.GetComponent<PlayerHealth>().LegHealth}/{this.GetComponent<PlayerHealth>().LegMaxHealth}";
         }
+        BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     /// <summary>

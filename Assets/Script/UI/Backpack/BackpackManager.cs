@@ -85,10 +85,10 @@ public class BackpackManager : MonoBehaviour
 
     void Update()
     {
-        if (_battlePanel.activeSelf)
-        {
-            RefreshArmorDisplay();
-        }
+        //if (_battlePanel.activeSelf)
+        //{
+        //    RefreshArmorDisplay();
+        //}
     }
 
 
