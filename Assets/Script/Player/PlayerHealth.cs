@@ -242,6 +242,8 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _headMaxHealth, BodyPart.Head);
             BackpackManager.Instance.HeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{_headHealth}/{HeadMaxHealth}";
+            BackpackManager.Instance.BattleHeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_headHealth}/{HeadMaxHealth}";
         }
     }
 
@@ -259,6 +261,8 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _bodyMaxHealth, BodyPart.Body);
             BackpackManager.Instance.BodyHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{_bodyHealth}/{BodyMaxHealth}";
+            BackpackManager.Instance.BattleBodyHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_bodyHealth}/{BodyMaxHealth}";
         }
     }
 
@@ -275,7 +279,9 @@ public class PlayerHealth : NetworkBehaviour
         {
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _legMaxHealth, BodyPart.Leg);
             BackpackManager.Instance.HeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
-                $"{_headHealth}/{HeadMaxHealth}";
+                $"{_legHealth}/{LegMaxHealth}";
+            BackpackManager.Instance.BattleHeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_legHealth}/{LegMaxHealth}";
         }
     }
 

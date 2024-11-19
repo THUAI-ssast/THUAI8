@@ -37,6 +37,8 @@ public class UIManager : MonoBehaviour
         set => _followImage = value;
     }
 
+    public SlotMenuTrigger CurrentSlotMenuTrigger { get; set; } // here
+
     [SerializeField] private GameObject _bagPanel;
     [SerializeField] private GameObject _battlePanel;
     [SerializeField] private Item _followImage;
@@ -209,6 +211,15 @@ public class UIManager : MonoBehaviour
         if (_battlePanel.activeSelf == false && ExistingOperationMenu != null)
         {
             Destroy(ExistingOperationMenu);
+        }
+    }
+
+    public void DestroyCurrentFollowImage()
+    {
+        if (CurrentSlotMenuTrigger != null)
+        {
+            CurrentSlotMenuTrigger.DestroyFollowImage();
+            CurrentSlotMenuTrigger = null; // 清空引用
         }
     }
 }

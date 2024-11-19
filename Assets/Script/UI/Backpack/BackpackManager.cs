@@ -21,12 +21,12 @@ public class BackpackManager : MonoBehaviour
     public Transform HeadHealthPanel;
     public Transform LegsHealthPanel;
     public Transform BodyHealthPanel;
-    private Transform _battleHeadHealthPanel;
-    private Transform _battleLegsHealthPanel;
-    private Transform _battleBodyHealthPanel;
-    private Transform _battleHeadHealthEnemyPanel;
-    private Transform _battleLegsHealthEnemyPanel;
-    private Transform _battleBodyHealthEnemyPanel;
+    public Transform BattleHeadHealthPanel;
+    public Transform BattleLegsHealthPanel;
+    public Transform BattleBodyHealthPanel;
+    public Transform BattleHeadHealthEnemyPanel;
+    public Transform BattleLegsHealthEnemyPanel;
+    public Transform BattleBodyHealthEnemyPanel;
 
     private Dictionary<PlayerHealth.BodyPosition, ArmorSlot> _armorSlots =
         new Dictionary<PlayerHealth.BodyPosition, ArmorSlot>();
@@ -72,12 +72,12 @@ public class BackpackManager : MonoBehaviour
         _armorSlots[PlayerHealth.BodyPosition.Legs] = LegsHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
 
         _battleSlotsTransform = _battlePanel.transform.Find("BattleItemsPanel/Scroll View/Viewport/Slots");
-        _battleHeadHealthPanel = _battlePanel.transform.Find("HealthPanel/Head");
-        _battleBodyHealthPanel = _battlePanel.transform.Find("HealthPanel/Body");
-        _battleLegsHealthPanel = _battlePanel.transform.Find("HealthPanel/Legs");
-        _battleHeadHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Head");
-        _battleBodyHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Body");
-        _battleLegsHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Legs");
+        BattleHeadHealthPanel = _battlePanel.transform.Find("HealthPanel/Head");
+        BattleBodyHealthPanel = _battlePanel.transform.Find("HealthPanel/Body");
+        BattleLegsHealthPanel = _battlePanel.transform.Find("HealthPanel/Legs");
+        BattleHeadHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Head");
+        BattleBodyHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Body");
+        BattleLegsHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Legs");
 
         RefreshSlots();
         StartCoroutine(initItems_debug());
@@ -310,13 +310,13 @@ public class BackpackManager : MonoBehaviour
             switch (position)
             {
                 case PlayerHealth.BodyPosition.Head:
-                    battleHealthPanel = _battleHeadHealthPanel;
+                    battleHealthPanel = BattleHeadHealthPanel;
                     break;
                 case PlayerHealth.BodyPosition.MainBody:
-                    battleHealthPanel = _battleBodyHealthPanel;
+                    battleHealthPanel = BattleBodyHealthPanel;
                     break;
                 case PlayerHealth.BodyPosition.Legs:
-                    battleHealthPanel = _battleLegsHealthPanel;
+                    battleHealthPanel = BattleLegsHealthPanel;
                     break;
             }
         }
@@ -326,13 +326,13 @@ public class BackpackManager : MonoBehaviour
             switch (position)
             {
                 case PlayerHealth.BodyPosition.Head:
-                    battleHealthPanel = _battleHeadHealthEnemyPanel;
+                    battleHealthPanel = BattleHeadHealthEnemyPanel;
                     break;
                 case PlayerHealth.BodyPosition.MainBody:
-                    battleHealthPanel = _battleBodyHealthEnemyPanel;
+                    battleHealthPanel = BattleBodyHealthEnemyPanel;
                     break;
                 case PlayerHealth.BodyPosition.Legs:
-                    battleHealthPanel = _battleLegsHealthEnemyPanel;
+                    battleHealthPanel = BattleLegsHealthEnemyPanel;
                     break;
             }
         }

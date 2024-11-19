@@ -51,6 +51,13 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     /// 临时的跟随鼠标的图片
     /// </summary>
     private Image _followImage;
+
+    public Image FollowImage
+    {
+        get => _followImage;
+        set => _followImage = value;
+    }
+
     /// <summary>
     /// 获取背包面板ui位置
     /// </summary>
@@ -79,15 +86,14 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
             // 生成一个与当前slot相同的Image
             if (_followImage == null)
             {
-                // 假设每个slot都有Image组件
+                UIManager.Instance.CurrentSlotMenuTrigger = this; // 注册当前实例
+
                 Image slotImage = GetComponent<Image>(); // 获取当前slot的Image
                 _followImage = Instantiate(slotImage, _battlePanel.transform);  // 在battlePanel上创建跟随Image
                 _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
                 _followImage.raycastTarget = false; // 设置为不可交互
 
                 UIManager.Instance.FollowImage = _slotItem;
-                Debug.Log("------------------------------");
-                Debug.Log(UIManager.Instance.FollowImage.name);
             }
         }
 
@@ -154,10 +160,14 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
 
             if (Input.GetMouseButtonDown(1))
             {
-                Destroy(_followImage.gameObject);
-                _followImage = null;
+                DestroyFollowImage();
             }
         }
     }
 
+    public void DestroyFollowImage()
+    {
+        Destroy(_followImage.gameObject);
+        _followImage = null;
+    }
 }
