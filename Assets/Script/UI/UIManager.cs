@@ -25,6 +25,12 @@ public class UIManager : MonoBehaviour
         private set => _bagPanel = value;
     }
 
+    public GameObject BattlePanel
+    {
+        get => _battlePanel;
+        private set => _battlePanel = value;
+    }
+
     [SerializeField] private GameObject _bagPanel;
     [SerializeField] private GameObject _battlePanel;
     private GameObject _craftPanel;
@@ -197,10 +203,5 @@ public class UIManager : MonoBehaviour
         {
             Destroy(ExistingOperationMenu);
         }
-    }
-
-    public GameObject getBattlePanel()
-    {
-        return _battlePanel;
     }
 }

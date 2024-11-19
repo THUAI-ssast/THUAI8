@@ -24,6 +24,10 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     /// </summary>
     private GameObject _bagPanel;
     /// <summary>
+    /// 定位战斗面板ui
+    /// </summary>
+    private GameObject _battlePanel;
+    /// <summary>
     /// 右键菜单
     /// </summary>
     private GameObject _operationMenu;
@@ -44,11 +48,16 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     /// </summary>
     private GameObject _existingOperationMenu;
     /// <summary>
+    /// 临时的跟随鼠标的图片
+    /// </summary>
+    private Image _followImage;
+    /// <summary>
     /// 获取背包面板ui位置
     /// </summary>
     void Start()
     {
         _bagPanel = UIManager.Instance.BagPanel;
+        _battlePanel = UIManager.Instance.BattlePanel;
     }
     /// <summary>
     /// 设置物品
@@ -59,14 +68,29 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
         _slotItem = item;
     }
     /// <summary>
-    /// 监听鼠标右键点击事件。生成全局唯一菜单、加入菜单按钮点击事件。
+    /// 监听鼠标左右键点击事件。生成全局唯一菜单、加入菜单按钮点击事件。
     /// </summary>
     /// <param name="eventData"></param>
     public void OnPointerClick(PointerEventData eventData)
     {
+        // 左键生成 followImage
+        if (eventData.button == PointerEventData.InputButton.Left && _slotItem != null)
+        {
+            // 生成一个与当前slot相同的Image
+            if (_followImage == null)
+            {
+                // 假设每个slot都有Image组件
+                Image slotImage = GetComponent<Image>(); // 获取当前slot的Image
+                _followImage = Instantiate(slotImage, _battlePanel.transform);  // 在battlePanel上创建跟随Image
+                _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
+                _followImage.raycastTarget = false; // 设置为不可交互
+            }
+        }
+
+        // 右键生成操作菜单
         if (eventData.button == PointerEventData.InputButton.Right && _slotItem != null)
         {
-            if(_existingOperationMenu != null)
+            if (_existingOperationMenu != null)
             {
                 Destroy(_existingOperationMenu);
                 return ;
@@ -98,6 +122,28 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
                     BackpackManager.Instance.DropItem(_slotItem);
                     Destroy(_operationMenu);    
                 });
+            }
+        }
+    }
+
+    void Update()
+    {
+        // 如果存在跟随图片，更新它的位置
+        if (_followImage != null)
+        {
+            Vector2 mousePosition = Input.mousePosition;
+
+            // 将屏幕空间的鼠标位置转换为UI空间的局部坐标
+            Vector2 localPosition;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(_battlePanel.GetComponent<RectTransform>(), mousePosition, null, out localPosition);
+
+            // 更新跟随图片的位置
+            _followImage.rectTransform.localPosition = localPosition;
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                Destroy(_followImage.gameObject);
+                _followImage = null;
             }
         }
     }
