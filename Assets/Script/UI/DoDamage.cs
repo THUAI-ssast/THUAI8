@@ -4,16 +4,14 @@ using UnityEngine;
 
 public class DoDamage : MonoBehaviour
 {
-    private GameObject _enemyHead;
-    private GameObject _enemyBody;
-    private GameObject _enemyLegs;
+    private GameObject _localPlayer;
+    private GameObject _enemyPlayer;
 
     // Start is called before the first frame update
     void Start()
     {
-        _enemyHead = gameObject.transform.GetChild(0).gameObject;
-        _enemyBody = gameObject.transform.GetChild(1).gameObject;
-        _enemyLegs = gameObject.transform.GetChild(2).gameObject;
+        _localPlayer = GameObject.FindWithTag("LocalPlayer");
+        _enemyPlayer = GameObject.FindWithTag("Player");
     }
 
     // Update is called once per frame
@@ -24,16 +22,19 @@ public class DoDamage : MonoBehaviour
 
     public void OnClickHead()
     {
-        Debug.Log("Clicked on Head!");
+        if (UIManager.Instance.FollowImage != null)
+            _localPlayer.GetComponent<PlayerHealth>().CmdAttack(_localPlayer, _enemyPlayer, (int)PlayerHealth.BodyPosition.Head, UIManager.Instance.FollowImage.gameObject);
     }
 
     public void OnClickBody()
     {
-        Debug.Log("Clicked on Body!");
+        if (UIManager.Instance.FollowImage != null)
+            _localPlayer.GetComponent<PlayerHealth>().CmdAttack(_localPlayer, _enemyPlayer, (int)PlayerHealth.BodyPosition.MainBody, UIManager.Instance.FollowImage.gameObject);
     }
 
     public void OnClickLegs()
     {
-        Debug.Log("Clicked on Legs!");
+        if (UIManager.Instance.FollowImage != null)
+            _localPlayer.GetComponent<PlayerHealth>().CmdAttack(_localPlayer, _enemyPlayer, (int)PlayerHealth.BodyPosition.Legs, UIManager.Instance.FollowImage.gameObject);
     }
 }

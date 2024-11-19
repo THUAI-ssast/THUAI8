@@ -85,7 +85,9 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
                 _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
                 _followImage.raycastTarget = false; // 设置为不可交互
 
-                UIManager.Instance.FollowImage = _followImage.gameObject;
+                UIManager.Instance.FollowImage = _slotItem;
+                Debug.Log("------------------------------");
+                Debug.Log(UIManager.Instance.FollowImage.name);
             }
         }
 

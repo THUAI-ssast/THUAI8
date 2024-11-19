@@ -31,7 +31,7 @@ public class UIManager : MonoBehaviour
         private set => _battlePanel = value;
     }
 
-    public GameObject FollowImage
+    public Item FollowImage
     {
         get => _followImage;
         set => _followImage = value;
@@ -39,7 +39,7 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private GameObject _bagPanel;
     [SerializeField] private GameObject _battlePanel;
-    [SerializeField] private GameObject _followImage;
+    [SerializeField] private Item _followImage;
     private GameObject _craftPanel;
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
