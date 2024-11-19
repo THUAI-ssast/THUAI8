@@ -245,6 +245,11 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.BattleHeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{_headHealth}/{HeadMaxHealth}";
         }
+        else if (this.gameObject == DoDamage.Instance.EnemyPlayer.gameObject)
+        {
+            BackpackManager.Instance.BattleHeadHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{this.GetComponent<PlayerHealth>().HeadHealth}/{this.GetComponent<PlayerHealth>().HeadMaxHealth}";
+        }
     }
 
     /// <summary>
@@ -264,6 +269,11 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.BattleBodyHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{_bodyHealth}/{BodyMaxHealth}";
         }
+        else if (this.gameObject == DoDamage.Instance.EnemyPlayer.gameObject)
+        {
+            BackpackManager.Instance.BattleBodyHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{this.GetComponent<PlayerHealth>().BodyHealth}/{this.GetComponent<PlayerHealth>().BodyMaxHealth}";
+        }
     }
 
     /// <summary>
@@ -278,10 +288,15 @@ public class PlayerHealth : NetworkBehaviour
         if (isLocalPlayer)
         {
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _legMaxHealth, BodyPart.Leg);
-            BackpackManager.Instance.HeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+            BackpackManager.Instance.LegsHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{_legHealth}/{LegMaxHealth}";
-            BackpackManager.Instance.BattleHeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+            BackpackManager.Instance.BattleLegsHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{_legHealth}/{LegMaxHealth}";
+        }
+        else if (this.gameObject == DoDamage.Instance.EnemyPlayer.gameObject)
+        {
+            BackpackManager.Instance.BattleLegsHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{this.GetComponent<PlayerHealth>().LegHealth}/{this.GetComponent<PlayerHealth>().LegMaxHealth}";
         }
     }
 
