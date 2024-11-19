@@ -37,18 +37,18 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
 
     public void UpdateDisplay()
     {
-        if (_armorItem == null)
-        {
-            _displayImage.enabled = false;
-            _armorName.text = "";
-            _armorDurability.text = "";
-        }
-        else if (_armorItem.ItemData is ArmorItemData armorData)
+        if (_armorItem != null&& _armorItem.ItemData is ArmorItemData armorData&& _armorItem.CurrentDurability>0)
         {
             _displayImage.enabled = true;
             _displayImage.sprite = armorData.ItemIcon;
             _armorName.text = armorData.ItemName;
             _armorDurability.text = $"{_armorItem.CurrentDurability}/{armorData.Durability}";
+        }
+        else
+        {
+            _displayImage.enabled = false;
+            _armorName.text = "";
+            _armorDurability.text = "";
         }
     }
 
