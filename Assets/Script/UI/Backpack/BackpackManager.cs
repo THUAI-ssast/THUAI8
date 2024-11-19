@@ -83,15 +83,6 @@ public class BackpackManager : MonoBehaviour
         StartCoroutine(initItems_debug());
     }
 
-    void Update()
-    {
-        //if (_battlePanel.activeSelf)
-        //{
-        //    RefreshArmorDisplay();
-        //}
-    }
-
-
     private IEnumerator initItems_debug()
     {
         yield return new WaitForSeconds(1);

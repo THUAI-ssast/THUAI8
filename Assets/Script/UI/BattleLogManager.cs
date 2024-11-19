@@ -1,34 +1,37 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-public class CombatLogManager : MonoBehaviour
+public class BattleLogManager : MonoBehaviour
 {
+    public static BattleLogManager Instance;
+
     public GameObject logTextPrefab;
     public Transform contentTransform;
 
-    private float timer = 0f;
-    private int logCounter = 0;
-
-    void Update()
+    private void Awake()
     {
-        timer += Time.deltaTime;
-        if (timer >= 1f)
+        if (Instance)
         {
-            timer = 0f;
-            AddLog($"Log message {logCounter++}");
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
         }
     }
 
-    void AddLog(string message)
+    public void AddLog(string message)
     {
         // 实例化新的日志条目
         GameObject newLog = Instantiate(logTextPrefab, contentTransform);
 
         // 设置日志内容
-        Text logText = newLog.GetComponent<Text>();
+        TMP_Text logText = newLog.GetComponent<TMP_Text>();
         if (logText != null)
         {
             logText.text = message;
+            Debug.Log(message);
         }
 
         ScrollToBottom();

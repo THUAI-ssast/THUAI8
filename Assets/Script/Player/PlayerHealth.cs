@@ -369,6 +369,36 @@ public class PlayerHealth : NetworkBehaviour
         ChangeHealth((int)position, -damage);
     }
 
+    public float GetWeaponDamage(BodyPosition position,Item weaponItem)
+    {
+        //武器伤害计算公式为：Dmg(伤害)= Tch(机制乘区)*Bdy(部位乘区)*Bsc(基础伤害)
+        WeaponItemData weaponData = weaponItem.ItemData as WeaponItemData;
+        if (weaponData == null)
+            return 0;
+        //基础伤害
+        float damage = weaponData.BasicDamage;
+        //部位乘区，默认为1
+        if (weaponData.BodyDamageDictionary.ContainsKey(position))
+            damage *= weaponData.BodyDamageDictionary.Get(position);
+        //清除已经被摧毁的防具
+        foreach (BodyPosition bodyPosition in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+        {
+            if (_armorEquipments.TryGetValue(bodyPosition, out var armor) && armor == null)
+            {
+                _armorEquipments.Remove(bodyPosition);
+            }
+        }
+        //机制乘区，默认为1，仅当对应部位有护甲&&护甲对武器伤害类型有特殊乘区时启用
+        if (_armorEquipments.TryGetValue(position, out var armorItem) && armorItem.ItemData is ArmorItemData armorData)
+        {
+            if (armorData.DamageTypeDictionary.ContainsKey(weaponData.AttackDamageType))
+            {
+                damage *= armorData.DamageTypeDictionary.Get(weaponData.AttackDamageType);
+            }
+        }
+        return damage;
+    }
+
 
     /// <summary>
     /// Command函数，在客户端被调用，但在服务端执行。
