@@ -21,4 +21,19 @@ public class DoDamage : MonoBehaviour
     {
         
     }
+
+    public void OnClickHead()
+    {
+        Debug.Log("Clicked on Head!");
+    }
+
+    public void OnClickBody()
+    {
+        Debug.Log("Clicked on Body!");
+    }
+
+    public void OnClickLegs()
+    {
+        Debug.Log("Clicked on Legs!");
+    }
 }

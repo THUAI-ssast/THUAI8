@@ -34,7 +34,7 @@ public class UIManager : MonoBehaviour
     public GameObject FollowImage
     {
         get => _followImage;
-        private set => _followImage = value;
+        set => _followImage = value;
     }
 
     [SerializeField] private GameObject _bagPanel;

@@ -84,6 +84,8 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
                 _followImage = Instantiate(slotImage, _battlePanel.transform);  // 在battlePanel上创建跟随Image
                 _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
                 _followImage.raycastTarget = false; // 设置为不可交互
+
+                UIManager.Instance.FollowImage = _followImage.gameObject;
             }
         }
 
@@ -133,12 +135,20 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
         {
             Vector2 mousePosition = Input.mousePosition;
 
+            // bias
+            Vector2 offset = new Vector2(28, -28);
+
             // 将屏幕空间的鼠标位置转换为UI空间的局部坐标
             Vector2 localPosition;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(_battlePanel.GetComponent<RectTransform>(), mousePosition, null, out localPosition);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                _battlePanel.GetComponent<RectTransform>(),
+                mousePosition,
+                null,
+                out localPosition
+            );
 
-            // 更新跟随图片的位置
-            _followImage.rectTransform.localPosition = localPosition;
+            // 应用偏移量
+            _followImage.rectTransform.localPosition = localPosition + offset;
 
             if (Input.GetMouseButtonDown(1))
             {
@@ -147,4 +157,5 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
             }
         }
     }
+
 }
