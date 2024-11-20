@@ -221,6 +221,7 @@ GameObject:
   - component: {fileID: 2817722690720741184}
   - component: {fileID: 7555593054347378952}
   - component: {fileID: 4657291643347750798}
+  - component: {fileID: 7124257541622284131}
   m_Layer: 5
   m_Name: BackpackSlot
   m_TagString: Untagged
@@ -303,6 +304,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _operationMenuPrefab: {fileID: 8184533505767772537, guid: f1f13e0f8ca089d418cc6c19f48bde0e, type: 3}
   _itemDescriptionPanelPrefab: {fileID: 8364959480719521508, guid: 1351dc518e7472548884d2dc9e1dd7ff, type: 3}
+--- !u!114 &7124257541622284131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4248620562482759993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b666ff8989a7ae544adc8affa8a95d14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mouseHoverPanelPrefab: {fileID: 1188841392764985691, guid: b071174d4e4abea4d94289ebd52f91ac, type: 3}
 --- !u!1 &4744918122507492816
 GameObject:
   m_ObjectHideFlags: 0
