@@ -21,6 +21,12 @@ public class BackpackManager : MonoBehaviour
     public Transform HeadHealthPanel;
     public Transform LegsHealthPanel;
     public Transform BodyHealthPanel;
+    public Transform BattleHeadHealthPanel;
+    public Transform BattleLegsHealthPanel;
+    public Transform BattleBodyHealthPanel;
+    public Transform BattleHeadHealthEnemyPanel;
+    public Transform BattleLegsHealthEnemyPanel;
+    public Transform BattleBodyHealthEnemyPanel;
 
     private Dictionary<PlayerHealth.BodyPosition, ArmorSlot> _armorSlots =
         new Dictionary<PlayerHealth.BodyPosition, ArmorSlot>();
@@ -60,14 +66,22 @@ public class BackpackManager : MonoBehaviour
         HeadHealthPanel = _bagPanel.transform.Find("HealthPanel/Head");
         BodyHealthPanel = _bagPanel.transform.Find("HealthPanel/Body");
         LegsHealthPanel = _bagPanel.transform.Find("HealthPanel/Legs");
+
         _armorSlots[PlayerHealth.BodyPosition.Head] = HeadHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
         _armorSlots[PlayerHealth.BodyPosition.MainBody] = BodyHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
         _armorSlots[PlayerHealth.BodyPosition.Legs] = LegsHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
+
         _battleSlotsTransform = _battlePanel.transform.Find("BattleItemsPanel/Scroll View/Viewport/Slots");
+        BattleHeadHealthPanel = _battlePanel.transform.Find("HealthPanel/Head");
+        BattleBodyHealthPanel = _battlePanel.transform.Find("HealthPanel/Body");
+        BattleLegsHealthPanel = _battlePanel.transform.Find("HealthPanel/Legs");
+        BattleHeadHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Head");
+        BattleBodyHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Body");
+        BattleLegsHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Legs");
+
         RefreshSlots();
         StartCoroutine(initItems_debug());
     }
-
 
     private IEnumerator initItems_debug()
     {
@@ -229,26 +243,25 @@ public class BackpackManager : MonoBehaviour
         }
     }
 
-
-    public void DeleteArmorDisplay(Item armorItem)
-    {
-
-    }
-
     public void RefreshArmorDisplay()
     {
-        GameObject player = GameObject.FindWithTag("LocalPlayer");
-        if (player == null)
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
+        if (localPlayer == null)
             return;
-        var playerHealth = player.GetComponent<PlayerHealth>();
+
+        var localPlayerHealth = localPlayer.GetComponent<PlayerHealth>();
         foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
         {
-            Item newArmor = playerHealth.GetItemAt(position);
+            Item newArmor = localPlayerHealth.GetItemAt(position);
             var oldArmor = _armorSlots[position].SetItem(newArmor);
+
+            // 更新 battlePanel 的显示
+            UpdateBattleArmorDisplay(position, newArmor);
+
             if (oldArmor != null)
             {
-                //若有护甲变动，将原护甲放回背包，否则仅刷新显示
-                if (oldArmor!=newArmor)
+                // 若有护甲变动，将原护甲放回背包，否则仅刷新显示
+                if (oldArmor != newArmor)
                 {
                     AddItem(oldArmor);
                 }
@@ -256,8 +269,71 @@ public class BackpackManager : MonoBehaviour
                 {
                     _armorSlots[position].UpdateDisplay();
                 }
-                
             }
+        }
+
+
+        GameObject enemy = GameObject.FindWithTag("Player");
+        if (enemy != null)
+        {
+            var enemyHealth = enemy.GetComponent<PlayerHealth>();
+            foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+            {
+                Item enemyArmor = enemyHealth.GetItemAt(position);
+
+                // 更新 enemy 的 battlePanel 显示
+                UpdateBattleArmorDisplay(position, enemyArmor, true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 更新 battlePanel 的 armor display
+    /// </summary>
+    /// <param name="position">身体部位位置</param>
+    /// <param name="newArmor">新装备的护甲</param>
+    private void UpdateBattleArmorDisplay(PlayerHealth.BodyPosition position, Item newArmor, bool isEnemy = false)
+    {
+        Transform battleHealthPanel = null;
+        // LocalPlayer
+        if (!isEnemy)
+        {
+            switch (position)
+            {
+                case PlayerHealth.BodyPosition.Head:
+                    battleHealthPanel = BattleHeadHealthPanel;
+                    break;
+                case PlayerHealth.BodyPosition.MainBody:
+                    battleHealthPanel = BattleBodyHealthPanel;
+                    break;
+                case PlayerHealth.BodyPosition.Legs:
+                    battleHealthPanel = BattleLegsHealthPanel;
+                    break;
+            }
+        }
+        // Player(enemy)
+        else
+        {
+            switch (position)
+            {
+                case PlayerHealth.BodyPosition.Head:
+                    battleHealthPanel = BattleHeadHealthEnemyPanel;
+                    break;
+                case PlayerHealth.BodyPosition.MainBody:
+                    battleHealthPanel = BattleBodyHealthEnemyPanel;
+                    break;
+                case PlayerHealth.BodyPosition.Legs:
+                    battleHealthPanel = BattleLegsHealthEnemyPanel;
+                    break;
+            }
+        }
+        
+
+        if (battleHealthPanel != null)
+        {
+            var battleArmorSlot = battleHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
+            battleArmorSlot.SetItem(newArmor);
+            battleArmorSlot.UpdateDisplay();
         }
     }
 

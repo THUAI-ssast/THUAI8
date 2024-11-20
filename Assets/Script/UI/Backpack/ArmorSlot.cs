@@ -13,7 +13,7 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
     private TMP_Text _armorName;
     private TMP_Text _armorDurability;
 
-    void Start()
+    void Awake()
     {
         _displayImage = transform.Find("Image").GetComponent<Image>();
         _armorName = transform.Find("Name").GetComponent<TMP_Text>();
@@ -37,18 +37,18 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
 
     public void UpdateDisplay()
     {
-        if (_armorItem == null)
-        {
-            _displayImage.enabled = false;
-            _armorName.text = "";
-            _armorDurability.text = "";
-        }
-        else if (_armorItem.ItemData is ArmorItemData armorData)
+        if (_armorItem != null&& _armorItem.ItemData is ArmorItemData armorData&& _armorItem.CurrentDurability>0)
         {
             _displayImage.enabled = true;
             _displayImage.sprite = armorData.ItemIcon;
             _armorName.text = armorData.ItemName;
             _armorDurability.text = $"{_armorItem.CurrentDurability}/{armorData.Durability}";
+        }
+        else
+        {
+            _displayImage.enabled = false;
+            _armorName.text = "";
+            _armorDurability.text = "";
         }
     }
 
@@ -61,6 +61,12 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
     /// <param name="eventData"></param>
     public void OnPointerClick(PointerEventData eventData)
     {
+        // _battlePanel 页面不允许卸下装备
+        if (UIManager.Instance.BattlePanel.activeSelf)
+        {
+            return;
+        }
+
         if (eventData.button == PointerEventData.InputButton.Right && _armorItem != null &&
             _armorItem.ItemData is ArmorItemData armorData)
         {

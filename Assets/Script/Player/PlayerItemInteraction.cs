@@ -183,5 +183,4 @@ public class PlayerItemInteraction : NetworkBehaviour
     {
         BackpackManager.Instance.AddItem(instance.GetComponent<Item>());
     }
-
 }
