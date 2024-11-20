@@ -37,7 +37,7 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
 
     public void UpdateDisplay()
     {
-        if (_armorItem == null)
+        if (_armorItem == null&& _displayImage&& _armorName&& _armorDurability)
         {
             _displayImage.enabled = false;
             _armorName.text = "";

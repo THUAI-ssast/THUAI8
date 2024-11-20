@@ -192,6 +192,7 @@ public class BackpackManager : MonoBehaviour
                 }
                 else
                 {
+                    slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
                     slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
                 }
 
@@ -203,6 +204,7 @@ public class BackpackManager : MonoBehaviour
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
                 slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
                 slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                slots.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(null);
             }
         }
 
