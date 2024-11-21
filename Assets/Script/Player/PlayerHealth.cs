@@ -335,13 +335,14 @@ public class PlayerHealth : NetworkBehaviour
         //机制乘区，默认为1，仅当对应部位有护甲&&护甲对武器伤害类型有特殊乘区时启用
         if (_armorEquipments.TryGetValue(position, out var armorItem) && armorItem.ItemData is ArmorItemData armorData)
         {
-            target.DecreaseDurability(armorItem.gameObject);
             if (armorData.DamageTypeDictionary.ContainsKey(weaponData.AttackDamageType))
             {
                 damage *= armorData.DamageTypeDictionary.Get(weaponData.AttackDamageType);
             }
+            damage = (float)Math.Round(damage, 1);
+            target.DecreaseDurability(armorItem.gameObject, damage);
         }
-
+        damage = (float)Math.Round(damage, 1);
         ChangeHealth((int)position, -damage);
     }
 

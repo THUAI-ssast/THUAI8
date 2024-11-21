@@ -48,7 +48,7 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
             _displayImage.enabled = true;
             _displayImage.sprite = armorData.ItemIcon;
             _armorName.text = armorData.ItemName;
-            _armorDurability.text = $"{_armorItem.CurrentDurability}/{armorData.Durability}";
+            _armorDurability.text = $"{_armorItem.CurrentDurability}";
         }
     }
 
