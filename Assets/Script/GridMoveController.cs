@@ -64,6 +64,7 @@ public class GridMoveController : MonoBehaviour
 
         _shadowCreator = _wallTilemap.GetComponent<ShadowCaster2DCreator>();
         _wallCollider2D = _wallTilemap.GetComponent<TilemapCollider2D>();
+        UpdateShadowCaster();
 
         _gridLine = transform.Find("GridLine");
 
@@ -294,10 +295,15 @@ public class GridMoveController : MonoBehaviour
             {
                 _wallTilemap.SetTile(doorPosition, doorTileHorizontal);
             }
-            _wallCollider2D.usedByComposite = true;
-            _shadowCreator.Create();
-            _wallCollider2D.usedByComposite = false;
+            UpdateShadowCaster();
         }
+    }
+
+    private void UpdateShadowCaster()
+    {
+        _wallCollider2D.usedByComposite = true;
+        _shadowCreator.Create();
+        _wallCollider2D.usedByComposite = false;
     }
 
     /// <summary>
