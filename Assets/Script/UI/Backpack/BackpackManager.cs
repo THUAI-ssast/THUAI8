@@ -44,6 +44,18 @@ public class BackpackManager : MonoBehaviour
     /// </summary>
     private List<Item> _itemList = new List<Item>();
 
+    public List<Item> ItemList
+    {
+        get => _itemList;
+        private set => _itemList = value;
+    }
+
+    public Dictionary<PlayerHealth.BodyPosition, ArmorSlot> ArmorSlots
+    {
+        get => _armorSlots;
+        private set => _armorSlots = value;
+    }
+
 
     private void Awake()
     {

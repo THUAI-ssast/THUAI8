@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
+using System.Linq;
 
 /// <summary>
 /// 该类中保存了玩家的名字、血量上限和当前血量，以及处理血量变化逻辑的方法
@@ -473,11 +474,30 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (_headHealth <= 0 || _bodyHealth <= 0)
         {
+            List<Item> items = new List<Item>();
+            foreach (var item in BackpackManager.Instance.ItemList)
+            {
+                items.Add(item);
+            }
+            foreach (var armorSlot in BackpackManager.Instance.ArmorSlots)
+            {
+                var bodyPosition = armorSlot.Key;
+                var slot = armorSlot.Value;
+                var item = slot.GetItem();
+
+                if (item != null)
+                {
+                    items.Add(item);
+                }
+            }
             Vector3Int tempPosition = _furnitureTilemap.WorldToCell(transform.position);
             Vector3 cellPosition = _furnitureTilemap.GetCellCenterWorld(tempPosition);
             GameObject instance = Instantiate(Resources.Load<GameObject>("ResourcePoint"));
             instance.transform.position = cellPosition;
             instance.transform.SetParent(_furnitureTilemap.transform);
+            ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
+            resourcePointController.InitializeWithCustomItems(items);
+
             NetworkServer.Spawn(instance);
             RpcSyncInstance(instance, cellPosition);
         }
@@ -492,5 +512,4 @@ public class PlayerHealth : NetworkBehaviour
         instance.transform.position = cellPosition;
         instance.transform.SetParent(_furnitureTilemap.transform);
     }
-
 }

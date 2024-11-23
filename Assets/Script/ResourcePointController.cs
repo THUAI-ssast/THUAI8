@@ -14,6 +14,8 @@ public class ResourcePointController : NetworkBehaviour
     private Tilemap _furnitureTilemap;
     private GameObject _player;
     private readonly List<Item> _itemList = new List<Item>();
+    private bool _useCustomInitItems = false;
+    private List<Item> _customInitItems;
 
     private float _requiredActionPoint = 2;
     public float RequiredActionPoint { get => _requiredActionPoint; }
@@ -25,7 +27,14 @@ public class ResourcePointController : NetworkBehaviour
         _furnitureTilemap = transform.parent.GetComponent<Tilemap>();
         if (isServer)
         {
-            StartCoroutine(InitItems());
+            if (_useCustomInitItems && _customInitItems != null)
+            {
+                StartCoroutine(AssignInitItems(_customInitItems));
+            }
+            else
+            {
+                StartCoroutine(RandomInitItems());
+            }
         }
     }
 
@@ -56,7 +65,7 @@ public class ResourcePointController : NetworkBehaviour
         }
     }
 
-    private IEnumerator InitItems()
+    private IEnumerator RandomInitItems()
     {
         yield return new WaitForSeconds(1);
         foreach (var match in _serializedProbilityDictionary.Dictionary)
@@ -75,6 +84,24 @@ public class ResourcePointController : NetworkBehaviour
                 }
                 CreateItem(directory + match.Key.name);
             }
+        }
+    }
+
+    public IEnumerator AssignInitItems(List<Item> items)
+    {
+        yield return new WaitForSeconds(1);
+        foreach (var item in items)
+        {
+            string directory = "ScriptableObject/Items/";
+            if (item.ItemData is WeaponItemData)
+            {
+                directory += "Weapons/";
+            }
+            else if (item.ItemData is ArmorItemData)
+            {
+                directory += "Armor/";
+            }
+            CreateItem(directory + item.ItemData.ItemName);
         }
     }
 
@@ -143,5 +170,11 @@ public class ResourcePointController : NetworkBehaviour
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
             }
         }
+    }
+
+    public void InitializeWithCustomItems(List<Item> customItems)
+    {
+        _useCustomInitItems = true;
+        _customInitItems = customItems;
     }
 }
