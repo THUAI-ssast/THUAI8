@@ -40,6 +40,12 @@ public class GridMoveController : MonoBehaviour
 
     private Vector3Int? _lastAdjacentDoor; // 相邻门的位置
 
+    public Tilemap FurnitureTilemap
+    {
+        get => _furnitureTilemap;
+        private set => _furnitureTilemap = value;
+    }
+
     private void Start()
     {
         Instance = this;

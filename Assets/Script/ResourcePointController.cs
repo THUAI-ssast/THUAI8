@@ -9,12 +9,11 @@ using UnityEngine.UI;
 
 public class ResourcePointController : NetworkBehaviour
 {
-    [SerializeField]private SerializableDictionary.Scripts.SerializableDictionary<ItemData, float> _serializedProbilityDictionary;
+    [SerializeField] private SerializableDictionary.Scripts.SerializableDictionary<ItemData, float> _serializedProbilityDictionary;
     private GameObject _resourceUIPanelInstance;
     private Tilemap _furnitureTilemap;
     private GameObject _player;
     private readonly List<Item> _itemList = new List<Item>();
-    private float _epsilon = 0.05f;
 
     private float _requiredActionPoint = 2;
     public float RequiredActionPoint { get => _requiredActionPoint; }
@@ -24,7 +23,7 @@ public class ResourcePointController : NetworkBehaviour
         _resourceUIPanelInstance = transform.GetChild(0).GetChild(0).gameObject;
         _resourceUIPanelInstance.SetActive(false);
         _furnitureTilemap = transform.parent.GetComponent<Tilemap>();
-        if(isServer)
+        if (isServer)
         {
             StartCoroutine(InitItems());
         }
@@ -35,21 +34,15 @@ public class ResourcePointController : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse1) && _player != null && !UIManager.Instance.IsUIActivating)
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3Int playerPos = _player.GetComponent<PlayerMove>().TilePosition;
             Vector3Int targetCellPos = _furnitureTilemap.WorldToCell(mousePos);
             Vector3 realPosition = _furnitureTilemap.CellToWorld(targetCellPos);
             bool isClickingThis = realPosition + new Vector3(0.5f, 0.5f, 0) == transform.position;
 
             if (isClickingThis)
             {
-                Vector3 playerPosBias = _player.transform.position;
-                playerPosBias.x -= 0.5f;
-                playerPosBias.y -= 0.5f;
-
-                bool isAdjacentInX = Mathf.Abs(targetCellPos.x - playerPosBias.x) <= 1.05f &&
-                                Mathf.Abs(targetCellPos.y - playerPosBias.y) <= _epsilon;
-
-                bool isAdjacentInY = Mathf.Abs(targetCellPos.y - playerPosBias.y) <= 1.05f &&
-                                    Mathf.Abs(targetCellPos.x - playerPosBias.x) <= _epsilon;
+                bool isAdjacentInX = Mathf.Abs(targetCellPos.x - playerPos.x) == 1 && targetCellPos.y == playerPos.y;
+                bool isAdjacentInY = Mathf.Abs(targetCellPos.y - playerPos.y) == 1 && targetCellPos.x == playerPos.x;
 
                 if (isAdjacentInX || isAdjacentInY)
                 {
@@ -57,7 +50,7 @@ public class ResourcePointController : NetworkBehaviour
                 }
             }
         }
-        else if(isClient)
+        else if (isClient)
         {
             _player = GameObject.FindWithTag("LocalPlayer");
         }
@@ -75,7 +68,8 @@ public class ResourcePointController : NetworkBehaviour
                 if (match.Key is WeaponItemData)
                 {
                     directory += "Weapons/";
-                }else if (match.Key is ArmorItemData)
+                }
+                else if (match.Key is ArmorItemData)
                 {
                     directory += "Armor/";
                 }
@@ -129,7 +123,7 @@ public class ResourcePointController : NetworkBehaviour
             RefreshSlots();
         }
     }
-    
+
     private void RefreshSlots()
     {
         Transform slots = gameObject.transform.Find("Canvas/ResourcePointPanel/Scroll View/Viewport/Slots");
