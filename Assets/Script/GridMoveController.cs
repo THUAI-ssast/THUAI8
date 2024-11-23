@@ -98,8 +98,8 @@ public class GridMoveController : MonoBehaviour
     public void InitLocalPlayer(PlayerMove player)
     {
         Player = player;
-        var position = _playerSpawnPosition;
-        player.transform.position = position;
+        var position = Player.transform.position;
+        //player.transform.position = position;
         Player.SetPosition(position, _groundTilemap.WorldToCell(position));
         var finderObj = Instantiate(Resources.Load<GameObject>(("PathFinder")), Player.transform);
         _pathBaker = finderObj.GetComponent<AstarPath>();

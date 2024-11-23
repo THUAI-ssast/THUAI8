@@ -40,7 +40,7 @@ public class SafeAreaManager : NetworkBehaviour
     /// <summary>
     /// 安全区左下角所在的cellPosition
     /// </summary>
-    [SyncVar] private Vector2Int _safeAreaOrigin ;
+    [SyncVar(hook = nameof(DisplaySafeArea))] private Vector2Int _safeAreaOrigin ;
 
     /// <summary>
     /// 下一次安全区的边长
@@ -75,16 +75,15 @@ public class SafeAreaManager : NetworkBehaviour
         else
         {
             Instance = this;
+            _wholeArea = transform.Find("WholeArea");
+            _safeAreaMask = transform.Find("SafeAreaMask");
+            _safeAreaOutline = transform.Find("SafeAreaOutline");
         }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        _wholeArea = transform.Find("WholeArea");
-        _safeAreaMask = transform.Find("SafeAreaMask");
-        _safeAreaOutline = transform.Find("SafeAreaOutline");
-
         _wholeArea.transform.localScale = new(168,168,0);
         _wholeArea.gameObject.SetActive(true);
         _safeAreaMask.gameObject.SetActive(true);
@@ -126,9 +125,6 @@ public class SafeAreaManager : NetworkBehaviour
                     break;
                 }
             }
-
-            // 使所有客户端显示安全区
-            RpcDisplaySafeArea();
         }
     }
 
@@ -158,8 +154,7 @@ public class SafeAreaManager : NetworkBehaviour
     /// <summary>
     /// 根据当前安全区的边长和左下角坐标绘制安全区的显示
     /// </summary>
-    [ClientRpc]
-    private void RpcDisplaySafeArea()
+    private void DisplaySafeArea(Vector2Int oldOrigin, Vector2Int newOrigin)
     {
         // 绘制安全区，确定position为正方形的中心坐标，scale等于边长
         float halfLength = _safeAreaLength / 2.0f;
