@@ -52,10 +52,16 @@ public class PlayerActionPoint : NetworkBehaviour
     /// <param name="newActionPoint"></param>
     public void ActionPointChange(float oldActionPoint, float newActionPoint)
     {
-        // 更新左下角的信息面板
         if (isLocalPlayer)
         {
+            // 更新左下角的信息面板
             LocalPlayerInfoPanel.UpdateActionPoint(newActionPoint, MaxActionPoint);
+            // 安全区伤害检测和施行
+            float decreaseActionPoint = oldActionPoint - newActionPoint;
+            if(decreaseActionPoint > 0)
+            {
+                SafeAreaManager.Instance.DoSafeAreaDamageByActionPoint(decreaseActionPoint);
+            }
         }
     }
 
