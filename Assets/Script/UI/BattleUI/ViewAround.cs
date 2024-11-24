@@ -14,7 +14,7 @@ public class ViewAround : MonoBehaviour
     void Start()
     {
         _button = GetComponent<Button>();
-        _backButton = transform.parent.GetChild(9).GetComponent<Button>();
+        _backButton = transform.parent.Find("BackButton").GetComponent<Button>();
         _battleUI = transform.parent.gameObject; // 假设 _battleUI 是这个 UI 面板
         _battleUIImage = _battleUI.GetComponent<Image>(); // 获取面板的 Image 组件
 

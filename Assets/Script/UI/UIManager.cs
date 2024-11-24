@@ -103,7 +103,7 @@ public class UIManager : MonoBehaviour
         _battlePanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
             {
-                _backButton = _battlePanel.transform.GetChild(9).GetComponent<Button>();
+                _backButton = _battlePanel.transform.Find("BackButton").GetComponent<Button>();
                 _battleUIImage = _battlePanel.GetComponent<Image>();
                 // 遍历 _battleUI 中的所有子物体
                 foreach (Transform child in _battlePanel.transform)

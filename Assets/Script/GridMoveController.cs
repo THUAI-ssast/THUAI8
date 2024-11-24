@@ -312,4 +312,8 @@ public class GridMoveController : MonoBehaviour
         graph.is2D = true;
         _pathBaker.Scan();
     }
+    public void ToggleMovementState(bool state)
+    {
+        _isMovable = state;
+    }
 }

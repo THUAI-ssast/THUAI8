@@ -466,5 +466,9 @@ public class PlayerHealth : NetworkBehaviour
     public void RpcPlayerDie()
     {
         Debug.Log(_name + " Player is Dead!");
+        if(gameObject.GetComponent<PlayerFight>().IsFighting)
+        {
+            gameObject.GetComponent<PlayerFight>().CmdDead();
+        }
     }
 }
