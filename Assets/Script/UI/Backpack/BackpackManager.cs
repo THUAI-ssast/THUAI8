@@ -108,6 +108,10 @@ public class BackpackManager : MonoBehaviour
             CreateItem("ScriptableObject/Items/Armor/防刺服");
             CreateItem("ScriptableObject/Items/Weapons/小刀");
         }
+        else
+        {
+            Debug.Log("Local Player is null!");
+        }
     }
 
     /// <summary>
@@ -211,7 +215,9 @@ public class BackpackManager : MonoBehaviour
     private void UpdateSlots(Transform slotsTransform, bool updateCraftWayUI)
     {
         if (slotsTransform == null)
+        {
             return;
+        }
 
         // 移除无效物品
         _itemList.RemoveAll(i => i == null);
@@ -284,7 +290,6 @@ public class BackpackManager : MonoBehaviour
             }
         }
 
-
         GameObject enemy = GameObject.FindWithTag("Player");
         if (enemy != null)
         {
@@ -293,7 +298,7 @@ public class BackpackManager : MonoBehaviour
             {
                 Item enemyArmor = enemyHealth.GetItemAt(position);
 
-                // 更新 enemy 的 battlePanel 显示
+                // 更新battlePanel 显示
                 UpdateBattleArmorDisplay(position, enemyArmor, true);
             }
         }
@@ -340,7 +345,6 @@ public class BackpackManager : MonoBehaviour
             }
         }
         
-
         if (battleHealthPanel != null)
         {
             var battleArmorSlot = battleHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
