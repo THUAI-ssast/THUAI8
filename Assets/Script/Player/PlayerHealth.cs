@@ -8,6 +8,7 @@ using UnityEngine.XR;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 
 /// <summary>
 /// 该类中保存了玩家的名字、血量上限和当前血量，以及处理血量变化逻辑的方法
@@ -18,11 +19,6 @@ public class PlayerHealth : NetworkBehaviour
     /// 用于玩家死亡后创建资源点
     /// </summary>
     private Tilemap _furnitureTilemap;
-
-    /// <summary>
-    /// 资源点瓦片
-    /// </summary>
-    public RuleTile TileToPlace;
 
     /// <summary>
     /// 玩家的名字
@@ -437,6 +433,11 @@ public class PlayerHealth : NetworkBehaviour
         float heal = 0;
         if (medicineData.BodyHealDictionary.ContainsKey(position))
             heal = medicineData.BodyHealDictionary.Get(position);
+        else
+        {
+            Debug.Log("cannot heal here!"); // here
+        }
+        healer.DecreaseDurability(medicineItem.gameObject); // 扣除药品使用次数
         ChangeHealth((int)position, heal);
     }
 

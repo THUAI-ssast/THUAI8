@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
 
     public bool IsUIActivating => _activeUIList.Count > 0;
     public GameObject ExistingOperationMenu;
+    public GameObject ExistingBodyPositionMenu;
 
     /// <summary>
     /// 背包UI界面
@@ -193,6 +194,10 @@ public class UIManager : MonoBehaviour
         {
             Destroy(ExistingOperationMenu);
         }
+        if (_bagPanel.activeSelf == false && ExistingBodyPositionMenu != null)
+        {
+            Destroy(ExistingBodyPositionMenu);
+        }
     }
 
     public void ReverseBattlePanel()
@@ -211,6 +216,10 @@ public class UIManager : MonoBehaviour
         if (_battlePanel.activeSelf == false && ExistingOperationMenu != null)
         {
             Destroy(ExistingOperationMenu);
+        }
+        if (_battlePanel.activeSelf == false && ExistingBodyPositionMenu != null)
+        {
+            Destroy(ExistingBodyPositionMenu);
         }
 
         BackpackManager.Instance.RefreshArmorDisplay();

@@ -106,7 +106,7 @@ public class BackpackManager : MonoBehaviour
             CreateItem("ScriptableObject/Items/金属破片");
             CreateItem("ScriptableObject/Items/Armor/纸质护甲");
             CreateItem("ScriptableObject/Items/Armor/防刺服");
-            CreateItem("ScriptableObject/Items/Weapons/小刀");
+            CreateItem("ScriptableObject/Items/Weapons/佩剑");
             CreateItem("ScriptableObject/Items/Medicines/医用绷带");
             CreateItem("ScriptableObject/Items/Medicines/止痛药");
         }
@@ -172,7 +172,10 @@ public class BackpackManager : MonoBehaviour
     /// 使用背包中的物品
     /// </summary>
     /// <param name="item">要使用的物品</param>
-    public void UseItem(Item item)
+    /// <param name="healhead">是否要治疗头部</param>
+    /// <param name="healbody">是否要治疗躯干</param>
+    /// <param name="heallegs">是否要治疗腿部</param>
+    public void UseItem(Item item, bool healhead = true, bool healbody = true, bool heallegs = true)
     {
         GameObject player = GameObject.FindWithTag("LocalPlayer");
         var playerInteraction = player.GetComponent<PlayerItemInteraction>();
@@ -188,7 +191,12 @@ public class BackpackManager : MonoBehaviour
         }
         else if (item.ItemData is MedicineItemData medicineData)
         {
-            player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject); // 治疗者，治疗部位，使用物品
+            if (healhead)
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject); // 治疗者，治疗部位，使用物品
+            if (healbody)
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject);
+            if (heallegs)
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject);
         }
 
         RefreshSlots();
