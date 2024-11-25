@@ -74,9 +74,14 @@ public class Item : NetworkBehaviour
         if (itemData is ArmorItemData armorItemData)
         {
             MaxDurability = armorItemData.Durability;
-        }else if (itemData is WeaponItemData weaponItemData)
+        }
+        else if (itemData is WeaponItemData weaponItemData)
         {
             MaxDurability = weaponItemData.Durability;
+        }
+        else if (itemData is MedicineItemData medicineItemData)
+        {
+            MaxDurability = medicineItemData.Durability;
         }
         CurrentDurability = MaxDurability;
     }

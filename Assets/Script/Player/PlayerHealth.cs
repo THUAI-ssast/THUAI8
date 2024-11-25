@@ -8,7 +8,7 @@ using UnityEngine.XR;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 using System.Linq;
-using UnityEditor.Experimental.GraphView;
+// using UnityEditor.Experimental.GraphView;
 
 /// <summary>
 /// 该类中保存了玩家的名字、血量上限和当前血量，以及处理血量变化逻辑的方法
@@ -411,21 +411,21 @@ public class PlayerHealth : NetworkBehaviour
         return damage;
     }
 
-    public static void Heal(PlayerHealth healer, BodyPosition position, Item medicine)
+    public static void Heal(PlayerHealth healer, BodyPosition position, Item medicine, bool isGlobalHeal = false)
     {
         MedicineItemData medicineData = medicine.ItemData as MedicineItemData;
         if (medicineData == null)
             return;
-        healer.TakeMedicineHeal(healer.GetComponent<PlayerItemInteraction>(), position, medicine);
+        healer.TakeMedicineHeal(healer.GetComponent<PlayerItemInteraction>(), position, medicine, isGlobalHeal);
     }
 
     [Command]
-    public void CmdHeal(GameObject healer, int position, GameObject medicine)
+    public void CmdHeal(GameObject healer, int position, GameObject medicine, bool isGlobalHeal)
     {
-        Heal(healer.GetComponent<PlayerHealth>(), (BodyPosition)position, medicine.GetComponent<Item>());
+        Heal(healer.GetComponent<PlayerHealth>(), (BodyPosition)position, medicine.GetComponent<Item>(), isGlobalHeal);
     }
 
-    private void TakeMedicineHeal(PlayerItemInteraction healer, BodyPosition position, Item medicineItem)
+    private void TakeMedicineHeal(PlayerItemInteraction healer, BodyPosition position, Item medicineItem, bool isGlobalHeal = false)
     {
         MedicineItemData medicineData = medicineItem.ItemData as MedicineItemData;
         if (medicineData == null)
@@ -433,11 +433,10 @@ public class PlayerHealth : NetworkBehaviour
         float heal = 0;
         if (medicineData.BodyHealDictionary.ContainsKey(position))
             heal = medicineData.BodyHealDictionary.Get(position);
-        else
+        if (!isGlobalHeal)
         {
-            Debug.Log("cannot heal here!"); // here
+            healer.DecreaseDurability(medicineItem.gameObject);
         }
-        healer.DecreaseDurability(medicineItem.gameObject); // 扣除药品使用次数
         ChangeHealth((int)position, heal);
     }
 

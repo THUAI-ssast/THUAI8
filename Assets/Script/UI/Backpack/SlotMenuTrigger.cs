@@ -181,17 +181,17 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
 
                             _bodyPositionLayout.GetChild(0).GetComponent<Button>().onClick.AddListener(() =>
                             {
-                                BackpackManager.Instance.UseItem(_slotItem, true, false, false);
+                                BackpackManager.Instance.UseItem(_slotItem, false, true, false, false);
                                 Destroy(_bodyPositionMenu);
                             });
                             _bodyPositionLayout.GetChild(1).GetComponent<Button>().onClick.AddListener(() =>
                             {
-                                BackpackManager.Instance.UseItem(_slotItem, false, true, false);
+                                BackpackManager.Instance.UseItem(_slotItem, false, false, true, false);
                                 Destroy(_bodyPositionMenu);
                             });
                             _bodyPositionLayout.GetChild(2).GetComponent<Button>().onClick.AddListener(() =>
                             {
-                                BackpackManager.Instance.UseItem(_slotItem, false, false, true);
+                                BackpackManager.Instance.UseItem(_slotItem, false, false, false, true);
                                 Destroy(_bodyPositionMenu);
                             });
                         }

@@ -175,7 +175,7 @@ public class BackpackManager : MonoBehaviour
     /// <param name="healhead">是否要治疗头部</param>
     /// <param name="healbody">是否要治疗躯干</param>
     /// <param name="heallegs">是否要治疗腿部</param>
-    public void UseItem(Item item, bool healhead = true, bool healbody = true, bool heallegs = true)
+    public void UseItem(Item item, bool isGlobalHeal = true, bool healhead = true, bool healbody = true, bool heallegs = true)
     {
         GameObject player = GameObject.FindWithTag("LocalPlayer");
         var playerInteraction = player.GetComponent<PlayerItemInteraction>();
@@ -191,12 +191,22 @@ public class BackpackManager : MonoBehaviour
         }
         else if (item.ItemData is MedicineItemData medicineData)
         {
-            if (healhead)
-                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject); // 治疗者，治疗部位，使用物品
-            if (healbody)
-                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject);
-            if (heallegs)
-                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject);
+            if (isGlobalHeal)
+            {
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, true);
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, true);
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, true);
+                player.GetComponent<PlayerItemInteraction>().DecreaseDurability(item.gameObject);
+            }
+            else
+            {
+                if (healhead)
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, false); // 治疗者，治疗部位，使用物品
+                else if (healbody)
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, false);
+                else if (heallegs)
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, false);
+            }
         }
 
         RefreshSlots();
