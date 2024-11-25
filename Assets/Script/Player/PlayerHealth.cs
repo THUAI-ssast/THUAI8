@@ -415,6 +415,31 @@ public class PlayerHealth : NetworkBehaviour
         return damage;
     }
 
+    public static void Heal(PlayerHealth healer, BodyPosition position, Item medicine)
+    {
+        MedicineItemData medicineData = medicine.ItemData as MedicineItemData;
+        if (medicineData == null)
+            return;
+        healer.TakeMedicineHeal(healer.GetComponent<PlayerItemInteraction>(), position, medicine);
+    }
+
+    [Command]
+    public void CmdHeal(GameObject healer, int position, GameObject medicine)
+    {
+        Heal(healer.GetComponent<PlayerHealth>(), (BodyPosition)position, medicine.GetComponent<Item>());
+    }
+
+    private void TakeMedicineHeal(PlayerItemInteraction healer, BodyPosition position, Item medicineItem)
+    {
+        MedicineItemData medicineData = medicineItem.ItemData as MedicineItemData;
+        if (medicineData == null)
+            return;
+        float heal = 0;
+        if (medicineData.BodyHealDictionary.ContainsKey(position))
+            heal = medicineData.BodyHealDictionary.Get(position);
+        ChangeHealth((int)position, heal);
+    }
+
 
     /// <summary>
     /// Command函数，在客户端被调用，但在服务端执行。

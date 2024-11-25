@@ -107,6 +107,8 @@ public class BackpackManager : MonoBehaviour
             CreateItem("ScriptableObject/Items/Armor/纸质护甲");
             CreateItem("ScriptableObject/Items/Armor/防刺服");
             CreateItem("ScriptableObject/Items/Weapons/小刀");
+            CreateItem("ScriptableObject/Items/Medicines/医用绷带");
+            CreateItem("ScriptableObject/Items/Medicines/止痛药");
         }
         else
         {
@@ -183,6 +185,10 @@ public class BackpackManager : MonoBehaviour
         {
             var target = GameObject.FindWithTag("Player");
             player.GetComponent<PlayerHealth>().CmdAttack(player,target,(int)PlayerHealth.BodyPosition.MainBody,item.gameObject); // 攻击方，被攻击方，攻击部位，使用武器
+        }
+        else if (item.ItemData is MedicineItemData medicineData)
+        {
+            player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject); // 治疗者，治疗部位，使用物品
         }
 
         RefreshSlots();
