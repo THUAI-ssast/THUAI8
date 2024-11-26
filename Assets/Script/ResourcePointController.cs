@@ -2,6 +2,7 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -82,6 +83,10 @@ public class ResourcePointController : NetworkBehaviour
                 {
                     directory += "Armor/";
                 }
+                else if (match.Key is MedicineItemData)
+                {
+                    directory += "Medicines/";
+                }
                 CreateItem(directory + match.Key.name);
             }
         }
@@ -100,6 +105,10 @@ public class ResourcePointController : NetworkBehaviour
             else if (item.ItemData is ArmorItemData)
             {
                 directory += "Armor/";
+            }
+            else if (item.ItemData is MedicineItemData)
+            {
+                directory += "Medicines/";
             }
             CreateItem(directory + item.ItemData.ItemName);
         }

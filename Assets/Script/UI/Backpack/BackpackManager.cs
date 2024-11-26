@@ -107,6 +107,7 @@ public class BackpackManager : MonoBehaviour
             CreateItem("ScriptableObject/Items/Armor/纸质护甲");
             CreateItem("ScriptableObject/Items/Armor/防刺服");
             CreateItem("ScriptableObject/Items/Weapons/佩剑");
+            CreateItem("ScriptableObject/Items/Weapons/小刀");
             CreateItem("ScriptableObject/Items/Medicines/医用绷带");
             CreateItem("ScriptableObject/Items/Medicines/止痛药");
         }
