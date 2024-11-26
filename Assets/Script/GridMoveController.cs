@@ -90,7 +90,6 @@ public class GridMoveController : MonoBehaviour
         }
     }
 
-    [SerializeField] private Vector3 _playerSpawnPosition;
     /// <summary>
     /// 将player初始化为本机player，绑定移动、寻路等组件。
     /// </summary>
@@ -98,8 +97,7 @@ public class GridMoveController : MonoBehaviour
     public void InitLocalPlayer(PlayerMove player)
     {
         Player = player;
-        var position = Player.transform.position;
-        //player.transform.position = position;
+        var position = player.transform.position;
         Player.SetPosition(position, _groundTilemap.WorldToCell(position));
         var finderObj = Instantiate(Resources.Load<GameObject>(("PathFinder")), Player.transform);
         _pathBaker = finderObj.GetComponent<AstarPath>();
