@@ -171,12 +171,25 @@ public class ResourcePointController : NetworkBehaviour
                 image.enabled = true;
                 image.sprite = _itemList[i].ItemData.ItemIcon;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
+                if (_itemList[i].MaxDurability != -1)
+                {
+                    slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = true;
+                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text =
+                        $"{_itemList[i].CurrentDurability}/{_itemList[i].MaxDurability}";
+                }
+                else
+                {
+                    slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
+                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                }
                 slots.GetChild(i).GetComponent<RPSlot>().SetItem(_itemList[i]);
             }
             else
             {
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
+                slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
             }
         }
     }

@@ -521,10 +521,11 @@ public class PlayerHealth : NetworkBehaviour
             instance.transform.position = cellPosition;
             instance.transform.SetParent(_furnitureTilemap.transform);
             ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
-            resourcePointController.InitializeWithCustomItems(items);
+            List<Item> emptyitemlist = new List<Item>();
+            resourcePointController.InitializeWithCustomItems(emptyitemlist);
 
             NetworkServer.Spawn(instance);
-            RpcSyncInstance(instance, cellPosition);
+            RpcSyncInstance(instance, cellPosition, items);
         }
     }
 
@@ -532,8 +533,11 @@ public class PlayerHealth : NetworkBehaviour
     /// 在客户端将实例设置为 Tilemap 的子对象，并更新位置
     /// </summary>
     [ClientRpc]
-    private void RpcSyncInstance(GameObject instance, Vector3 cellPosition)
+    private void RpcSyncInstance(GameObject instance, Vector3 cellPosition, List<Item> items)
     {
+        ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
+        foreach (var item in items)
+            resourcePointController.AddItemToResourcePoint(item);
         instance.transform.position = cellPosition;
         instance.transform.SetParent(_furnitureTilemap.transform);
     }

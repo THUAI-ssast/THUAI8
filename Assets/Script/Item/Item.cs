@@ -27,7 +27,7 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 物体耐久度，若无耐久度则为-1，有耐久度的物体耐久度归零会损坏
     /// </summary>
-    public int CurrentDurability { get; private set; } = -1;
+    public int CurrentDurability { get; set; } = -1;
     public int MaxDurability { get; private set; } = -1;
     /// <summary> 
     /// 物品的网络ID
