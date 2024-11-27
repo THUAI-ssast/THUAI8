@@ -18,8 +18,6 @@ public class MapUIManager : MonoBehaviour
 
     private readonly float _lengthPerTile = 316.56f / 143;
 
-    public Rect cropArea;
-
     public bool IsDisplayBigMap = false;
 
     private Vector2 _originalPos;
