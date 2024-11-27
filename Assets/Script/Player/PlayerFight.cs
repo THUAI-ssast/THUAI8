@@ -31,10 +31,10 @@ public class PlayerFight : NetworkBehaviour
     /// 存储开始战斗后生成的战斗流程GameObject，在客户端和服务端都有改变，但无同步。
     /// </summary>
     GameObject _fightingProcess;
+    GameObject _waitingForFightUI;
     /// <summary>
     /// 是否在攻击范围内，仅在客户端改变，不向服务端同步，LocalPlayer始终为false。
     /// </summary>
-    GameObject _waitingForFightUI;
     bool _inAttackRange;
     NetworkIdentity _interruptedPlayerID;
     void Start()
@@ -51,7 +51,7 @@ public class PlayerFight : NetworkBehaviour
     }
     void Update()
     {
-        if(isLocalPlayer)
+        if(isLocalPlayer && !UIState())
         {
             if(Input.GetKeyDown(KeyCode.LeftAlt) || Input.GetKeyDown(KeyCode.RightAlt))
             {
@@ -73,9 +73,13 @@ public class PlayerFight : NetworkBehaviour
             }
         }
     }
+    bool UIState()
+    {
+        return _battleUI.activeSelf || _waitingForFightUI.activeSelf;
+    }
     void OnTriggerEnter2D(Collider2D Other)
     {
-        Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + " " + gameObject.tag + " " + IsFighting);
+        // Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + " " + gameObject.tag + " " + IsFighting);
         if(gameObject.CompareTag("Player") && Other.gameObject.CompareTag("LocalPlayerAttackRange"))
         {
             // Debug.Log("Enter");
@@ -122,7 +126,7 @@ public class PlayerFight : NetworkBehaviour
     /// 打断战斗流程。在被打断者的服务端执行。
     /// </summary>
     /// <param name="playerID">打断者NetworkIdentity</param>
-    void DeployInterruptFighting(NetworkIdentity playerID)
+    void DeployInterruptFighting(NetworkIdentity playerID) 
     {
         _fightingProcess.GetComponent<FightingProcess>().InterruptFighting(true, playerID, gameObject.GetComponent<NetworkIdentity>());
         TargetInterruptUI(playerID.connectionToClient, true);
@@ -130,16 +134,27 @@ public class PlayerFight : NetworkBehaviour
     }
     void OnMouseEnter()
     {
-        Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + " Enter inAttackRange:" + _inAttackRange);
         if(_inAttackRange)
         {
             GridMoveController.Instance.ToggleMovementState(false);
             _selectedUI.SetActive(true);
         }
     }
+    void OnMouseOver()
+    {
+        if(_inAttackRange)
+        {
+            GridMoveController.Instance.ToggleMovementState(false);
+            _selectedUI.SetActive(true);
+        }
+        else
+        {
+            if(!UIState()) GridMoveController.Instance.ToggleMovementState(true);
+            _selectedUI.SetActive(false);
+        }
+    }
     void OnMouseExit()
     {
-        Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + " Exit inAttackRange:" + _inAttackRange);
         if(_inAttackRange)
         {
             GridMoveController.Instance.ToggleMovementState(true);
@@ -160,7 +175,7 @@ public class PlayerFight : NetworkBehaviour
         {
             if(_fightingProcess.GetComponent<FightingProcess>().FightingInterrupted == false)
             {
-                TargetInterruptUI(playerID.connectionToClient, false);
+                // TargetInterruptUI(playerID.connectionToClient, false);
                 yield break;
             }
             TargetUpdateInterruptUI(playerID.connectionToClient, 0, roundDuration, timer, attackerName);
@@ -171,7 +186,7 @@ public class PlayerFight : NetworkBehaviour
         TargetUpdateInterruptUI(playerID.connectionToClient, 1, roundDuration, timer, attackerName);
         yield return new WaitForSeconds(2);
         TargetInterruptUI(playerID.connectionToClient, false);
-        playerID.GetComponent<PlayerFight>().TargetStartFighting(playerID.connectionToClient, gameObject.GetComponent<NetworkIdentity>());
+        playerID.GetComponent<PlayerFight>().TargetEnterStartFighting(playerID.connectionToClient, gameObject.GetComponent<NetworkIdentity>());
     }
     /// <summary>
     /// 开始战斗，调用CmdStartFighting。在打断者的客户端执行。
@@ -179,16 +194,17 @@ public class PlayerFight : NetworkBehaviour
     /// <param name="target"></param>
     /// <param name="playerID">被打断者NetworkIdentity</param>
     [TargetRpc]
-    public void TargetStartFighting(NetworkConnection target, NetworkIdentity playerID)
+    void TargetEnterStartFighting(NetworkConnection target, NetworkIdentity playerID)
     {
         CmdStartFighting(gameObject, playerID.gameObject);
     }
     [TargetRpc]
-    public void TargetInterruptUI(NetworkConnection target, bool state)
+    void TargetInterruptUI(NetworkConnection target, bool state)
     {
         GridMoveController.Instance.ToggleMovementState(!state);
         _waitingForFightUI.transform.GetChild(2).GetComponent<Button>().interactable = true;
         _waitingForFightUI.SetActive(state);
+        GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerFight>().SetAttackRangeFalse();
     }
     [TargetRpc]
     void TargetUpdateInterruptUI(NetworkConnection target, int mode, float roundDuration, float timeLeft, string attackerName)
@@ -239,6 +255,7 @@ public class PlayerFight : NetworkBehaviour
         _fightingProcess = FightingProcessManager.Instance.transform.GetChild(0).gameObject;
         GridMoveController.Instance.ToggleMovementState(false);
         _battleUI.SetActive(true);
+        GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerFight>().SetAttackRangeFalse();
     }
     [Command]
     void CmdSetIsFighting()
@@ -287,5 +304,9 @@ public class PlayerFight : NetworkBehaviour
             Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + "Defender" + " ConfirmOver");
         }
         _fightingProcess.GetComponent<FightingProcess>().ConfirmOver(FightingState);
+    }
+    public void SetAttackRangeFalse()
+    {
+        _attackRange.SetActive(false);
     }
 }

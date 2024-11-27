@@ -352,4 +352,4 @@ public class FightingProcess : NetworkBehaviour
         _battleUI.transform.Find("IntertruptedMessagePanel").gameObject.SetActive(state);
     }
 }
-// TODO: 玩家断联 不可拖动 FightLog 阻塞ui 打断过程战斗结束 SeletedUI
+// TODO: 玩家断联 不可拖动 FightLog 打断过程战斗结束有时候会有奇怪bug
