@@ -142,8 +142,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1/5
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2d47345a621ced245a407257581fd134, type: 2}
-  m_sharedMaterial: {fileID: 3114029235034608195, guid: 2d47345a621ced245a407257581fd134, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 387f580385e2a6642a409f5f5d4f43bc, type: 2}
+  m_sharedMaterial: {fileID: -122742541679575602, guid: 387f580385e2a6642a409f5f5d4f43bc, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -303,6 +303,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _operationMenuPrefab: {fileID: 8184533505767772537, guid: f1f13e0f8ca089d418cc6c19f48bde0e, type: 3}
+  _bodyPositionMenuPrefab: {fileID: 8184533505767772537, guid: b7d370a16631fbc45856c1145e5629b6, type: 3}
   _itemDescriptionPanelPrefab: {fileID: 8364959480719521508, guid: 1351dc518e7472548884d2dc9e1dd7ff, type: 3}
 --- !u!114 &7124257541622284131
 MonoBehaviour:
@@ -384,8 +385,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 81625efe3b4036848a1ebb71217e5359, type: 2}
-  m_sharedMaterial: {fileID: -290105375507619517, guid: 81625efe3b4036848a1ebb71217e5359, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 387f580385e2a6642a409f5f5d4f43bc, type: 2}
+  m_sharedMaterial: {fileID: -122742541679575602, guid: 387f580385e2a6642a409f5f5d4f43bc, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

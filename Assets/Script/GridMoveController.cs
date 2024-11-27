@@ -40,6 +40,12 @@ public class GridMoveController : MonoBehaviour
 
     private Vector3Int? _lastAdjacentDoor; // 相邻门的位置
 
+    public Tilemap FurnitureTilemap
+    {
+        get => _furnitureTilemap;
+        private set => _furnitureTilemap = value;
+    }
+
     /// <summary>
     /// 配合JudgeReachable函数使用，判断路径是否可行的指示变量
     /// </summary>
