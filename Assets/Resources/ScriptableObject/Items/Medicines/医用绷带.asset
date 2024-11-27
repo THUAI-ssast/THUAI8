@@ -17,7 +17,7 @@ MonoBehaviour:
   ItemDesc: 
   ItemType: 0
   ItemValue: 0
-  Durability: 2
+  Durability: 1
   BodyHealDictionary:
     _pairs:
     - _key: 0
