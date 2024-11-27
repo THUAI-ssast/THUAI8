@@ -70,11 +70,7 @@ public class PlayerActionPoint : NetworkBehaviour
         bool isEnough = (_currentActionPoint - requiredActionPoint) >= 0;
         if (!isEnough && isDisplayUI)
         {
-            if (displayCoroutine != null)
-            {
-                StopCoroutine(displayCoroutine);
-            }
-            displayCoroutine = StartCoroutine(DisplayAPNotEnoughWarning());
+            UIManager.Instance.DisplayHoverStatusPanel("你的体力不足！");
         }
         return isEnough;
     }
@@ -135,18 +131,5 @@ public class PlayerActionPoint : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// 弹出UI提示玩家体力值不足
-    /// </summary>
-    private IEnumerator DisplayAPNotEnoughWarning()
-    {
-        GameObject ActionPointWarningPanel = GameObject.Find("Canvas").transform.Find("ActionPointWarningPanel").gameObject;
-        ActionPointWarningPanel.GetComponent<CanvasGroup>().alpha = 1f;
-        ActionPointWarningPanel.SetActive(true);
-        yield return new WaitForSeconds(1);
-        ActionPointWarningPanel.GetComponent<CanvasGroup>().DOFade(0f, 1f);
-        yield return new WaitForSeconds(1);
-        ActionPointWarningPanel.SetActive(false);
-    }
 
 }

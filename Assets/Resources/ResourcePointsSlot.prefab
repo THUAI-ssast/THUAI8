@@ -221,6 +221,7 @@ GameObject:
   - component: {fileID: 2817722690720741184}
   - component: {fileID: 7555593054347378952}
   - component: {fileID: -7138398970353965961}
+  - component: {fileID: 7954623099965150884}
   m_Layer: 5
   m_Name: ResourcePointsSlot
   m_TagString: Untagged
@@ -302,6 +303,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rp: {fileID: 3053860048405829172, guid: dfa34685de68be1428590ad03863476b, type: 3}
+--- !u!114 &7954623099965150884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4248620562482759993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b666ff8989a7ae544adc8affa8a95d14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4744918122507492816
 GameObject:
   m_ObjectHideFlags: 0

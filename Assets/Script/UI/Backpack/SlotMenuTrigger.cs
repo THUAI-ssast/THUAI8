@@ -90,6 +90,10 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     {
         _slotItem = item;
     }
+    public Item GetItem()
+    {
+        return _slotItem;
+    }
     /// <summary>
     /// 监听鼠标左右键点击事件。生成全局唯一菜单、加入菜单按钮点击事件。
     /// </summary>

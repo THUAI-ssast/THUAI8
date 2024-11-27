@@ -46,6 +46,19 @@ public class GridMoveController : MonoBehaviour
         private set => _furnitureTilemap = value;
     }
 
+    /// <summary>
+    /// 配合JudgeReachable函数使用，判断路径是否可行的指示变量
+    /// </summary>
+    private bool _isReachable;
+    /// <summary>
+    /// 配合JudgeReachable函数使用，存储的路径
+    /// </summary>
+    private Path _path;
+    /// <summary>
+    /// 配合JudgeReachable函数使用，用于悬停显示使用的targetWorldPosition
+    /// </summary>
+    private Vector3 _hoverUseTargetWorldPosition;
+
     private void Start()
     {
         Instance = this;
@@ -57,6 +70,7 @@ public class GridMoveController : MonoBehaviour
 
         _shadowCreator = _wallTilemap.GetComponent<ShadowCaster2DCreator>();
         _wallCollider2D = _wallTilemap.GetComponent<TilemapCollider2D>();
+        UpdateShadowCaster();
 
         _gridLine = transform.Find("GridLine");
 
@@ -89,7 +103,7 @@ public class GridMoveController : MonoBehaviour
     public void InitLocalPlayer(PlayerMove player)
     {
         Player = player;
-        var position = Player.transform.position;
+        var position = player.transform.position;
         Player.SetPosition(position, _groundTilemap.WorldToCell(position));
         var finderObj = Instantiate(Resources.Load<GameObject>(("PathFinder")), Player.transform);
         _pathBaker = finderObj.GetComponent<AstarPath>();
@@ -108,8 +122,7 @@ public class GridMoveController : MonoBehaviour
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int targetCellPos = _groundTilemap.WorldToCell(mousePos);
-            if (Math.Abs(targetCellPos.x - Player.TilePosition.x) <= 3 &&
-                Math.Abs(targetCellPos.y - Player.TilePosition.y) <= 3)
+            if (IsInBoundary(targetCellPos) && Player.TilePosition != targetCellPos)
                 _targetCellPosition = targetCellPos;
         }
         else if (Input.GetKeyDown(KeyCode.A))
@@ -190,7 +203,7 @@ public class GridMoveController : MonoBehaviour
         else
         {
             //成功找到路径
-            if (p.vectorPath[^1]==targetWorldPosition&&_isMovable)
+            if (p.vectorPath[^1] == targetWorldPosition && _isMovable)
             {
                 float duration = (p.vectorPath.Count - 1) * 0.6f; // 假设移动速度为每格0.6秒
                 var pathArray = p.vectorPath.ToArray();
@@ -201,7 +214,7 @@ public class GridMoveController : MonoBehaviour
                     return; // 如果被门阻挡，直接返回，不进行后面的操作
                 }
 
-                float requiredActionPoint = 0.5f * (pathArray.Length - 1);
+                float requiredActionPoint = ComputeRequiredActionPoint(p);
                 if (!GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().CheckForEnoughActionPoint(requiredActionPoint))
                 {
                     Debug.Log("ActionPoint is not enough.");
@@ -261,9 +274,9 @@ public class GridMoveController : MonoBehaviour
         return tile == doorTileHorizontal || tile == doorTileVertical;
     }
 
-    public void BreakGlass(Vector3Int cellPosition,PlayerSound playerSound)
+    public void BreakGlass(Vector3Int cellPosition, PlayerSound playerSound)
     {
-        if (_glassTilemap.HasTile(cellPosition)&&_glassTilemap.GetTile(cellPosition)!=brokenGlassTile)
+        if (_glassTilemap.HasTile(cellPosition) && _glassTilemap.GetTile(cellPosition) != brokenGlassTile)
         {
             playerSound.PlayGlassBreakSound();
             _glassTilemap.SetTile(cellPosition, brokenGlassTile);
@@ -288,10 +301,15 @@ public class GridMoveController : MonoBehaviour
             {
                 _wallTilemap.SetTile(doorPosition, doorTileHorizontal);
             }
-            _wallCollider2D.usedByComposite = true;
-            _shadowCreator.Create();
-            _wallCollider2D.usedByComposite = false;
+            UpdateShadowCaster();
         }
+    }
+
+    private void UpdateShadowCaster()
+    {
+        _wallCollider2D.usedByComposite = true;
+        _shadowCreator.Create();
+        _wallCollider2D.usedByComposite = false;
     }
 
     /// <summary>
@@ -317,5 +335,74 @@ public class GridMoveController : MonoBehaviour
         graph.RelocateNodes(_groundTilemap.WorldToCell(Player.TilePosition), Quaternion.identity, 1);
         graph.is2D = true;
         _pathBaker.Scan();
+    }
+
+    /// <summary>
+    /// 判断某个tile位置是否可达。
+    /// 注意：该函数没有返回值，是否可达的bool变量通过GridMoveController.Instance.IsReachable获取，可达情况下所需的体力值通过GridMoveController.Instance.RequiredActionPoint()获取
+    /// </summary>
+    /// <param name="targetCellPosition">需要进行判断的tile的位置</param>
+    public void JudgeReachable(Vector3Int targetCellPosition)
+    {
+        _hoverUseTargetWorldPosition = _groundTilemap.CellToWorld(targetCellPosition) + _cellBias;
+        _pathSeeker.StartPath(_groundTilemap.CellToWorld(Player.TilePosition) + _cellBias, _hoverUseTargetWorldPosition, onPathJudge);
+    }
+
+    /// <summary>
+    /// 判断目标tile是否可达的回调函数
+    /// </summary>
+    /// <param name="p">通过寻路算法计算好的路径</param>
+    private void onPathJudge(Path p)
+    {
+        var pathArray = p.vectorPath.ToArray();
+        // 在目标不可达时，算法提供的路径只有可行的一部分，该路径中的最后一个位置不等于目标位置
+        if (p.vectorPath[^1] != _hoverUseTargetWorldPosition || CheckForDoorBlock(pathArray))
+        {
+            _isReachable = false;
+            _path = null;
+            return;
+        }
+        _isReachable = true;
+        _path = p;
+    }
+
+    /// <summary>
+    /// 用以判断玩家是否正在移动
+    /// </summary>
+    public bool IsMovable => _isMovable;
+
+    /// <summary>
+    /// 配合JudgeReachable函数使用，表示目标位置是否可达
+    /// </summary>
+    public bool IsReachable => _isReachable;
+
+    /// <summary>
+    /// 配合JudgeReachable函数使用，获取到达目标所需要的体力值
+    /// </summary>
+    /// <returns>到达目标所需要的体力值，如果返回值是0则代表使用JudgeReachable函数出错</returns>
+    public float RequiredActionPoint()
+    {
+        return _path != null ? ComputeRequiredActionPoint(_path) : 0;
+    }
+
+    /// <summary>
+    /// 判断某个tile的位置是否处在以玩家为中心的7*7范围内
+    /// </summary>
+    /// <param name="targetCellPos">需要判断的tile的位置</param>
+    /// <returns>返回true则表示指定的tile处在以玩家为中心的7*7范围内</returns>
+    public bool IsInBoundary(Vector3Int targetCellPos)
+    {
+        return Math.Abs(targetCellPos.x - Player.TilePosition.x) <= 3 &&
+               Math.Abs(targetCellPos.y - Player.TilePosition.y) <= 3;
+    }
+
+    /// <summary>
+    /// 计算玩家经过某条路径所需要的体力值
+    /// </summary>
+    /// <param name="path">用以计算的路径</param>
+    /// <returns>所需的体力值</returns>
+    private float ComputeRequiredActionPoint(Path path)
+    {
+        return 0.2f * (path.vectorPath.ToArray().Length - 1);
     }
 }

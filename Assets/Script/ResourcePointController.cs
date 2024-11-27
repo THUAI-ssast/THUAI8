@@ -23,6 +23,11 @@ public class ResourcePointController : NetworkBehaviour
 
     public List<Item> ItemList { get => _itemList; }
 
+    /// <summary>
+    /// 存储地图上所有资源点的字典：key是tilePosition，value是资源点
+    /// </summary>
+    public static Dictionary<Vector3Int, Transform> ResourcePointDictionary = new Dictionary<Vector3Int, Transform>();
+    
     void Start()
     {
         _resourceUIPanelInstance = transform.GetChild(0).GetChild(0).gameObject;
@@ -39,6 +44,8 @@ public class ResourcePointController : NetworkBehaviour
                 StartCoroutine(RandomInitItems());
             }
         }
+        // 资源点生成时存储到字典中
+        ResourcePointDictionary.Add(_furnitureTilemap.WorldToCell(transform.position), transform);
     }
 
     void Update()
@@ -192,6 +199,7 @@ public class ResourcePointController : NetworkBehaviour
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
                 slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
                 slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                slots.GetChild(i).GetComponent<RPSlot>().SetItem(null);
             }
         }
     }

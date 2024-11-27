@@ -269,6 +269,7 @@ public class BackpackManager : MonoBehaviour
                 }
                 else
                 {
+                    slotsTransform.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
                     slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
                 }
 
@@ -276,11 +277,11 @@ public class BackpackManager : MonoBehaviour
             }
             else
             {
-                // 清空槽位内容
                 slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
                 slotsTransform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
                 slotsTransform.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
                 slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                slotsTransform.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(null);
             }
         }
 
