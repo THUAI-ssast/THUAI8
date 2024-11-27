@@ -40,7 +40,7 @@ public class SafeAreaManager : NetworkBehaviour
     /// <summary>
     /// 安全区左下角所在的cellPosition
     /// </summary>
-    [SyncVar(hook = nameof(DisplaySafeArea))] private Vector2Int _safeAreaOrigin ;
+    [SyncVar] private Vector2Int _safeAreaOrigin ;
 
     /// <summary>
     /// 下一次安全区的边长
@@ -50,7 +50,7 @@ public class SafeAreaManager : NetworkBehaviour
     /// <summary>
     /// 下一次安全区的左下角坐标，初始化时需要设置为全图的左下角
     /// </summary>
-    [SyncVar] private Vector2Int _nextSafeAreaOrigin = new(-84,-84);
+    [SyncVar(hook = nameof(DisplaySafeArea))] private Vector2Int _nextSafeAreaOrigin = new(-84,-84);
 
     /// <summary>
     /// 用于显示安全区，覆盖全图
@@ -84,7 +84,7 @@ public class SafeAreaManager : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _wholeArea.transform.localScale = new(168,168,0);
+        _wholeArea.transform.localScale = new(200,200,0);
         _wholeArea.gameObject.SetActive(true);
         _safeAreaMask.gameObject.SetActive(true);
         _safeAreaOutline.gameObject.SetActive(true);
@@ -102,7 +102,7 @@ public class SafeAreaManager : NetworkBehaviour
         {
             if (newLength == -1)
                 return;
-            if (newLength != _nextSafeAreaLength)
+            if (newLength != _nextSafeAreaLength && currentRoundCount > 1)
             {
                 Debug.Log("SafeArea has error");
                 return;
@@ -118,8 +118,12 @@ public class SafeAreaManager : NetworkBehaviour
                 int nextLength;
                 if(_safeAreaChangePlan.TryGetValue(currentRoundCount+i, out nextLength))
                 {
-                    if (nextLength == -1) 
+                    if (nextLength == -1)
+                    {
+                        _nextSafeAreaLength = -1;
+                        _nextSafeAreaOrigin = new Vector2Int(0,0);
                         break;
+                    }
                     _nextSafeAreaLength = nextLength;
                     _nextSafeAreaOrigin += ComputeOriginDelta(newLength, nextLength);
                     break;
@@ -163,6 +167,8 @@ public class SafeAreaManager : NetworkBehaviour
         // 绘制安全区轮廓
         _safeAreaOutline.position = _safeAreaMask.position;
         _safeAreaOutline.localScale = _safeAreaMask.localScale + new Vector3(0.1f,0.1f);
+
+        MapUIManager.Instance.UpdateSafeArea(_safeAreaLength, _safeAreaOrigin, _nextSafeAreaLength, _nextSafeAreaOrigin);
     }
 
     private Vector2Int ComputeOriginDelta(int oldLength, int newLength)

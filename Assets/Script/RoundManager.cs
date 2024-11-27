@@ -62,6 +62,8 @@ public class RoundManager : NetworkBehaviour
     /// </summary>
     [SyncVar(hook = nameof(RoundCountChange))] private int _roundCount = 0;
 
+    public int RoundCount => _roundCount;
+
     private void Awake()
     {
         if (Instance)

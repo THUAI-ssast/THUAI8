@@ -69,6 +69,11 @@ public class MouseHoverManager : MonoBehaviour
     /// </summary>
     private Coroutine _displayCoroutine;
 
+    /// <summary>
+    /// 记录当玩家打开其他阻塞式UI之前鼠标悬停显示的状态，用于在玩家关闭所有阻塞式UI后恢复之前的设置
+    /// </summary>
+    private bool _isShowUIBefore;
+
 
     private void Start()
     {
@@ -103,13 +108,21 @@ public class MouseHoverManager : MonoBehaviour
                 ReverseShowUIStatus();
                 _isSwitchCD = false;
             }
+            if (_isShowUIBefore)
+            {
+                _isShowUIBefore = false;
+                _isSwitchCD = true;
+                ReverseShowUIStatus(false);
+                _isSwitchCD = false;
+            }
         }
         else
         {
             // 当其他阻塞式UI被打开时，关闭鼠标悬停功能
             if (_isShowUI)
             {
-                ReverseShowUIStatus();
+                _isShowUIBefore = true;
+                ReverseShowUIStatus(false);
             }
         }
     }
@@ -153,7 +166,7 @@ public class MouseHoverManager : MonoBehaviour
             if (_wallTilemap.HasTile(targetCellPos))    // WallTilemap（包括墙、门和其他类型的障碍物）
             {
                 isTileOccupied = true;
-                descriptionText = IsDoorTile(targetCellPos) ? "门：<sprite=1>右键打开或关闭\n" : "此处无法到达\n"; // TextMeshPro的富文本功能，可以插入图片
+                descriptionText = IsDoorTile(targetCellPos) ? "门：靠近  <sprite=1>右键打开或关闭\n" : "此处无法到达\n"; // TextMeshPro的富文本功能，可以插入图片
             }
             else if (_furnitureTilemap.HasTile(targetCellPos))  // FurnitureTilemap
             {
@@ -239,7 +252,7 @@ public class MouseHoverManager : MonoBehaviour
     /// <summary>
     /// 切换是否启用鼠标悬停功能的状态
     /// </summary>
-    private void ReverseShowUIStatus()
+    private void ReverseShowUIStatus(bool isDisplayText=true)
     {
         string displayText;
         _isShowUI = !_isShowUI;
@@ -259,7 +272,10 @@ public class MouseHoverManager : MonoBehaviour
             displayText = "鼠标悬停显示已关";
         }
         // 显示UI以提示玩家当前鼠标悬停功能是否启用
-        UIManager.Instance.DisplayHoverStatusPanel(displayText);
+        if(isDisplayText)
+        {
+            UIManager.Instance.DisplayHoverStatusPanel(displayText);
+        }
     }
 
 }

@@ -31,6 +31,7 @@ public class UIManager : MonoBehaviour
     private GameObject _craftPanel;
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
+    private GameObject _bigMapPanel;
 
 
     private List<GameObject> _activeUIList = new List<GameObject>();
@@ -89,13 +90,27 @@ public class UIManager : MonoBehaviour
             .AddListener(() => reverseUIActive(_craftPanel));
         _craftPanel.transform.Find("ApplyButton").GetComponent<Button>().onClick
             .AddListener(() => BackpackManager.Instance.DeployCraft(CraftWayUI.SelectedCraftWay));
+
+        _bigMapPanel = MainCanvas.transform.Find("MapPanel/SmallMapMask/BigMapImage").gameObject;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            ReverseBagPanel();
+            ReversePanel(_bagPanel);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            if(MapUIManager.Instance.IsDisplayBigMap)
+            {
+                MapUIManager.Instance.DisplaySmallMap();
+            }
+            else
+            {
+                MapUIManager.Instance.DisplayBigMap();
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -143,10 +158,10 @@ public class UIManager : MonoBehaviour
         reverseUIActive(ui);
     }
 
-    public void ReverseBagPanel()
+    public void ReversePanel(GameObject panel)
     {
-        reverseUIActive(_bagPanel);
-        if (_bagPanel.activeSelf == false && ExistingOperationMenu != null)
+        reverseUIActive(panel);
+        if (panel.activeSelf == false && ExistingOperationMenu != null)
         {
             Destroy(ExistingOperationMenu);
         }
