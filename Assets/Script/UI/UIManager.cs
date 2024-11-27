@@ -234,6 +234,7 @@ public class UIManager : MonoBehaviour
 
     public void DestroyCurrentFollowImage()
     {
+        UIManager.Instance.FollowImage = null;
         if (CurrentSlotMenuTrigger != null)
         {
             CurrentSlotMenuTrigger.DestroyFollowImage();
