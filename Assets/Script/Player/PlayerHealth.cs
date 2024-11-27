@@ -8,7 +8,7 @@ using UnityEngine.XR;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 using System.Linq;
-// using UnityEditor.Experimental.GraphView;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// 该类中保存了玩家的名字、血量上限和当前血量，以及处理血量变化逻辑的方法
@@ -223,7 +223,6 @@ public class PlayerHealth : NetworkBehaviour
     // Start is called before the first frame update 
     void Start()
     {
-
         if (isLocalPlayer)
         {
             // 获取玩家名字
@@ -499,46 +498,63 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (_headHealth <= 0 || _bodyHealth <= 0)
         {
-            List<Item> items = new List<Item>();
-            foreach (var item in BackpackManager.Instance.ItemList)
-            {
-                items.Add(item);
-            }
-            foreach (var armorSlot in BackpackManager.Instance.ArmorSlots)
-            {
-                var bodyPosition = armorSlot.Key;
-                var slot = armorSlot.Value;
-                var item = slot.GetItem();
-
-                if (item != null)
-                {
-                    items.Add(item);
-                }
-            }
-            Vector3Int tempPosition = _furnitureTilemap.WorldToCell(transform.position);
-            Vector3 cellPosition = _furnitureTilemap.GetCellCenterWorld(tempPosition);
-            GameObject instance = Instantiate(Resources.Load<GameObject>("ResourcePoint"));
-            instance.transform.position = cellPosition;
-            instance.transform.SetParent(_furnitureTilemap.transform);
-            ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
-            List<Item> emptyitemlist = new List<Item>();
-            resourcePointController.InitializeWithCustomItems(emptyitemlist);
-
-            NetworkServer.Spawn(instance);
-            RpcSyncInstance(instance, cellPosition, items);
+            NetworkIdentity networkIdentity = GetComponent<NetworkIdentity>();
+            TargetCreateRP();
         }
     }
+
+    [TargetRpc]
+    public void TargetCreateRP()
+    {
+        List<Item> itemlist = BackpackManager.Instance.ItemList;
+        foreach (var armorSlot in BackpackManager.Instance.ArmorSlots)
+        {
+            var slot = armorSlot.Value;
+            var item = slot.GetItem();
+            if (item != null)
+            {
+                itemlist.Add(item);
+            }
+        }
+        CmdCreateRP(itemlist);
+    }
+
+
+    [Command]
+    public void CmdCreateRP(List<Item> itemlist)
+    {
+        Vector3Int tempPosition = _furnitureTilemap.WorldToCell(transform.position);
+        Vector3 cellPosition = _furnitureTilemap.GetCellCenterWorld(tempPosition);
+        GameObject instance = Instantiate(Resources.Load<GameObject>("ResourcePoint"));
+        instance.transform.position = cellPosition;
+        instance.transform.SetParent(_furnitureTilemap.transform);
+        ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
+        List<Item> emptyitemlist = new List<Item>();
+        resourcePointController.InitializeWithCustomItems(emptyitemlist);
+
+        foreach (var item in itemlist)
+        {
+            resourcePointController.AddItemToResourcePoint(item);
+        }
+        NetworkServer.Spawn(instance);
+        RpcSyncInstance(instance, cellPosition, itemlist);
+    }
+
 
     /// <summary>
     /// 在客户端将实例设置为 Tilemap 的子对象，并更新位置
     /// </summary>
     [ClientRpc]
-    private void RpcSyncInstance(GameObject instance, Vector3 cellPosition, List<Item> items)
+    private void RpcSyncInstance(GameObject instance, Vector3 cellPosition, List<Item> itemlist)
     {
         ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
-        foreach (var item in items)
-            resourcePointController.AddItemToResourcePoint(item);
         instance.transform.position = cellPosition;
         instance.transform.SetParent(_furnitureTilemap.transform);
+
+        foreach (var item in itemlist)
+        {
+            resourcePointController.AddItemToResourcePoint(item);
+        }
     }
+
 }

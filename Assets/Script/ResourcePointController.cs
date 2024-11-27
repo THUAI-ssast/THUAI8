@@ -21,6 +21,8 @@ public class ResourcePointController : NetworkBehaviour
     private float _requiredActionPoint = 2;
     public float RequiredActionPoint { get => _requiredActionPoint; }
 
+    public List<Item> ItemList { get => _itemList; }
+
     void Start()
     {
         _resourceUIPanelInstance = transform.GetChild(0).GetChild(0).gameObject;
@@ -160,7 +162,7 @@ public class ResourcePointController : NetworkBehaviour
         }
     }
 
-    private void RefreshSlots()
+    public void RefreshSlots()
     {
         Transform slots = gameObject.transform.Find("Canvas/ResourcePointPanel/Scroll View/Viewport/Slots");
         for (int i = 0; i < slots.childCount; i++)
