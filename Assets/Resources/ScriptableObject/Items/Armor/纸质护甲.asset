@@ -17,11 +17,15 @@ MonoBehaviour:
   ItemDesc: 
   ItemType: 0
   ItemValue: 1
-  Durability: 1
+  Durability: 2
   EquipBodyPosition: 1
   DamageTypeDictionary:
     _pairs:
-    - _key: 2
-      _value: 3
     - _key: 0
       _value: 0.8
+    - _key: 1
+      _value: 0.6
+    - _key: 2
+      _value: 0.8
+    - _key: 3
+      _value: 2

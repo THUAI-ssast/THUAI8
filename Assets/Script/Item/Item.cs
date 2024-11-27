@@ -24,7 +24,7 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 物体耐久度，若无耐久度则为-1，有耐久度的物体耐久度归零会损坏
     /// </summary>
-    public float CurrentDurability { get; private set; } = -1;
+    public float CurrentDurability { get; set; } = -1;
     public float MaxDurability { get; private set; } = -1;
     /// <summary> 
     /// 物品的网络ID
@@ -71,9 +71,14 @@ public class Item : NetworkBehaviour
         if (itemData is ArmorItemData armorItemData)
         {
             MaxDurability = armorItemData.Durability;
-        }else if (itemData is WeaponItemData weaponItemData)
+        }
+        else if (itemData is WeaponItemData weaponItemData)
         {
             MaxDurability = weaponItemData.Durability;
+        }
+        else if (itemData is MedicineItemData medicineItemData)
+        {
+            MaxDurability = medicineItemData.Durability;
         }
         CurrentDurability = MaxDurability;
     }

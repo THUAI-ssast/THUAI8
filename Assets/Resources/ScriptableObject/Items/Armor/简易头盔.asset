@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63676bb77be643344b6f44e68edeb0d4, type: 3}
+  m_Name: "\u7B80\u6613\u5934\u76D4"
+  m_EditorClassIdentifier: 
+  ItemName: "\u7B80\u6613\u5934\u76D4"
+  ItemIcon: {fileID: 21300000, guid: e8c77b7edfae6fc4a9944db54db83a81, type: 3}
+  ItemDesc: 
+  ItemType: 0
+  ItemValue: 1
+  Durability: 2
+  EquipBodyPosition: 0
+  DamageTypeDictionary:
+    _pairs:
+    - _key: 0
+      _value: 0.9
+    - _key: 1
+      _value: 0.8
+    - _key: 2
+      _value: 0.8

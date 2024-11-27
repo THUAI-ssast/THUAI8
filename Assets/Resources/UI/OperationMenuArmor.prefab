@@ -33,6 +33,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5122889502164786245, guid: f1f13e0f8ca089d418cc6c19f48bde0e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5122889502164786245, guid: f1f13e0f8ca089d418cc6c19f48bde0e, type: 3}
       propertyPath: m_lastCharacterOfLine
       value: 1
       objectReference: {fileID: 0}

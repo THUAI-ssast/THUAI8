@@ -17,6 +17,7 @@ public class UIManager : MonoBehaviour
 
     public bool IsUIActivating => _activeUIList.Count > 0;
     public GameObject ExistingOperationMenu;
+    public GameObject ExistingBodyPositionMenu;
 
     /// <summary>
     /// 背包UI界面
@@ -27,11 +28,31 @@ public class UIManager : MonoBehaviour
         private set => _bagPanel = value;
     }
 
+    public GameObject BattlePanel
+    {
+        get => _battlePanel;
+        private set => _battlePanel = value;
+    }
+
+    public Item FollowImage
+    {
+        get => _followImage;
+        set => _followImage = value;
+    }
+
+    public SlotMenuTrigger CurrentSlotMenuTrigger { get; set; } // here
+
     [SerializeField] private GameObject _bagPanel;
+    [SerializeField] private GameObject _battlePanel;
+    [SerializeField] private Item _followImage;
     private GameObject _craftPanel;
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
 
+    private bool _isOnBattle = false;
+
+    private Button _backButton;
+    private Image _battleUIImage;
 
     private List<GameObject> _activeUIList = new List<GameObject>();
 
@@ -66,6 +87,7 @@ public class UIManager : MonoBehaviour
 
         //初始化craft way ui 需要其父物体active
         _bagPanel.SetActive(true);
+        _battlePanel.SetActive(true);
         _craftPanel.SetActive(true);
         CraftWayUI.ClearItemList();
         foreach (CraftWayData craftWayData in Resources.LoadAll<CraftWayData>("ScriptableObject/CraftWay"))
@@ -73,8 +95,9 @@ public class UIManager : MonoBehaviour
             Instantiate(_craftWayUIPrefab, _craftContent).GetComponent<CraftWayUI>().CraftWayData = craftWayData;
         }
 
-        _craftPanel.SetActive(false);
         _bagPanel.SetActive(false);
+        _battlePanel.SetActive(false);
+        _craftPanel.SetActive(false);
 
         _bagPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
@@ -85,6 +108,29 @@ public class UIManager : MonoBehaviour
         _bagPanel.transform.Find("CraftButton").GetComponent<Button>().onClick
             .AddListener(() => setUIActive(_craftPanel, true));
 
+        _battlePanel.transform.Find("BackButton").GetComponent<Button>().onClick
+            .AddListener(() =>
+            {
+                _backButton = _battlePanel.transform.GetChild(9).GetComponent<Button>();
+                _battleUIImage = _battlePanel.GetComponent<Image>();
+                // 遍历 _battleUI 中的所有子物体
+                foreach (Transform child in _battlePanel.transform)
+                {
+                    if (child != _backButton.transform) // 排除 _backButton
+                    {
+                        child.gameObject.SetActive(true); // 显示其他 UI 元素
+                    }
+                }
+                _backButton.gameObject.SetActive(false);
+
+                if (_battleUIImage != null)
+                {
+                    Color tempColor = _battleUIImage.color;
+                    tempColor.a = 100f; // 设置透明度为 100 (完全透明)，原本为 0
+                    _battleUIImage.color = tempColor;
+                }
+            });
+
         _craftPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() => reverseUIActive(_craftPanel));
         _craftPanel.transform.Find("ApplyButton").GetComponent<Button>().onClick
@@ -93,9 +139,14 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) && !_isOnBattle)
         {
             ReverseBagPanel();
+        }
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            ReverseBattlePanel();
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -149,6 +200,45 @@ public class UIManager : MonoBehaviour
         if (_bagPanel.activeSelf == false && ExistingOperationMenu != null)
         {
             Destroy(ExistingOperationMenu);
+        }
+        if (_bagPanel.activeSelf == false && ExistingBodyPositionMenu != null)
+        {
+            Destroy(ExistingBodyPositionMenu);
+        }
+    }
+
+    public void ReverseBattlePanel()
+    {
+        reverseUIActive(_battlePanel);
+
+        if (_battlePanel.activeSelf)
+        {
+            _isOnBattle = true;
+        }
+        else
+        {
+            _isOnBattle = false;
+        }
+
+        if (_battlePanel.activeSelf == false && ExistingOperationMenu != null)
+        {
+            Destroy(ExistingOperationMenu);
+        }
+        if (_battlePanel.activeSelf == false && ExistingBodyPositionMenu != null)
+        {
+            Destroy(ExistingBodyPositionMenu);
+        }
+
+        BackpackManager.Instance.RefreshArmorDisplay();
+    }
+
+    public void DestroyCurrentFollowImage()
+    {
+        UIManager.Instance.FollowImage = null;
+        if (CurrentSlotMenuTrigger != null)
+        {
+            CurrentSlotMenuTrigger.DestroyFollowImage();
+            CurrentSlotMenuTrigger = null; // 清空引用
         }
     }
 

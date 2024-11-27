@@ -16,15 +16,23 @@ public class BackpackManager : MonoBehaviour
     /// 定位背包UI
     /// </summary>
     [SerializeField] private GameObject _bagPanel;
+    [SerializeField] private GameObject _battlePanel;
 
     public Transform HeadHealthPanel;
     public Transform LegsHealthPanel;
     public Transform BodyHealthPanel;
+    public Transform BattleHeadHealthPanel;
+    public Transform BattleLegsHealthPanel;
+    public Transform BattleBodyHealthPanel;
+    public Transform BattleHeadHealthEnemyPanel;
+    public Transform BattleLegsHealthEnemyPanel;
+    public Transform BattleBodyHealthEnemyPanel;
 
     private Dictionary<PlayerHealth.BodyPosition, ArmorSlot> _armorSlots =
         new Dictionary<PlayerHealth.BodyPosition, ArmorSlot>();
 
     private Transform _slotsTransform;
+    private Transform _battleSlotsTransform;
 
     /// <summary>
     /// 单例模式
@@ -35,6 +43,18 @@ public class BackpackManager : MonoBehaviour
     /// 背包中现有所有物品的列表，增删需更改列表。
     /// </summary>
     private List<Item> _itemList = new List<Item>();
+
+    public List<Item> ItemList
+    {
+        get => _itemList;
+        private set => _itemList = value;
+    }
+
+    public Dictionary<PlayerHealth.BodyPosition, ArmorSlot> ArmorSlots
+    {
+        get => _armorSlots;
+        private set => _armorSlots = value;
+    }
 
 
     private void Awake()
@@ -58,13 +78,22 @@ public class BackpackManager : MonoBehaviour
         HeadHealthPanel = _bagPanel.transform.Find("HealthPanel/Head");
         BodyHealthPanel = _bagPanel.transform.Find("HealthPanel/Body");
         LegsHealthPanel = _bagPanel.transform.Find("HealthPanel/Legs");
+
         _armorSlots[PlayerHealth.BodyPosition.Head] = HeadHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
         _armorSlots[PlayerHealth.BodyPosition.MainBody] = BodyHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
         _armorSlots[PlayerHealth.BodyPosition.Legs] = LegsHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
+
+        _battleSlotsTransform = _battlePanel.transform.Find("BattleItemsPanel/Scroll View/Viewport/Slots");
+        BattleHeadHealthPanel = _battlePanel.transform.Find("HealthPanel/Head");
+        BattleBodyHealthPanel = _battlePanel.transform.Find("HealthPanel/Body");
+        BattleLegsHealthPanel = _battlePanel.transform.Find("HealthPanel/Legs");
+        BattleHeadHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Head");
+        BattleBodyHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Body");
+        BattleLegsHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Legs");
+
         RefreshSlots();
         StartCoroutine(initItems_debug());
     }
-
 
     private IEnumerator initItems_debug()
     {
@@ -75,9 +104,20 @@ public class BackpackManager : MonoBehaviour
             CreateItem("ScriptableObject/Items/锤石");
             CreateItem("ScriptableObject/Items/木棒");
             CreateItem("ScriptableObject/Items/金属破片");
-            CreateItem("ScriptableObject/Items/Armor/纸质护甲");
+            CreateItem("ScriptableObject/Items/石头");
+            CreateItem("ScriptableObject/Items/刀片");
+            CreateItem("ScriptableObject/Items/攀岩绳");
+            CreateItem("ScriptableObject/Items/Armor/摩托头盔");
             CreateItem("ScriptableObject/Items/Armor/防刺服");
+            CreateItem("ScriptableObject/Items/Weapons/不死斩");
             CreateItem("ScriptableObject/Items/Weapons/小刀");
+            CreateItem("ScriptableObject/Items/Medicines/医用酒精");
+            CreateItem("ScriptableObject/Items/Medicines/医用绷带");
+            CreateItem("ScriptableObject/Items/Medicines/止痛药");
+        }
+        else
+        {
+            Debug.Log("Local Player is null!");
         }
     }
 
@@ -137,7 +177,10 @@ public class BackpackManager : MonoBehaviour
     /// 使用背包中的物品
     /// </summary>
     /// <param name="item">要使用的物品</param>
-    public void UseItem(Item item)
+    /// <param name="healhead">是否要治疗头部</param>
+    /// <param name="healbody">是否要治疗躯干</param>
+    /// <param name="heallegs">是否要治疗腿部</param>
+    public void UseItem(Item item, bool isGlobalHeal = true, bool healhead = true, bool healbody = true, bool heallegs = true)
     {
         GameObject player = GameObject.FindWithTag("LocalPlayer");
         var playerInteraction = player.GetComponent<PlayerItemInteraction>();
@@ -149,7 +192,26 @@ public class BackpackManager : MonoBehaviour
         else if (item.ItemData is WeaponItemData weaponData)
         {
             var target = GameObject.FindWithTag("Player");
-            player.GetComponent<PlayerHealth>().CmdAttack(player,target,(int)PlayerHealth.BodyPosition.MainBody,item.gameObject);
+            player.GetComponent<PlayerHealth>().CmdAttack(player,target,(int)PlayerHealth.BodyPosition.MainBody,item.gameObject); // 攻击方，被攻击方，攻击部位，使用武器
+        }
+        else if (item.ItemData is MedicineItemData medicineData)
+        {
+            if (isGlobalHeal)
+            {
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, true);
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, true);
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, true);
+                player.GetComponent<PlayerItemInteraction>().DecreaseDurability(item.gameObject);
+            }
+            else
+            {
+                if (healhead)
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, false); // 治疗者，治疗部位，使用物品
+                else if (healbody)
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, false);
+                else if (heallegs)
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, false);
+            }
         }
 
         RefreshSlots();
@@ -168,68 +230,86 @@ public class BackpackManager : MonoBehaviour
         CraftWayUI.UpdateSatisfiedAll();
     }
 
-    /// <summary>
-    /// 刷新背包中的物品槽，更新物品显示状态，包括图标、名称等。
-    /// </summary>
     public void RefreshSlots()
     {
-        Transform slots = _slotsTransform;
-        if (slots == null)
+        UpdateSlots(_slotsTransform, true);
+        UpdateSlots(_battleSlotsTransform, false);
+    }
+
+    /// <summary>
+    /// 更新指定的物品槽内容
+    /// </summary>
+    /// <param name="slotsTransform">要更新的物品槽的 Transform</param>
+    /// <param name="updateCraftWayUI">是否更新 CraftWayUI</param>
+    private void UpdateSlots(Transform slotsTransform, bool updateCraftWayUI)
+    {
+        if (slotsTransform == null)
+        {
             return;
+        }
+
+        // 移除无效物品
         _itemList.RemoveAll(i => i == null);
-        for (int i = 0; i < slots.childCount; i++)
+
+        // 遍历更新槽位
+        for (int i = 0; i < slotsTransform.childCount; i++)
         {
             if (i < _itemList.Count)
             {
-                slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = true;
-                slots.GetChild(i).GetChild(0).GetComponent<Image>().sprite = _itemList[i].ItemData.ItemIcon;
-                slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
+                // 设置槽位内容
+                slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().enabled = true;
+                slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().sprite = _itemList[i].ItemData.ItemIcon;
+                slotsTransform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
+
                 if (_itemList[i].MaxDurability != -1)
                 {
-                    slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = true;
-                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text =
+                    slotsTransform.GetChild(i).GetChild(2).GetComponent<Image>().enabled = true;
+                    slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text =
                         $"{_itemList[i].CurrentDurability}/{_itemList[i].MaxDurability}";
                 }
                 else
                 {
-                    slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
-                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                    slotsTransform.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
+                    slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
                 }
 
-                slots.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(_itemList[i]);
+                slotsTransform.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(_itemList[i]);
             }
             else
             {
-                slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
-                slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
-                slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
-                slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
-                slots.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(null);
+                slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
+                slotsTransform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                slotsTransform.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
+                slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                slotsTransform.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(null);
             }
         }
 
-        CraftWayUI.UpdateSatisfiedAll();
-    }
-
-    public void DeleteArmorDisplay(Item armorItem)
-    {
-
+        if (updateCraftWayUI)
+        {
+            CraftWayUI.UpdateSatisfiedAll();
+        }
     }
 
     public void RefreshArmorDisplay()
     {
-        GameObject player = GameObject.FindWithTag("LocalPlayer");
-        if (player == null)
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
+        if (localPlayer == null)
             return;
-        var playerHealth = player.GetComponent<PlayerHealth>();
+
+        var localPlayerHealth = localPlayer.GetComponent<PlayerHealth>();
         foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
         {
-            Item newArmor = playerHealth.GetItemAt(position);
+            Item newArmor = localPlayerHealth.GetItemAt(position);
             var oldArmor = _armorSlots[position].SetItem(newArmor);
+
+            // 更新 battlePanel 的显示
+            UpdateBattleArmorDisplay(position, newArmor);
+
             if (oldArmor != null)
             {
-                //若有护甲变动，将原护甲放回背包，否则仅刷新显示
-                if (oldArmor!=newArmor)
+                // 若有护甲变动，将原护甲放回背包，否则仅刷新显示
+                if (oldArmor != newArmor)
                 {
                     AddItem(oldArmor);
                 }
@@ -237,8 +317,69 @@ public class BackpackManager : MonoBehaviour
                 {
                     _armorSlots[position].UpdateDisplay();
                 }
-                
             }
+        }
+
+        GameObject enemy = GameObject.FindWithTag("Player");
+        if (enemy != null)
+        {
+            var enemyHealth = enemy.GetComponent<PlayerHealth>();
+            foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+            {
+                Item enemyArmor = enemyHealth.GetItemAt(position);
+
+                // 更新battlePanel 显示
+                UpdateBattleArmorDisplay(position, enemyArmor, true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 更新 battlePanel 的 armor display
+    /// </summary>
+    /// <param name="position">身体部位位置</param>
+    /// <param name="newArmor">新装备的护甲</param>
+    private void UpdateBattleArmorDisplay(PlayerHealth.BodyPosition position, Item newArmor, bool isEnemy = false)
+    {
+        Transform battleHealthPanel = null;
+        // LocalPlayer
+        if (!isEnemy)
+        {
+            switch (position)
+            {
+                case PlayerHealth.BodyPosition.Head:
+                    battleHealthPanel = BattleHeadHealthPanel;
+                    break;
+                case PlayerHealth.BodyPosition.MainBody:
+                    battleHealthPanel = BattleBodyHealthPanel;
+                    break;
+                case PlayerHealth.BodyPosition.Legs:
+                    battleHealthPanel = BattleLegsHealthPanel;
+                    break;
+            }
+        }
+        // Player(enemy)
+        else
+        {
+            switch (position)
+            {
+                case PlayerHealth.BodyPosition.Head:
+                    battleHealthPanel = BattleHeadHealthEnemyPanel;
+                    break;
+                case PlayerHealth.BodyPosition.MainBody:
+                    battleHealthPanel = BattleBodyHealthEnemyPanel;
+                    break;
+                case PlayerHealth.BodyPosition.Legs:
+                    battleHealthPanel = BattleLegsHealthEnemyPanel;
+                    break;
+            }
+        }
+        
+        if (battleHealthPanel != null)
+        {
+            var battleArmorSlot = battleHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
+            battleArmorSlot.SetItem(newArmor);
+            battleArmorSlot.UpdateDisplay();
         }
     }
 
@@ -312,7 +453,20 @@ public class BackpackManager : MonoBehaviour
 
         foreach (var item in destroyList)
             DestroyItem(item);
-        CreateItem("ScriptableObject/Items/" + craftWay.ProductItem.ItemName);
+        if (craftWay.ProductItem is WeaponItemData weaponitem)
+        {
+            CreateItem("ScriptableObject/Items/" + "Weapons/" + weaponitem.ItemName);
+        }
+        else if (craftWay.ProductItem is MedicineItemData medicineitem)
+        {
+            CreateItem("ScriptableObject/Items/" + "Medicines/" + medicineitem.ItemName);
+        }
+        else if (craftWay.ProductItem is ArmorItemData armoritem)
+        {
+            CreateItem("ScriptableObject/Items/" + "Armor/" + armoritem.ItemName);
+        }
+        else
+            CreateItem("ScriptableObject/Items/" + craftWay.ProductItem.ItemName);
         _itemList = testItemList;
 
         CraftWayUI.UpdateSatisfiedAll();

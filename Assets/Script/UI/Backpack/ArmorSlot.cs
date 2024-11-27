@@ -13,7 +13,7 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
     private TMP_Text _armorName;
     private TMP_Text _armorDurability;
 
-    void Start()
+    void Awake()
     {
         _displayImage = transform.Find("Image").GetComponent<Image>();
         _armorName = transform.Find("Name").GetComponent<TMP_Text>();
@@ -37,7 +37,7 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
 
     public void UpdateDisplay()
     {
-        if (_armorItem == null&& _displayImage&& _armorName&& _armorDurability)
+        if (_armorItem == null && _displayImage && _armorName && _armorDurability)
         {
             _displayImage.enabled = false;
             _armorName.text = "";
@@ -61,6 +61,12 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
     /// <param name="eventData"></param>
     public void OnPointerClick(PointerEventData eventData)
     {
+        // _battlePanel 页面不允许卸下装备
+        if (UIManager.Instance.BattlePanel.activeSelf)
+        {
+            return;
+        }
+
         if (eventData.button == PointerEventData.InputButton.Right && _armorItem != null &&
             _armorItem.ItemData is ArmorItemData armorData)
         {
