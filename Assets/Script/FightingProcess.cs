@@ -21,6 +21,12 @@ public class FightingProcess : NetworkBehaviour
     /// </summary>
     private float _roundDuration;
     public float RoundDuration => _roundDuration;
+    public float RoundAPLimit => _roundAPLimit;
+    float _roundAPLimit;
+    public float RoundAPRemaining => _roundAPRemaining;
+
+    [SyncVar]
+    float _roundAPRemaining;
     /// <summary>
     /// 回合结束标志。
     /// </summary>
@@ -60,6 +66,8 @@ public class FightingProcess : NetworkBehaviour
         _deadPlayer = null;
         _roundCount = 1;
         _roundDuration = 20f;
+        _roundAPLimit = 1;
+        _roundAPRemaining = _roundAPLimit;
         _finishRound = false;
         _battleUI = GameObject.Find("Canvas").transform.Find("BattlePanel").gameObject; 
         _roundUI = _battleUI.transform.Find("RoundUI").gameObject;
@@ -90,7 +98,7 @@ public class FightingProcess : NetworkBehaviour
         yield return new WaitForSeconds(2);
         while (!IsFightOver())
         {
-            if (_timer > 0 && !_finishRound)
+            if (_timer > 0 && !_finishRound && _roundAPRemaining > 0)
             {
                 _timer -= Time.deltaTime;
                 UpdateTimerText();
@@ -118,6 +126,8 @@ public class FightingProcess : NetworkBehaviour
         // 战斗日志输出
         _attacker.GetComponent<PlayerFight>().IsFighting = false;
         _defender.GetComponent<PlayerFight>().IsFighting = false;
+        BattleLogManager.Instance.TargetDestroyAllLog(_attacker.GetComponent<NetworkIdentity>().connectionToClient);
+        BattleLogManager.Instance.TargetDestroyAllLog(_defender.GetComponent<NetworkIdentity>().connectionToClient);
         if(_escapePlayer != null)
         {
             TargetPlayerEscape(_defender.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Defender);
@@ -137,8 +147,8 @@ public class FightingProcess : NetworkBehaviour
         }
         else if(_fightingInterrupted)
         {
-            TargetPlayerInterrupt(_attacker.GetComponent<NetworkIdentity>().connectionToClient);
-            TargetPlayerInterrupt(_defender.GetComponent<NetworkIdentity>().connectionToClient); 
+            TargetPlayerInterrupt(_attacker.GetComponent<NetworkIdentity>().connectionToClient, _interruptText);
+            TargetPlayerInterrupt(_defender.GetComponent<NetworkIdentity>().connectionToClient, _interruptText); 
         }
         yield return new WaitForSeconds(2);
         while(_attackerCmdComfirmFightOver == false || _defenderCmdComfirmFightOver == false)
@@ -150,9 +160,10 @@ public class FightingProcess : NetworkBehaviour
         FightingProcessManager.Instance.DestroyProcess(gameObject);
     }
     [TargetRpc]
-    void TargetPlayerInterrupt(NetworkConnection target)
+    void TargetPlayerInterrupt(NetworkConnection target, string text)
     {
-        StartCoroutine(Interrupt(_interruptText));
+        Debug.Log(text);
+        StartCoroutine(Interrupt(text));
     }
     [TargetRpc]
     void TargetPlayerEscape(NetworkConnection target, PlayerState playerState)
@@ -174,6 +185,7 @@ public class FightingProcess : NetworkBehaviour
         if(isDead)
         {
             _battleUI.SetActive(false);
+            GameObject.Find("Canvas").transform.Find("PlayerDead").gameObject.SetActive(true);
             GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
         }
         else
@@ -224,11 +236,14 @@ public class FightingProcess : NetworkBehaviour
     {
         _timer = _roundDuration;
         _finishRound = false;
+        _roundAPRemaining = _roundAPLimit;
+
         // 开始当前进攻方的回合
         TargetStartRound(_attacker.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Attacker);
         TargetStartRound(_defender.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Defender);
         _roundCount++;
         // 战斗日志输出
+        DeployAddLog($"{_attacker.GetComponent<PlayerHealth>().Name}的回合开始");
     }
     void EndRoundOnServer()
     {
@@ -237,6 +252,7 @@ public class FightingProcess : NetworkBehaviour
         TargetEndRound(_defender.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Defender);
         
         // 战斗日志输出
+        DeployAddLog($"{_attacker.GetComponent<PlayerHealth>().Name}的回合结束");
         // 切换进攻方防守方
         GameObject temp = _attacker;
         _attacker = _defender;
@@ -248,11 +264,15 @@ public class FightingProcess : NetworkBehaviour
         Debug.Log(playerState + "EndRound");
         if(playerState == PlayerState.Attacker)
         {
+            if(UIManager.Instance.FollowImage)
+            {
+                UIManager.Instance.DestroyCurrentFollowImage();
+            }
             StartCoroutine(SetRoundUI("YourRoundEnd"));
             // 进攻方按钮变灰 不可点
             _finishRoundButton.GetComponent<Button>().interactable = false;
             _escapeButton.GetComponent<Button>().interactable = false;
-            // 进攻方不可拖动
+            
         }
         if(playerState == PlayerState.Defender)
         {
@@ -274,12 +294,13 @@ public class FightingProcess : NetworkBehaviour
             // 进攻方按钮变亮 可点
             _finishRoundButton.GetComponent<Button>().interactable = true;
             _escapeButton.GetComponent<Button>().interactable = true;
-            // 进攻方可拖动
+            _battleUI.transform.Find("FinishRoundButton").GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = $"(0AP/{_roundAPLimit}AP)";
         }
         if(playerState == PlayerState.Defender)
         {
             StartCoroutine(SetRoundUI("EnemyRoundStart"));
             currentRound.GetComponent<TMPro.TextMeshProUGUI>().text = $"第{_roundCount}回合\n对方回合";
+            _battleUI.transform.Find("FinishRoundButton").GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = $"(0AP/{_roundAPLimit}AP)";
         }
     }
     IEnumerator SetRoundUI(string childName)
@@ -302,7 +323,7 @@ public class FightingProcess : NetworkBehaviour
     }
     bool IsFightOver()
     {
-        // 玩家逃跑、死亡或被打断的情况
+        // 玩家逃跑、死亡的情况
         if(_deadPlayer != null || _escapePlayer != null)
         {
             return true;
@@ -351,5 +372,21 @@ public class FightingProcess : NetworkBehaviour
         _battleUI.transform.Find("IntertruptedMessagePanel").GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = text;
         _battleUI.transform.Find("IntertruptedMessagePanel").gameObject.SetActive(state);
     }
+    public void DeployAddLog(string message)
+    {
+        BattleLogManager.Instance.TargetAddLog(_attacker.GetComponent<NetworkIdentity>().connectionToClient, message);
+        BattleLogManager.Instance.TargetAddLog(_defender.GetComponent<NetworkIdentity>().connectionToClient, message);
+    }
+    public void DeployConsumeAP(float costAP)
+    {
+        _roundAPRemaining -= costAP;
+        TargetAPChange(_attacker.GetComponent<NetworkIdentity>().connectionToClient, _roundAPLimit - _roundAPRemaining);
+    }
+    [TargetRpc]
+    public void TargetAPChange(NetworkConnection target, float consumedAP)
+    {
+        GameObject ConsumeAPText = _battleUI.transform.Find("FinishRoundButton").GetChild(1).gameObject;
+        ConsumeAPText.GetComponent<TMPro.TextMeshProUGUI>().text = $"({consumedAP}AP/{_roundAPLimit}AP)";
+    }
 }
-// TODO: 玩家断联 不可拖动 FightLog 打断过程战斗结束有时候会有奇怪bug
+// TODO: 玩家断联 FightLog 打断过程战斗结束有时候会有奇怪bug

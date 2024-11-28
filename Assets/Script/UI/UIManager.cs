@@ -108,12 +108,21 @@ public class UIManager : MonoBehaviour
                 // 遍历 _battleUI 中的所有子物体
                 foreach (Transform child in _battlePanel.transform)
                 {
+                    if(child.name == "InterruptedMessagePanel")
+                    {
+                        if(FightingProcessManager.Instance.transform.GetChild(0).GetComponent<FightingProcess>().FightingInterrupted)
+                        {
+                            continue;
+                        }
+                    }
                     if (child != _backButton.transform) // 排除 _backButton
                     {
                         child.gameObject.SetActive(true); // 显示其他 UI 元素
                     }
                 }
                 _backButton.gameObject.SetActive(false);
+                GameObject.Find("Canvas").transform.Find("PlayerInfoPanel").gameObject.SetActive(true); // 显示玩家信息面板
+                GameObject.Find("Canvas").transform.Find("Round").gameObject.SetActive(true); // 显示回合信息面板
 
                 if (_battleUIImage != null)
                 {

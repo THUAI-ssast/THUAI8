@@ -1,13 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Mirror;
 
-public class BattleLogManager : MonoBehaviour
+public class BattleLogManager : NetworkBehaviour
 {
     public static BattleLogManager Instance;
 
-    public GameObject logTextPrefab;
-    public Transform contentTransform;
+    [SerializeField] GameObject logTextPrefab;
+    [SerializeField] GameObject _logPanelContent;
 
     private void Awake()
     {
@@ -20,31 +21,31 @@ public class BattleLogManager : MonoBehaviour
             Instance = this;
         }
     }
-
-    public void AddLog(string message)
+    
+    [TargetRpc]
+    public void TargetAddLog(NetworkConnection conn, string message)
     {
-        // 实例化新的日志条目
-        GameObject newLog = Instantiate(logTextPrefab, contentTransform);
-
-        // 设置日志内容
-        TMP_Text logText = newLog.GetComponent<TMP_Text>();
-        if (logText != null)
-        {
-            logText.text = message;
-            Debug.Log(message);
-        }
-
+        GameObject newLog = Instantiate(logTextPrefab, _logPanelContent.transform);
+        newLog.GetComponent<TMPro.TextMeshProUGUI>().text = message;
         ScrollToBottom();
     }
 
     void ScrollToBottom()
     {
-        // 如果有 Scroll Rect，可以手动将滚动条拉到最底部
-        ScrollRect scrollRect = contentTransform.GetComponentInParent<ScrollRect>();
+        ScrollRect scrollRect = _logPanelContent.transform.GetComponentInParent<ScrollRect>();
         if (scrollRect != null)
         {
             Canvas.ForceUpdateCanvases();
             scrollRect.verticalNormalizedPosition = 0f;
+        }
+    }
+
+    [TargetRpc]
+    public void TargetDestroyAllLog(NetworkConnection conn)
+    {
+        foreach (Transform child in _logPanelContent.transform)
+        {
+            Destroy(child.gameObject);
         }
     }
 }

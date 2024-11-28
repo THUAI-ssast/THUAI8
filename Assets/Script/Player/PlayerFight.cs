@@ -1,8 +1,7 @@
 using System.Collections;
 using Mirror;
+using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayerFight : NetworkBehaviour
@@ -14,7 +13,7 @@ public class PlayerFight : NetworkBehaviour
     /// <summary>
     /// 回合战斗状态，仅在服务端改变，不向客户端同步。
     /// </summary>
-    public FightingProcess.PlayerState FightingState;
+    [SyncVar] public FightingProcess.PlayerState FightingState;
     /// <summary>
     /// 定位BattlePanel。
     /// </summary>
@@ -244,18 +243,30 @@ public class PlayerFight : NetworkBehaviour
         Debug.Log("StartFighting");
         FightingProcessManager.Instance.CreateProcess(attacker, defender);
         _fightingProcess.GetComponent<FightingProcess>().StartFighting(attacker, defender);
-        TargetStartFighting(attacker.GetComponent<NetworkIdentity>().connectionToClient, attacker);
-        defender.GetComponent<PlayerFight>().TargetStartFighting(defender.GetComponent<NetworkIdentity>().connectionToClient, defender);
+        TargetStartFighting(attacker.GetComponent<NetworkIdentity>().connectionToClient, attacker, defender);
+        defender.GetComponent<PlayerFight>().TargetStartFighting(defender.GetComponent<NetworkIdentity>().connectionToClient, defender, attacker);
     }
     [TargetRpc]
-    void TargetStartFighting(NetworkConnection target, GameObject player)
+    void TargetStartFighting(NetworkConnection target, GameObject player, GameObject enemyPlayer)
     {
         Debug.Log("TargetSetIsFighting " + gameObject.GetComponent<NetworkIdentity>().netId);
         CmdSetIsFighting();
         _fightingProcess = FightingProcessManager.Instance.transform.GetChild(0).gameObject;
+        HealthPanelEnemy.Instance.SetEnemy(enemyPlayer);
         GridMoveController.Instance.ToggleMovementState(false);
         _battleUI.SetActive(true);
+        BackpackManager.Instance.RefreshArmorDisplay();
+        RefreshPositionHealth(enemyPlayer);
         GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerFight>().SetAttackRangeFalse();
+    }
+    void RefreshPositionHealth(GameObject enemyPlayer)
+    {
+        _battleUI.transform.Find("HealthPanel_enemy/Head").GetChild(0).GetComponent<TMP_Text>().text = 
+            $"{enemyPlayer.GetComponent<PlayerHealth>().HeadHealth}/{enemyPlayer.GetComponent<PlayerHealth>().HeadMaxHealth}";
+        _battleUI.transform.Find("HealthPanel_enemy/Body").GetChild(0).GetComponent<TMP_Text>().text = 
+            $"{enemyPlayer.GetComponent<PlayerHealth>().BodyHealth}/{enemyPlayer.GetComponent<PlayerHealth>().BodyMaxHealth}";
+        _battleUI.transform.Find("HealthPanel_enemy/Legs").GetChild(0).GetComponent<TMP_Text>().text = 
+            $"{enemyPlayer.GetComponent<PlayerHealth>().LegHealth}/{enemyPlayer.GetComponent<PlayerHealth>().LegMaxHealth}";
     }
     [Command]
     void CmdSetIsFighting()
@@ -267,6 +278,7 @@ public class PlayerFight : NetworkBehaviour
     public void CmdEscape()
     {
         _fightingProcess.GetComponent<FightingProcess>().PlayerEscape(gameObject);
+        gameObject.GetComponent<PlayerActionPoint>().DecreaseActionPoint(2);
     }
     [Command]
     public void CmdFinishRound()
@@ -276,6 +288,11 @@ public class PlayerFight : NetworkBehaviour
             Debug.Log("Cmd_fightingProcess is null. Please check the reference!");
         }
         _fightingProcess.GetComponent<FightingProcess>().FinishRound();
+        if(gameObject.GetComponent<PlayerActionPoint>().CurrentActionPoint < 1 && 
+            _fightingProcess.GetComponent<FightingProcess>().RoundAPRemaining == _fightingProcess.GetComponent<FightingProcess>().RoundAPLimit)
+        {
+            gameObject.GetComponent<PlayerActionPoint>().IncreaseActionPoint(1);
+        }
     }
     [Command]
     public void CmdDead()
@@ -308,5 +325,15 @@ public class PlayerFight : NetworkBehaviour
     public void SetAttackRangeFalse()
     {
         _attackRange.SetActive(false);
+    }
+    [Command]
+    public void CmdAttackHappened(string message, float costAP)
+    {
+        _fightingProcess.GetComponent<FightingProcess>().DeployAddLog(message);
+        _fightingProcess.GetComponent<FightingProcess>().DeployConsumeAP(costAP);
+    }
+    public float QueryRemainingAP()
+    {
+        return _fightingProcess.GetComponent<FightingProcess>().RoundAPRemaining;
     }
 }

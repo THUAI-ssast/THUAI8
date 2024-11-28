@@ -9,6 +9,7 @@ public class HealthPanelEnemy : MonoBehaviour
 
     private GameObject _localPlayer;
     private GameObject _enemyPlayer;
+    private GameObject _apBar;
 
     public GameObject EnemyPlayer
     {
@@ -33,7 +34,11 @@ public class HealthPanelEnemy : MonoBehaviour
     void Start()
     {
         _localPlayer = GameObject.FindWithTag("LocalPlayer");
-        _enemyPlayer = GameObject.FindWithTag("Player");
+        // _enemyPlayer = GameObject.FindWithTag("Player");
+        _apBar = transform.parent.Find("APPanel").GetChild(0).gameObject;
+        float currentAP = _localPlayer.GetComponent<PlayerActionPoint>().CurrentActionPoint;
+        float maxAP = _localPlayer.GetComponent<PlayerActionPoint>().MaxActionPoint;
+        UpdateActionPoint(currentAP, maxAP);
     }
 
     public void OnClickHead()
@@ -48,7 +53,11 @@ public class HealthPanelEnemy : MonoBehaviour
             string enemyName = enemyPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Head, UIManager.Instance.FollowImage);
             string message = $"当前回合：你消耗{costAP}AP使用{itemName}攻击了{enemyName}的头部，造成了{damage}HP伤害。";
-            BattleLogManager.Instance.AddLog(message);
+            _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
+
+            float currentAP = _localPlayer.GetComponent<PlayerActionPoint>().CurrentActionPoint;
+            float maxAP = _localPlayer.GetComponent<PlayerActionPoint>().MaxActionPoint;
+            UpdateActionPoint(currentAP - costAP, maxAP);
         }
     }
 
@@ -64,7 +73,11 @@ public class HealthPanelEnemy : MonoBehaviour
             string enemyName = enemyPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.MainBody, UIManager.Instance.FollowImage);
             string message = $"当前回合：你消耗{costAP}AP使用{itemName}攻击了{enemyName}的躯干，造成了{damage}HP伤害。";
-            BattleLogManager.Instance.AddLog(message);
+            _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
+
+            float currentAP = _localPlayer.GetComponent<PlayerActionPoint>().CurrentActionPoint;
+            float maxAP = _localPlayer.GetComponent<PlayerActionPoint>().MaxActionPoint;
+            UpdateActionPoint(currentAP - costAP, maxAP);
         }
     }
 
@@ -80,7 +93,34 @@ public class HealthPanelEnemy : MonoBehaviour
             string enemyName = enemyPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Legs, UIManager.Instance.FollowImage);
             string message = $"当前回合：你消耗{costAP}AP使用{itemName}攻击了{enemyName}的腿部，造成了{damage}HP伤害。";
-            BattleLogManager.Instance.AddLog(message);
+            _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
+
+            float currentAP = _localPlayer.GetComponent<PlayerActionPoint>().CurrentActionPoint;
+            float maxAP = _localPlayer.GetComponent<PlayerActionPoint>().MaxActionPoint;
+            UpdateActionPoint(currentAP - costAP, maxAP);
         }
+    }
+
+    /// <summary>
+    /// 更新 AP 条的长度和显示的数值
+    /// </summary>
+    /// <param name="currentAP">当前 AP 值</param>
+    /// <param name="maxAP">最大 AP 值</param>
+    public void UpdateActionPoint(float currentAP, float maxAP)
+    {
+        // 更新 AP 条长度
+        RectTransform apBarRect = _apBar.GetComponent<RectTransform>();
+        _apBar.GetComponent<UnityEngine.UI.Image>().fillAmount = currentAP / maxAP;
+
+        // 更新 AP 条文本
+        Transform valueText = _apBar.transform.Find("Value");
+        if (valueText != null)
+        {
+            valueText.GetComponent<TextMeshProUGUI>().text = currentAP.ToString() + "\n /\n20";
+        }
+    }
+    public void SetEnemy(GameObject enemyPlayer)
+    {
+        _enemyPlayer = enemyPlayer;
     }
 }

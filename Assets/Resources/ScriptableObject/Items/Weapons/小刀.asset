@@ -17,7 +17,7 @@ MonoBehaviour:
   ItemDesc: 
   ItemType: 0
   ItemValue: 0
-  Durability: 3
+  Durability: 50
   AttakAPCost: 0.5
   BasicDamage: 1
   BodyDamageDictionary:

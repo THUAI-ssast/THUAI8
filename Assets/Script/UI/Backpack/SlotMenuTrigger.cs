@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+
+using Mirror;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -83,17 +82,21 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
         // 左键生成 followImage
         if (eventData.button == PointerEventData.InputButton.Left && _slotItem != null)
         {
-            // 生成一个与当前slot相同的Image
-            if (_followImage == null)
+            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Attacker &&
+            GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().QueryRemainingAP() >= (_slotItem.ItemData as WeaponItemData).AttakAPCost)
             {
-                UIManager.Instance.CurrentSlotMenuTrigger = this; // 注册当前实例
+                // 生成一个与当前slot相同的Image
+                if (_followImage == null)
+                {
+                    UIManager.Instance.CurrentSlotMenuTrigger = this; // 注册当前实例
 
-                Image slotImage = GetComponent<Image>(); // 获取当前slot的Image
-                _followImage = Instantiate(slotImage, _battlePanel.transform);  // 在battlePanel上创建跟随Image
-                _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
-                _followImage.raycastTarget = false; // 设置为不可交互
+                    Image slotImage = GetComponent<Image>(); // 获取当前slot的Image
+                    _followImage = Instantiate(slotImage, _battlePanel.transform);  // 在battlePanel上创建跟随Image
+                    _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
+                    _followImage.raycastTarget = false; // 设置为不可交互
 
-                UIManager.Instance.FollowImage = _slotItem;
+                    UIManager.Instance.FollowImage = _slotItem;
+                }
             }
         }
 
