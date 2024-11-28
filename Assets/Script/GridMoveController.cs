@@ -315,6 +315,5 @@ public class GridMoveController : MonoBehaviour
     public void ToggleMovementState(bool state)
     {
         _isMovable = state;
-        Debug.Log(GameObject.FindWithTag("LocalPlayer").GetComponent<NetworkIdentity>().netId + " " + _isMovable);
     }
 }

@@ -56,12 +56,12 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
     private GameObject _menuObject;
 
     /// <summary>
-    /// ¼àÌýÊó±êÓÒ¼üµã»÷ÊÂ¼þ¡£Éú³ÉÈ«¾ÖÎ¨Ò»²Ëµ¥¡¢¼ÓÈë²Ëµ¥°´Å¥µã»÷ÊÂ¼þ¡£
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò¼ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½Î¨Ò»ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½Å¥ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½
     /// </summary>
     /// <param name="eventData"></param>
     public void OnPointerClick(PointerEventData eventData)
     {
-        // _battlePanel Ò³Ãæ²»ÔÊÐíÐ¶ÏÂ×°±¸
+        // _battlePanel Ò³ï¿½æ²»ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½×°ï¿½ï¿½
         if (UIManager.Instance.BattlePanel.activeSelf)
         {
             return;

@@ -30,13 +30,6 @@ public class ViewAround : MonoBehaviour
         // 遍历 _battleUI 中的所有子物体
         foreach (Transform child in _battleUI.transform)
         {
-            if(child.name == "InterruptedMessagePanel")
-            {
-                if(FightingProcessManager.Instance.transform.GetChild(0).GetComponent<FightingProcess>().FightingInterrupted)
-                {
-                    continue;
-                }
-            }
             if (child != _backButton.transform) // 排除 _backButton
             {
                 child.gameObject.SetActive(false); // 隐藏其他 UI 元素

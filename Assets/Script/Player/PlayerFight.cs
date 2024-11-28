@@ -10,32 +10,50 @@ public class PlayerFight : NetworkBehaviour
     /// 是否正在战斗，服务端改变，向客户端同步。
     /// </summary>
     [SyncVar] public bool IsFighting;
+
     /// <summary>
     /// 回合战斗状态，仅在服务端改变，不向客户端同步。
     /// </summary>
     [SyncVar] public FightingProcess.PlayerState FightingState;
+
     /// <summary>
     /// 定位BattlePanel。
     /// </summary>
     GameObject _battleUI;
+
     /// <summary>
     /// 定位攻击范围ui。
     /// </summary>
     GameObject _attackRange;
+
     /// <summary>
     /// 定位玩家被选中ui。
     /// </summary>
     GameObject _selectedUI;
+
     /// <summary>
     /// 存储开始战斗后生成的战斗流程GameObject，在客户端和服务端都有改变，但无同步。
     /// </summary>
     GameObject _fightingProcess;
+
+    /// <summary>
+    /// 定位打断战斗后等待战斗的UI。
+    /// </summary>
     GameObject _waitingForFightUI;
+
     /// <summary>
     /// 是否在攻击范围内，仅在客户端改变，不向服务端同步，LocalPlayer始终为false。
     /// </summary>
     bool _inAttackRange;
+
+    /// <summary>
+    /// 打断战斗时被攻击的玩家
+    /// </summary>
     NetworkIdentity _interruptedPlayerID;
+
+    /// <summary>
+    /// 初始化
+    /// </summary>
     void Start()
     {
         _interruptedPlayerID = null;
@@ -48,6 +66,10 @@ public class PlayerFight : NetworkBehaviour
         _battleUI = GameObject.Find("Canvas").transform.Find("BattlePanel").gameObject;
         _waitingForFightUI = GameObject.Find("Canvas").transform.Find("WaitingForFight").gameObject;
     }
+
+    /// <summary>
+    /// 每帧更新，检测是否按下Alt键，显示攻击范围。当有UI被激活时，不显示攻击范围。
+    /// </summary>
     void Update()
     {
         if(isLocalPlayer && !UIState())
@@ -72,32 +94,45 @@ public class PlayerFight : NetworkBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// 判断是否有UI界面被激活。
+    /// </summary>
+    /// <returns></returns>
     bool UIState()
     {
         return _battleUI.activeSelf || _waitingForFightUI.activeSelf;
     }
+
+    /// <summary>
+    /// 碰撞检测。当该玩家物体进入LocalPlayer的攻击范围时（攻击范围是一个触发器），设置_inAttackRange为true。
+    /// </summary>
+    /// <param name="Other"></param>
     void OnTriggerEnter2D(Collider2D Other)
     {
-        // Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + " " + gameObject.tag + " " + IsFighting);
         if(gameObject.CompareTag("Player") && Other.gameObject.CompareTag("LocalPlayerAttackRange"))
         {
-            // Debug.Log("Enter");
             _inAttackRange = true;
-            // Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + " ToggleInAttackRange:" + _inAttackRange);
         }
     }
+
+    /// <summary>
+    /// 碰撞检测。当该玩家物体离开LocalPlayer的攻击范围时（攻击范围是一个触发器），设置_inAttackRange为false。
+    /// </summary>
+    /// <param name="Other"></param>
     void OnTriggerExit2D(Collider2D Other)
     {
         if(gameObject.CompareTag("Player") && Other.gameObject.CompareTag("LocalPlayerAttackRange"))
         {
-            // Debug.Log("Exit");
             _inAttackRange = false;
-            // Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + " ToggleInAttackRange:" + _inAttackRange);
         }
     }
+
+    /// <summary>
+    /// 鼠标按下事件，当该玩家物体被点击时，如果在LocalPlayer攻击范围内，隐藏选中UI，调用CmdStartFighting。在客户端执行。
+    /// </summary>
     void OnMouseDown()
     {
-        // Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + " Down inAttackRange:" + _inAttackRange);
         if(_inAttackRange)
         {
             _selectedUI.SetActive(false);
@@ -121,6 +156,7 @@ public class PlayerFight : NetworkBehaviour
         _interruptedPlayerID = playerID;
         playerID.gameObject.GetComponent<PlayerFight>().DeployInterruptFighting(gameObject.GetComponent<NetworkIdentity>());
     }
+
     /// <summary>
     /// 打断战斗流程。在被打断者的服务端执行。
     /// </summary>
@@ -131,6 +167,10 @@ public class PlayerFight : NetworkBehaviour
         TargetInterruptUI(playerID.connectionToClient, true);
         StartCoroutine(InterruptFighting(playerID));
     }
+
+    /// <summary>
+    /// 鼠标进入事件，在该玩家物体被鼠标悬浮时的第一帧，如果在LocalPlayer攻击范围内，禁用移动，显示选中UI。在客户端执行。
+    /// </summary>
     void OnMouseEnter()
     {
         if(_inAttackRange)
@@ -139,6 +179,11 @@ public class PlayerFight : NetworkBehaviour
             _selectedUI.SetActive(true);
         }
     }
+
+    /// <summary>
+    /// 鼠标悬浮事件，在该玩家物体被鼠标悬浮时的每一帧，如果在LocalPlayer攻击范围内，禁用移动，显示选中UI；
+    /// 如果不在LocalPlayer攻击范围内，无UI被激活时启用移动，隐藏选中UI。在客户端执行。
+    /// </summary>
     void OnMouseOver()
     {
         if(_inAttackRange)
@@ -152,6 +197,10 @@ public class PlayerFight : NetworkBehaviour
             _selectedUI.SetActive(false);
         }
     }
+
+    /// <summary>
+    /// 鼠标离开事件，在该玩家物体被鼠标离开时的第一帧，如果在LocalPlayer攻击范围内，启用移动，隐藏选中UI。在客户端执行。
+    /// </summary>
     void OnMouseExit()
     {
         if(_inAttackRange)
@@ -160,6 +209,7 @@ public class PlayerFight : NetworkBehaviour
             _selectedUI.SetActive(false);
         }
     }
+
     /// <summary>
     /// 打断战斗流程，处理打断者监听FightingProcess。在被打断者的服务端执行。
     /// </summary>
@@ -187,6 +237,7 @@ public class PlayerFight : NetworkBehaviour
         TargetInterruptUI(playerID.connectionToClient, false);
         playerID.GetComponent<PlayerFight>().TargetEnterStartFighting(playerID.connectionToClient, gameObject.GetComponent<NetworkIdentity>());
     }
+
     /// <summary>
     /// 开始战斗，调用CmdStartFighting。在打断者的客户端执行。
     /// </summary>
@@ -197,6 +248,12 @@ public class PlayerFight : NetworkBehaviour
     {
         CmdStartFighting(gameObject, playerID.gameObject);
     }
+
+    /// <summary>
+    /// 显示或隐藏打断战斗UI。显示UI时禁用移动，关闭战斗范围。在打断者的客户端执行。
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="state">显示或隐藏ui。true为显示，false为隐藏</param>
     [TargetRpc]
     void TargetInterruptUI(NetworkConnection target, bool state)
     {
@@ -205,6 +262,15 @@ public class PlayerFight : NetworkBehaviour
         _waitingForFightUI.SetActive(state);
         GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerFight>().SetAttackRangeFalse();
     }
+
+    /// <summary>
+    /// 更新打断战斗UI。在打断者的客户端执行。
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="mode">模式1和2。2为即将开始战斗的界面。</param>
+    /// <param name="roundDuration">战斗回合时长</param>
+    /// <param name="timeLeft">战斗回合剩余时长</param>
+    /// <param name="attackerName">打断者名字</param>
     [TargetRpc]
     void TargetUpdateInterruptUI(NetworkConnection target, int mode, float roundDuration, float timeLeft, string attackerName)
     {
@@ -223,42 +289,62 @@ public class PlayerFight : NetworkBehaviour
             return ;
         }
     }
+
+    /// <summary>
+    /// 设置战斗状态。在服务端执行。
+    /// </summary>
+    /// <param name="state"></param>
     [Command]
     public void CmdSetFightingState(FightingProcess.PlayerState state)
     {
         FightingState = state;
     }
-    public void SetFightingProcess(NetworkIdentity processID)
+
+    /// <summary>
+    /// 指向战斗流程GameObject。在服务端执行。
+    /// </summary>
+    /// <param name="processID">战斗流程NetworkIdentity</param>
+    public void DeploySetFightingProcess(NetworkIdentity processID)
     {
         _fightingProcess = processID.gameObject;
     }
+
     /// <summary>
     /// 开始战斗，生成战斗流程GameObject，调用战斗流程的StartFighting方法。在攻击者的服务端执行，从攻击者客户端调用。
     /// </summary>
-    /// <param name="attacker"></param>
-    /// <param name="defender"></param>
+    /// <param name="attacker">攻击者</param>
+    /// <param name="defender">防守者</param>
     [Command]
     public void CmdStartFighting(GameObject attacker, GameObject defender)
     {
-        Debug.Log("StartFighting");
         FightingProcessManager.Instance.CreateProcess(attacker, defender);
         _fightingProcess.GetComponent<FightingProcess>().StartFighting(attacker, defender);
-        TargetStartFighting(attacker.GetComponent<NetworkIdentity>().connectionToClient, attacker, defender);
-        defender.GetComponent<PlayerFight>().TargetStartFighting(defender.GetComponent<NetworkIdentity>().connectionToClient, defender, attacker);
+        TargetStartFighting(attacker.GetComponent<NetworkIdentity>().connectionToClient, defender);
+        defender.GetComponent<PlayerFight>().TargetStartFighting(defender.GetComponent<NetworkIdentity>().connectionToClient, attacker);
     }
+
+    /// <summary>
+    /// 双方客户端开始战斗。更新血量和护甲显示。关闭战斗范围。
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="enemyPlayer">对面玩家</param>
     [TargetRpc]
-    void TargetStartFighting(NetworkConnection target, GameObject player, GameObject enemyPlayer)
+    void TargetStartFighting(NetworkConnection target, GameObject enemyPlayer)
     {
-        Debug.Log("TargetSetIsFighting " + gameObject.GetComponent<NetworkIdentity>().netId);
         CmdSetIsFighting();
         _fightingProcess = FightingProcessManager.Instance.transform.GetChild(0).gameObject;
         HealthPanelEnemy.Instance.SetEnemy(enemyPlayer);
         GridMoveController.Instance.ToggleMovementState(false);
         _battleUI.SetActive(true);
-        BackpackManager.Instance.RefreshArmorDisplay();
+        BackpackManager.Instance.RefreshArmorBattleDisplay(enemyPlayer);
         RefreshPositionHealth(enemyPlayer);
         GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerFight>().SetAttackRangeFalse();
     }
+
+    /// <summary>
+    /// 更新对面玩家的血量显示。在客户端执行。
+    /// </summary>
+    /// <param name="enemyPlayer"></param>
     void RefreshPositionHealth(GameObject enemyPlayer)
     {
         _battleUI.transform.Find("HealthPanel_enemy/Head").GetChild(0).GetComponent<TMP_Text>().text = 
@@ -268,70 +354,101 @@ public class PlayerFight : NetworkBehaviour
         _battleUI.transform.Find("HealthPanel_enemy/Legs").GetChild(0).GetComponent<TMP_Text>().text = 
             $"{enemyPlayer.GetComponent<PlayerHealth>().LegHealth}/{enemyPlayer.GetComponent<PlayerHealth>().LegMaxHealth}";
     }
+
+    /// <summary>
+    /// 设置IsFighting为true。在服务端执行。
+    /// </summary>
     [Command]
     void CmdSetIsFighting()
     {
         IsFighting = true;
-        Debug.Log("SetIsFighting" + gameObject.GetComponent<NetworkIdentity>().netId);
     }
+
+    /// <summary>
+    /// 玩家逃跑，调用DeployPlayerEscape。在服务端执行。
+    /// </summary>
     [Command]
     public void CmdEscape()
     {
-        _fightingProcess.GetComponent<FightingProcess>().PlayerEscape(gameObject);
+        _fightingProcess.GetComponent<FightingProcess>().DeployPlayerEscape(gameObject);
         gameObject.GetComponent<PlayerActionPoint>().DecreaseActionPoint(2);
     }
+
+    /// <summary>
+    /// 玩家结束回合，调用DeployFinishRound。在服务端执行。
+    /// </summary>
     [Command]
     public void CmdFinishRound()
     {
-        if(_fightingProcess == null)
-        {
-            Debug.Log("Cmd_fightingProcess is null. Please check the reference!");
-        }
-        _fightingProcess.GetComponent<FightingProcess>().FinishRound();
+        _fightingProcess.GetComponent<FightingProcess>().DeployFinishRound();
         if(gameObject.GetComponent<PlayerActionPoint>().CurrentActionPoint < 1 && 
             _fightingProcess.GetComponent<FightingProcess>().RoundAPRemaining == _fightingProcess.GetComponent<FightingProcess>().RoundAPLimit)
         {
             gameObject.GetComponent<PlayerActionPoint>().IncreaseActionPoint(1);
         }
     }
+
+    /// <summary>
+    /// 玩家死亡，调用DeployPlayerDead。在服务端执行。
+    /// </summary>
     [Command]
     public void CmdDead()
     {
-        _fightingProcess.GetComponent<FightingProcess>().PlayerDead(gameObject);
+        _fightingProcess.GetComponent<FightingProcess>().DeployPlayerDead(gameObject);
     }
+
+    /// <summary>
+    /// 玩家取消打断。在打断者服务端执行。
+    /// </summary>
     [Command]
     public void CmdCancelInterrupt()
     {
         TargetInterruptUI(gameObject.GetComponent<NetworkIdentity>().connectionToClient, false);
         _interruptedPlayerID.gameObject.GetComponent<PlayerFight>().DeployCancelInterrupt();
     }
+
+    /// <summary>
+    /// 玩家取消打断。在被打断者的服务端执行。
+    /// </summary>
     void DeployCancelInterrupt()
     {
         _fightingProcess.GetComponent<FightingProcess>().InterruptFighting(false, null, null);
     }
+
+    /// <summary>
+    /// 双方玩家确认结束回合。在双方服务端执行。
+    /// </summary>
     [Command]
     public void CmdConfirmOver()
     {
-        if(FightingState == FightingProcess.PlayerState.Attacker)
-        {
-            Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + "Attacker" + " ConfirmOver");
-        }
-        else
-        {
-            Debug.Log(gameObject.GetComponent<NetworkIdentity>().netId + "Defender" + " ConfirmOver");
-        }
-        _fightingProcess.GetComponent<FightingProcess>().ConfirmOver(FightingState);
+        _fightingProcess.GetComponent<FightingProcess>().DeployConfirmOver(FightingState);
     }
+
+    /// <summary>
+    /// 关闭玩家战斗范围。
+    /// </summary>
     public void SetAttackRangeFalse()
     {
         _attackRange.SetActive(false);
     }
+
+    /// <summary>
+    /// 在战斗界面将武器拖到对方身上后被调用，表示检测到攻击，执行增加战斗日志，记录耗费AP及刷新护甲显示的流程。在服务端执行。
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="costAP"></param>
     [Command]
     public void CmdAttackHappened(string message, float costAP)
     {
         _fightingProcess.GetComponent<FightingProcess>().DeployAddLog(message);
         _fightingProcess.GetComponent<FightingProcess>().DeployConsumeAP(costAP);
+        _fightingProcess.GetComponent<FightingProcess>().DeployRefreshArmorDisplay();   
     }
+
+    /// <summary>
+    /// 查询剩余AP，在客户端执行，用于判断是否能使用武器。
+    /// </summary>
+    /// <returns></returns>
     public float QueryRemainingAP()
     {
         return _fightingProcess.GetComponent<FightingProcess>().RoundAPRemaining;

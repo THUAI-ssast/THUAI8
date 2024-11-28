@@ -110,7 +110,7 @@ public class UIManager : MonoBehaviour
                 {
                     if(child.name == "InterruptedMessagePanel")
                     {
-                        if(FightingProcessManager.Instance.transform.GetChild(0).GetComponent<FightingProcess>().FightingInterrupted)
+                        if(!FightingProcessManager.Instance.transform.GetChild(0).GetComponent<FightingProcess>().FightingInterrupted)
                         {
                             continue;
                         }

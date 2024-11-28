@@ -250,7 +250,7 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.BattleHeadHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{gameObject.GetComponent<PlayerHealth>().HeadHealth}/{gameObject.GetComponent<PlayerHealth>().HeadMaxHealth}";
         }
-        BackpackManager.Instance.RefreshArmorDisplay();
+        // BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     /// <summary>
@@ -275,7 +275,7 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.BattleBodyHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{GetComponent<PlayerHealth>().BodyHealth}/{GetComponent<PlayerHealth>().BodyMaxHealth}";
         }
-        BackpackManager.Instance.RefreshArmorDisplay();
+        // BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     /// <summary>
@@ -300,7 +300,7 @@ public class PlayerHealth : NetworkBehaviour
             BackpackManager.Instance.BattleLegsHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{GetComponent<PlayerHealth>().LegHealth}/{GetComponent<PlayerHealth>().LegMaxHealth}";
         }
-        BackpackManager.Instance.RefreshArmorDisplay();
+        // BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     /// <summary>
@@ -465,7 +465,6 @@ public class PlayerHealth : NetworkBehaviour
     [TargetRpc]
     public void TargetPlayerDie(NetworkConnection conn)
     {
-        Debug.Log(_name + " Player is Dead!");
         if(gameObject.GetComponent<PlayerFight>().IsFighting)
         {
             gameObject.GetComponent<PlayerFight>().CmdDead();

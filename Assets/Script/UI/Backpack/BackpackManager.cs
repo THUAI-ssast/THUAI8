@@ -245,7 +245,7 @@ public class BackpackManager : MonoBehaviour
 
     public void RefreshArmorDisplay()
     {
-        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");  
         if (localPlayer == null)
             return;
 
@@ -254,10 +254,6 @@ public class BackpackManager : MonoBehaviour
         {
             Item newArmor = localPlayerHealth.GetItemAt(position);
             var oldArmor = _armorSlots[position].SetItem(newArmor);
-
-            // 更新 battlePanel 的显示
-            UpdateBattleArmorDisplay(position, newArmor);
-
             if (oldArmor != null)
             {
                 // 若有护甲变动，将原护甲放回背包，否则仅刷新显示
@@ -270,18 +266,33 @@ public class BackpackManager : MonoBehaviour
                     _armorSlots[position].UpdateDisplay();
                 }
             }
+        }   
+    }
+
+
+    /// <summary>
+    /// 更新战斗面板的护甲显示，在玩家战斗时从客户端调用。
+    /// </summary>
+    /// <param name="enemyPlayer">当前玩家的敌人</param>
+    public void RefreshArmorBattleDisplay(GameObject enemyPlayer)
+    {
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
+        if (localPlayer != null)
+        {
+            var playerHealth = localPlayer.GetComponent<PlayerHealth>();
+            foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+            {
+                Item playerArmor = playerHealth.GetItemAt(position);
+                UpdateBattleArmorDisplay(position, playerArmor, false);
+            }
         }
-
-
-        GameObject enemy = null;
+        GameObject enemy = enemyPlayer;
         if (enemy != null)
         {
             var enemyHealth = enemy.GetComponent<PlayerHealth>();
             foreach (PlayerHealth.BodyPosition position in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
             {
                 Item enemyArmor = enemyHealth.GetItemAt(position);
-
-                // 更新 enemy 的 battlePanel 显示
                 UpdateBattleArmorDisplay(position, enemyArmor, true);
             }
         }
