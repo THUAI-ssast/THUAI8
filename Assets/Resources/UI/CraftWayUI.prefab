@@ -304,8 +304,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u7269\u54C1"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2d47345a621ced245a407257581fd134, type: 2}
-  m_sharedMaterial: {fileID: -5471723069554805099, guid: 2d47345a621ced245a407257581fd134, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 387f580385e2a6642a409f5f5d4f43bc, type: 2}
+  m_sharedMaterial: {fileID: -122742541679575602, guid: 387f580385e2a6642a409f5f5d4f43bc, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

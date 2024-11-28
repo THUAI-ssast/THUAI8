@@ -5,12 +5,21 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.XR;
+using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// 该类中保存了玩家的名字、血量上限和当前血量，以及处理血量变化逻辑的方法
 /// </summary>
 public class PlayerHealth : NetworkBehaviour
 {
+    /// <summary>
+    /// 用于玩家死亡后创建资源点
+    /// </summary>
+    private Tilemap _furnitureTilemap;
+
     /// <summary>
     /// 玩家的名字
     /// </summary>
@@ -225,6 +234,8 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(_bodyHealth, _bodyMaxHealth, BodyPart.Body);
             LocalPlayerInfoPanel.UpdateHealthPoint(_legHealth, _legMaxHealth, BodyPart.Leg);
         }
+
+        _furnitureTilemap = GridMoveController.Instance.FurnitureTilemap;
     }
 
 
@@ -248,7 +259,7 @@ public class PlayerHealth : NetworkBehaviour
         else if (gameObject == HealthPanelEnemy.Instance.EnemyPlayer.gameObject)
         {
             BackpackManager.Instance.BattleHeadHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
-                $"{gameObject.GetComponent<PlayerHealth>().HeadHealth}/{gameObject.GetComponent<PlayerHealth>().HeadMaxHealth}";
+                $"{HeadHealth}/{HeadMaxHealth}";
         }
         // BackpackManager.Instance.RefreshArmorDisplay();
     }
@@ -273,7 +284,7 @@ public class PlayerHealth : NetworkBehaviour
         else if (gameObject == HealthPanelEnemy.Instance.EnemyPlayer.gameObject)
         {
             BackpackManager.Instance.BattleBodyHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
-                $"{GetComponent<PlayerHealth>().BodyHealth}/{GetComponent<PlayerHealth>().BodyMaxHealth}";
+                $"{BodyHealth}/{BodyMaxHealth}";
         }
         // BackpackManager.Instance.RefreshArmorDisplay();
     }
@@ -298,7 +309,7 @@ public class PlayerHealth : NetworkBehaviour
         else if (gameObject == HealthPanelEnemy.Instance.EnemyPlayer.gameObject)
         {
             BackpackManager.Instance.BattleLegsHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
-                $"{GetComponent<PlayerHealth>().LegHealth}/{GetComponent<PlayerHealth>().LegMaxHealth}";
+                $"{LegHealth}/{LegMaxHealth}";
         }
         // BackpackManager.Instance.RefreshArmorDisplay();
     }
@@ -351,7 +362,7 @@ public class PlayerHealth : NetworkBehaviour
         //清除已经被摧毁的防具
         foreach (BodyPosition bodyPosition in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
         {
-            if (_armorEquipments.TryGetValue(bodyPosition,out var armor)&& armor==null)
+            if (_armorEquipments.TryGetValue(bodyPosition, out var armor) && armor == null)
             {
                 _armorEquipments.Remove(bodyPosition);
             }
@@ -359,17 +370,18 @@ public class PlayerHealth : NetworkBehaviour
         //机制乘区，默认为1，仅当对应部位有护甲&&护甲对武器伤害类型有特殊乘区时启用
         if (_armorEquipments.TryGetValue(position, out var armorItem) && armorItem.ItemData is ArmorItemData armorData)
         {
-            target.DecreaseDurability(armorItem.gameObject);
             if (armorData.DamageTypeDictionary.ContainsKey(weaponData.AttackDamageType))
             {
                 damage *= armorData.DamageTypeDictionary.Get(weaponData.AttackDamageType);
             }
+            damage = (float)Math.Round(damage, 1);
+            target.DecreaseDurability(armorItem.gameObject, damage);
         }
-
+        damage = (float)Math.Round(damage, 1);
         ChangeHealth((int)position, -damage);
     }
 
-    public float GetWeaponDamage(BodyPosition position,Item weaponItem)
+    public float GetWeaponDamage(BodyPosition position, Item weaponItem)
     {
         //武器伤害计算公式为：Dmg(伤害)= Tch(机制乘区)*Bdy(部位乘区)*Bsc(基础伤害)
         WeaponItemData weaponData = weaponItem.ItemData as WeaponItemData;
@@ -399,6 +411,35 @@ public class PlayerHealth : NetworkBehaviour
         return damage;
     }
 
+    public static void Heal(PlayerHealth healer, BodyPosition position, Item medicine, bool isGlobalHeal = false)
+    {
+        MedicineItemData medicineData = medicine.ItemData as MedicineItemData;
+        if (medicineData == null)
+            return;
+        healer.TakeMedicineHeal(healer.GetComponent<PlayerItemInteraction>(), position, medicine, isGlobalHeal);
+    }
+
+    [Command]
+    public void CmdHeal(GameObject healer, int position, GameObject medicine, bool isGlobalHeal)
+    {
+        Heal(healer.GetComponent<PlayerHealth>(), (BodyPosition)position, medicine.GetComponent<Item>(), isGlobalHeal);
+    }
+
+    private void TakeMedicineHeal(PlayerItemInteraction healer, BodyPosition position, Item medicineItem, bool isGlobalHeal = false)
+    {
+        MedicineItemData medicineData = medicineItem.ItemData as MedicineItemData;
+        if (medicineData == null)
+            return;
+        float heal = 0;
+        if (medicineData.BodyHealDictionary.ContainsKey(position))
+            heal = medicineData.BodyHealDictionary.Get(position);
+        if (!isGlobalHeal)
+        {
+            healer.DecreaseDurability(medicineItem.gameObject);
+        }
+        ChangeHealth((int)position, heal);
+    }
+
 
     /// <summary>
     /// Command函数，在客户端被调用，但在服务端执行。
@@ -416,21 +457,21 @@ public class PlayerHealth : NetworkBehaviour
     /// </summary>
     /// <param name="bodyPosition">血量改变部位，需要使用(int)BodyPosition.xxx</param>
     /// <param name="healthChange">血量改变量，正数回血，负数扣血</param>
-    private void ChangeHealth(int bodyPosition, float healthChange)
+    public void ChangeHealth(int bodyPosition, float healthChange)
     {
         if (isServer)
         {
-            DeployChangeHealth(bodyPosition,healthChange);
+            DeployChangeHealth(bodyPosition, healthChange);
         }
         else
         {
-            CmdChangeHealth(bodyPosition,healthChange);
+            CmdChangeHealth(bodyPosition, healthChange);
         }
     }
     [Command]
     private void CmdChangeHealth(int bodyPosition, float healthChange)
     {
-        DeployChangeHealth(bodyPosition,healthChange);
+        DeployChangeHealth(bodyPosition, healthChange);
     }
     private void DeployChangeHealth(int bodyPosition, float healthChange)
     {
@@ -458,10 +499,66 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (_headHealth <= 0 || _bodyHealth <= 0)
         {
+            NetworkIdentity networkIdentity = GetComponent<NetworkIdentity>();
+            TargetCreateRP();
             TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient);
         }
     }
 
+    [TargetRpc]
+    public void TargetCreateRP()
+    {
+        List<Item> itemlist = BackpackManager.Instance.ItemList;
+        foreach (var armorSlot in BackpackManager.Instance.ArmorSlots)
+        {
+            var slot = armorSlot.Value;
+            var item = slot.GetItem();
+            if (item != null)
+            {
+                itemlist.Add(item);
+            }
+        }
+        CmdCreateRP(itemlist);
+    }
+
+
+    [Command]
+    public void CmdCreateRP(List<Item> itemlist)
+    {
+        Vector3Int tempPosition = _furnitureTilemap.WorldToCell(transform.position);
+        Vector3 cellPosition = _furnitureTilemap.GetCellCenterWorld(tempPosition);
+        GameObject instance = Instantiate(Resources.Load<GameObject>("ResourcePoint"));
+        instance.transform.position = cellPosition;
+        instance.transform.SetParent(_furnitureTilemap.transform);
+        ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
+        List<Item> emptyitemlist = new List<Item>();
+        resourcePointController.InitializeWithCustomItems(emptyitemlist);
+
+        foreach (var item in itemlist)
+        {
+            resourcePointController.AddItemToResourcePoint(item);
+        }
+        NetworkServer.Spawn(instance);
+        RpcSyncInstance(instance, cellPosition, itemlist);
+    }
+
+
+    /// <summary>
+    /// 在客户端将实例设置为 Tilemap 的子对象，并更新位置
+    /// </summary>
+    [ClientRpc]
+    private void RpcSyncInstance(GameObject instance, Vector3 cellPosition, List<Item> itemlist)
+    {
+        ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
+        instance.transform.position = cellPosition;
+        instance.transform.SetParent(_furnitureTilemap.transform);
+
+        foreach (var item in itemlist)
+        {
+            resourcePointController.AddItemToResourcePoint(item);
+        }
+    }
+    
     [TargetRpc]
     public void TargetPlayerDie(NetworkConnection conn)
     {

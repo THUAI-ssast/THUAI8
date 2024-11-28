@@ -2,6 +2,7 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -9,25 +10,42 @@ using UnityEngine.UI;
 
 public class ResourcePointController : NetworkBehaviour
 {
-    [SerializeField]private SerializableDictionary.Scripts.SerializableDictionary<ItemData, float> _serializedProbilityDictionary;
+    [SerializeField] private SerializableDictionary.Scripts.SerializableDictionary<ItemData, float> _serializedProbilityDictionary;
     private GameObject _resourceUIPanelInstance;
     private Tilemap _furnitureTilemap;
     private GameObject _player;
     private readonly List<Item> _itemList = new List<Item>();
-    private float _epsilon = 0.05f;
+    private bool _useCustomInitItems = false;
+    private List<Item> _customInitItems;
 
     private float _requiredActionPoint = 2;
     public float RequiredActionPoint { get => _requiredActionPoint; }
 
+    public List<Item> ItemList { get => _itemList; }
+
+    /// <summary>
+    /// 存储地图上所有资源点的字典：key是tilePosition，value是资源点
+    /// </summary>
+    public static Dictionary<Vector3Int, Transform> ResourcePointDictionary = new Dictionary<Vector3Int, Transform>();
+    
     void Start()
     {
         _resourceUIPanelInstance = transform.GetChild(0).GetChild(0).gameObject;
         _resourceUIPanelInstance.SetActive(false);
         _furnitureTilemap = transform.parent.GetComponent<Tilemap>();
-        if(isServer)
+        if (isServer)
         {
-            StartCoroutine(InitItems());
+            if (_useCustomInitItems && _customInitItems != null)
+            {
+                StartCoroutine(AssignInitItems(_customInitItems));
+            }
+            else
+            {
+                StartCoroutine(RandomInitItems());
+            }
         }
+        // 资源点生成时存储到字典中
+        ResourcePointDictionary.Add(_furnitureTilemap.WorldToCell(transform.position), transform);
     }
 
     void Update()
@@ -35,21 +53,15 @@ public class ResourcePointController : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse1) && _player != null && !UIManager.Instance.IsUIActivating)
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3Int playerPos = _player.GetComponent<PlayerMove>().TilePosition;
             Vector3Int targetCellPos = _furnitureTilemap.WorldToCell(mousePos);
             Vector3 realPosition = _furnitureTilemap.CellToWorld(targetCellPos);
             bool isClickingThis = realPosition + new Vector3(0.5f, 0.5f, 0) == transform.position;
 
             if (isClickingThis)
             {
-                Vector3 playerPosBias = _player.transform.position;
-                playerPosBias.x -= 0.5f;
-                playerPosBias.y -= 0.5f;
-
-                bool isAdjacentInX = Mathf.Abs(targetCellPos.x - playerPosBias.x) <= 1.05f &&
-                                Mathf.Abs(targetCellPos.y - playerPosBias.y) <= _epsilon;
-
-                bool isAdjacentInY = Mathf.Abs(targetCellPos.y - playerPosBias.y) <= 1.05f &&
-                                    Mathf.Abs(targetCellPos.x - playerPosBias.x) <= _epsilon;
+                bool isAdjacentInX = Mathf.Abs(targetCellPos.x - playerPos.x) == 1 && targetCellPos.y == playerPos.y;
+                bool isAdjacentInY = Mathf.Abs(targetCellPos.y - playerPos.y) == 1 && targetCellPos.x == playerPos.x;
 
                 if (isAdjacentInX || isAdjacentInY)
                 {
@@ -57,13 +69,13 @@ public class ResourcePointController : NetworkBehaviour
                 }
             }
         }
-        else if(isClient)
+        else if (isClient)
         {
             _player = GameObject.FindWithTag("LocalPlayer");
         }
     }
 
-    private IEnumerator InitItems()
+    private IEnumerator RandomInitItems()
     {
         yield return new WaitForSeconds(1);
         foreach (var match in _serializedProbilityDictionary.Dictionary)
@@ -75,12 +87,39 @@ public class ResourcePointController : NetworkBehaviour
                 if (match.Key is WeaponItemData)
                 {
                     directory += "Weapons/";
-                }else if (match.Key is ArmorItemData)
+                }
+                else if (match.Key is ArmorItemData)
                 {
                     directory += "Armor/";
                 }
+                else if (match.Key is MedicineItemData)
+                {
+                    directory += "Medicines/";
+                }
                 CreateItem(directory + match.Key.name);
             }
+        }
+    }
+
+    public IEnumerator AssignInitItems(List<Item> items)
+    {
+        yield return new WaitForSeconds(1);
+        foreach (var item in items)
+        {
+            string directory = "ScriptableObject/Items/";
+            if (item.ItemData is WeaponItemData)
+            {
+                directory += "Weapons/";
+            }
+            else if (item.ItemData is ArmorItemData)
+            {
+                directory += "Armor/";
+            }
+            else if (item.ItemData is MedicineItemData)
+            {
+                directory += "Medicines/";
+            }
+            CreateItem(directory + item.ItemData.ItemName);
         }
     }
 
@@ -129,8 +168,8 @@ public class ResourcePointController : NetworkBehaviour
             RefreshSlots();
         }
     }
-    
-    private void RefreshSlots()
+
+    public void RefreshSlots()
     {
         Transform slots = gameObject.transform.Find("Canvas/ResourcePointPanel/Scroll View/Viewport/Slots");
         for (int i = 0; i < slots.childCount; i++)
@@ -141,13 +180,33 @@ public class ResourcePointController : NetworkBehaviour
                 image.enabled = true;
                 image.sprite = _itemList[i].ItemData.ItemIcon;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
+                if (_itemList[i].MaxDurability != -1)
+                {
+                    slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = true;
+                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text =
+                        $"{_itemList[i].CurrentDurability}/{_itemList[i].MaxDurability}";
+                }
+                else
+                {
+                    slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
+                    slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                }
                 slots.GetChild(i).GetComponent<RPSlot>().SetItem(_itemList[i]);
             }
             else
             {
                 slots.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                slots.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
+                slots.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                slots.GetChild(i).GetComponent<RPSlot>().SetItem(null);
             }
         }
+    }
+
+    public void InitializeWithCustomItems(List<Item> customItems)
+    {
+        _useCustomInitItems = true;
+        _customInitItems = customItems;
     }
 }

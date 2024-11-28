@@ -9,8 +9,9 @@ public class WeaponItemData : ItemData
 {
     public enum DamageType
     {
-        Puncture,
         Blunt,
+        Puncture,
+        Slash,
         Burn
     }
 

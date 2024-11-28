@@ -44,6 +44,18 @@ public class BackpackManager : MonoBehaviour
     /// </summary>
     private List<Item> _itemList = new List<Item>();
 
+    public List<Item> ItemList
+    {
+        get => _itemList;
+        private set => _itemList = value;
+    }
+
+    public Dictionary<PlayerHealth.BodyPosition, ArmorSlot> ArmorSlots
+    {
+        get => _armorSlots;
+        private set => _armorSlots = value;
+    }
+
 
     private void Awake()
     {
@@ -92,9 +104,19 @@ public class BackpackManager : MonoBehaviour
             CreateItem("ScriptableObject/Items/锤石");
             CreateItem("ScriptableObject/Items/木棒");
             CreateItem("ScriptableObject/Items/金属破片");
-            CreateItem("ScriptableObject/Items/Armor/纸质护甲");
+            CreateItem("ScriptableObject/Items/石头");
+            CreateItem("ScriptableObject/Items/刀片");
+            CreateItem("ScriptableObject/Items/攀岩绳");
+            CreateItem("ScriptableObject/Items/Armor/摩托头盔");
             CreateItem("ScriptableObject/Items/Armor/防刺服");
             CreateItem("ScriptableObject/Items/Weapons/小刀");
+            CreateItem("ScriptableObject/Items/Medicines/医用酒精");
+            CreateItem("ScriptableObject/Items/Medicines/医用绷带");
+            CreateItem("ScriptableObject/Items/Medicines/止痛药");
+        }
+        else
+        {
+            Debug.Log("Local Player is null!");
         }
     }
 
@@ -154,7 +176,10 @@ public class BackpackManager : MonoBehaviour
     /// 使用背包中的物品
     /// </summary>
     /// <param name="item">要使用的物品</param>
-    public void UseItem(Item item)
+    /// <param name="healhead">是否要治疗头部</param>
+    /// <param name="healbody">是否要治疗躯干</param>
+    /// <param name="heallegs">是否要治疗腿部</param>
+    public void UseItem(Item item, bool isGlobalHeal = true, bool healhead = true, bool healbody = true, bool heallegs = true)
     {
         GameObject player = GameObject.FindWithTag("LocalPlayer");
         var playerInteraction = player.GetComponent<PlayerItemInteraction>();
@@ -167,6 +192,25 @@ public class BackpackManager : MonoBehaviour
         {
             var target = GameObject.FindWithTag("Player");
             player.GetComponent<PlayerHealth>().CmdAttack(player,target,(int)PlayerHealth.BodyPosition.MainBody,item.gameObject); // 攻击方，被攻击方，攻击部位，使用武器
+        }
+        else if (item.ItemData is MedicineItemData medicineData)
+        {
+            if (isGlobalHeal)
+            {
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, true);
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, true);
+                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, true);
+                player.GetComponent<PlayerItemInteraction>().DecreaseDurability(item.gameObject);
+            }
+            else
+            {
+                if (healhead)
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, false); // 治疗者，治疗部位，使用物品
+                else if (healbody)
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, false);
+                else if (heallegs)
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, false);
+            }
         }
 
         RefreshSlots();
@@ -199,7 +243,9 @@ public class BackpackManager : MonoBehaviour
     private void UpdateSlots(Transform slotsTransform, bool updateCraftWayUI)
     {
         if (slotsTransform == null)
+        {
             return;
+        }
 
         // 移除无效物品
         _itemList.RemoveAll(i => i == null);
@@ -222,6 +268,7 @@ public class BackpackManager : MonoBehaviour
                 }
                 else
                 {
+                    slotsTransform.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
                     slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
                 }
 
@@ -229,11 +276,11 @@ public class BackpackManager : MonoBehaviour
             }
             else
             {
-                // 清空槽位内容
                 slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().enabled = false;
                 slotsTransform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
                 slotsTransform.GetChild(i).GetChild(2).GetComponent<Image>().enabled = false;
                 slotsTransform.GetChild(i).GetChild(3).GetComponent<TextMeshProUGUI>().text = "";
+                slotsTransform.GetChild(i).GetComponent<SlotMenuTrigger>().SetItem(null);
             }
         }
 
@@ -339,7 +386,6 @@ public class BackpackManager : MonoBehaviour
             }
         }
         
-
         if (battleHealthPanel != null)
         {
             var battleArmorSlot = battleHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
@@ -418,7 +464,20 @@ public class BackpackManager : MonoBehaviour
 
         foreach (var item in destroyList)
             DestroyItem(item);
-        CreateItem("ScriptableObject/Items/" + craftWay.ProductItem.ItemName);
+        if (craftWay.ProductItem is WeaponItemData weaponitem)
+        {
+            CreateItem("ScriptableObject/Items/" + "Weapons/" + weaponitem.ItemName);
+        }
+        else if (craftWay.ProductItem is MedicineItemData medicineitem)
+        {
+            CreateItem("ScriptableObject/Items/" + "Medicines/" + medicineitem.ItemName);
+        }
+        else if (craftWay.ProductItem is ArmorItemData armoritem)
+        {
+            CreateItem("ScriptableObject/Items/" + "Armor/" + armoritem.ItemName);
+        }
+        else
+            CreateItem("ScriptableObject/Items/" + craftWay.ProductItem.ItemName);
         _itemList = testItemList;
 
         CraftWayUI.UpdateSatisfiedAll();

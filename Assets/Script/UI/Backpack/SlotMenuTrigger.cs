@@ -15,6 +15,10 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     /// </summary>
     [SerializeField] private GameObject _operationMenuPrefab;
     /// <summary>
+    /// 治疗身体部位菜单预制体
+    /// </summary>
+    [SerializeField] private GameObject _bodyPositionMenuPrefab;
+    /// <summary>
     /// 物品描述面板预制体
     /// </summary>
     [SerializeField] private GameObject _itemDescriptionPanelPrefab;
@@ -31,6 +35,10 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     /// </summary>
     private GameObject _operationMenu;
     /// <summary>
+    /// 身体部位菜单
+    /// </summary>
+    private GameObject _bodyPositionMenu;
+    /// <summary>
     /// 物品描述面板
     /// </summary>
     private GameObject _itemDescriptionPanel;
@@ -43,13 +51,21 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     /// </summary>
     private Transform _layout;
     /// <summary>
+    /// 右键菜单布局
+    /// </summary>
+    private Transform _bodyPositionLayout;
+    /// <summary>
     /// 已存在的右键菜单，保证全局唯一右键菜单
     /// </summary>
     private GameObject _existingOperationMenu;
     /// <summary>
+    /// 已存在的治疗身体部位菜单，保证全局唯一
+    /// </summary>
+    private GameObject _existingBodyPositionMenu;
+    /// <summary>
     /// 临时的跟随鼠标的图片
     /// </summary>
-    private Image _followImage;
+    private static Image _followImage;
 
     public Image FollowImage
     {
@@ -73,6 +89,10 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     {
         _slotItem = item;
     }
+    public Item GetItem()
+    {
+        return _slotItem;
+    }
     /// <summary>
     /// 监听鼠标左右键点击事件。生成全局唯一菜单、加入菜单按钮点击事件。
     /// </summary>
@@ -85,18 +105,18 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
             if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Attacker &&
             GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().QueryRemainingAP() >= (_slotItem.ItemData as WeaponItemData).AttakAPCost)
             {
-                // 生成一个与当前slot相同的Image
-                if (_followImage == null)
+                if (_followImage != null)
                 {
-                    UIManager.Instance.CurrentSlotMenuTrigger = this; // 注册当前实例
-
-                    Image slotImage = GetComponent<Image>(); // 获取当前slot的Image
-                    _followImage = Instantiate(slotImage, _battlePanel.transform);  // 在battlePanel上创建跟随Image
-                    _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
-                    _followImage.raycastTarget = false; // 设置为不可交互
-
-                    UIManager.Instance.FollowImage = _slotItem;
+                    DestroyFollowImage();
+                    UIManager.Instance.FollowImage = null;
                 }
+                UIManager.Instance.CurrentSlotMenuTrigger = this; // 注册当前实例
+
+                Image itemImage = transform.GetChild(0).GetComponent<Image>(); // 获取当前slot中item的Image
+                _followImage = Instantiate(itemImage, _battlePanel.transform);  // 在battlePanel上创建跟随Image
+                _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
+                _followImage.raycastTarget = false; // 设置为不可交互
+                UIManager.Instance.FollowImage = _slotItem;
             }
         }
 
@@ -111,6 +131,15 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
             if(UIManager.Instance.ExistingOperationMenu != null)
             {
                 Destroy(UIManager.Instance.ExistingOperationMenu);
+            }
+            if (_existingBodyPositionMenu != null)
+            {
+                Destroy(_existingBodyPositionMenu);
+                return;
+            }
+            if (UIManager.Instance.ExistingBodyPositionMenu != null)
+            {
+                Destroy(UIManager.Instance.ExistingBodyPositionMenu);
             }
             _operationMenu = Instantiate(_operationMenuPrefab, _bagPanel.transform.GetChild(2), false);
             _operationMenu.transform.position = gameObject.transform.position + new Vector3(60, -100, 0);
@@ -127,8 +156,56 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
                 }
                 _layout.GetChild(0).GetComponent<Button>().onClick.AddListener(() => 
                 {
-                    BackpackManager.Instance.UseItem(_slotItem);
                     Destroy(_operationMenu);
+                    if (_slotItem.ItemData is MedicineItemData medicineData)
+                    {
+                        string medicinename = _slotItem.ItemData.ItemName;
+                        if (medicinename == "止痛药" || medicinename == "肾上腺素")
+                        {
+                            BackpackManager.Instance.UseItem(_slotItem);
+                        }
+                        else
+                        {
+                            _bodyPositionMenu = Instantiate(_bodyPositionMenuPrefab, _bagPanel.transform.GetChild(2), false);
+                            _bodyPositionMenu.transform.position = gameObject.transform.position + new Vector3(60, -100, 0);
+                            UIManager.Instance.ExistingBodyPositionMenu = _bodyPositionMenu;
+                            _existingBodyPositionMenu = _bodyPositionMenu;
+                            _bodyPositionLayout = _bodyPositionMenu.transform.GetChild(0);
+
+                            if (!medicineData.BodyHealDictionary.ContainsKey(PlayerHealth.BodyPosition.Head))
+                            {
+                                _bodyPositionLayout.GetChild(0).GetComponent<Button>().interactable = false;
+                            }
+                            if (!medicineData.BodyHealDictionary.ContainsKey(PlayerHealth.BodyPosition.MainBody))
+                            {
+                                _bodyPositionLayout.GetChild(1).GetComponent<Button>().interactable = false;
+                            }
+                            if (!medicineData.BodyHealDictionary.ContainsKey(PlayerHealth.BodyPosition.Legs))
+                            {
+                                _bodyPositionLayout.GetChild(2).GetComponent<Button>().interactable = false;
+                            }
+
+                            _bodyPositionLayout.GetChild(0).GetComponent<Button>().onClick.AddListener(() =>
+                            {
+                                BackpackManager.Instance.UseItem(_slotItem, false, true, false, false);
+                                Destroy(_bodyPositionMenu);
+                            });
+                            _bodyPositionLayout.GetChild(1).GetComponent<Button>().onClick.AddListener(() =>
+                            {
+                                BackpackManager.Instance.UseItem(_slotItem, false, false, true, false);
+                                Destroy(_bodyPositionMenu);
+                            });
+                            _bodyPositionLayout.GetChild(2).GetComponent<Button>().onClick.AddListener(() =>
+                            {
+                                BackpackManager.Instance.UseItem(_slotItem, false, false, false, true);
+                                Destroy(_bodyPositionMenu);
+                            });
+                        }
+                    }
+                    else
+                    {
+                        BackpackManager.Instance.UseItem(_slotItem);
+                    }
                 });
                 _layout.GetChild(1).GetComponent<Button>().onClick.AddListener(() => 
                 {

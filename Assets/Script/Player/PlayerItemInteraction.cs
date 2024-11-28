@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -75,6 +76,10 @@ public class PlayerItemInteraction : NetworkBehaviour
         ItemData itemData = Resources.Load<ItemData>(itemData_pth);
         var spriteRenderer = instance.GetComponent<SpriteRenderer>();
         spriteRenderer.enabled = false;
+        if(itemData == null)
+        {
+            Debug.Log(itemData_pth);
+        }
         spriteRenderer.sprite = itemData.ItemIcon;
         var item = instance.GetComponent<Item>();
         item.Initialize(itemData, owner, playerId);
@@ -103,33 +108,33 @@ public class PlayerItemInteraction : NetworkBehaviour
     /// 请通过对应物品拥有者的playerInteractive.DecreaseDurability()使用
     /// </summary>
     /// <param name="itemObject">需要减少耐久度的物体</param>
-    public void DecreaseDurability(GameObject itemObject)
+    public void DecreaseDurability(GameObject itemObject,float damage = 1)
     {
         if (isServer)
         {
-            RpcDecreaseItemDurability(itemObject);
+            RpcDecreaseItemDurability(itemObject, damage);
         }
         else
         {
-            CmdDecreaseDurability(itemObject);
+            CmdDecreaseDurability(itemObject, damage);
         }
     }
     [Command]
-    public void CmdDecreaseDurability(GameObject itemObject)
+    public void CmdDecreaseDurability(GameObject itemObject, float damage)
     {
-        RpcDecreaseItemDurability(itemObject);
+        RpcDecreaseItemDurability(itemObject,damage);
     }
     /// <summary>
     /// DecreaseDurability的附属同步函数
     /// </summary>
     /// <param name="itemObject"></param>
     [ClientRpc]
-    private void RpcDecreaseItemDurability(GameObject itemObject)
+    private void RpcDecreaseItemDurability(GameObject itemObject, float damage )
     {
         var item = itemObject.GetComponent<Item>();
         if (item!=null&&item.CurrentDurability!=-1)
         {
-            item.DecreaseDurability();
+            item.DecreaseDurability(damage);
             if (item.ItemLocation.Owner==ItemOwner.PlayerBackpack)
             {
                 BackpackManager.Instance.RefreshSlots();

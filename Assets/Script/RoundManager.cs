@@ -56,6 +56,14 @@ public class RoundManager : NetworkBehaviour
     /// 局内玩家数量
     /// </summary>
     [SyncVar(hook = nameof(UpdateReadyButtonUIAll))] private int _playerCount;
+
+    /// <summary>
+    /// 回合计数
+    /// </summary>
+    [SyncVar(hook = nameof(RoundCountChange))] private int _roundCount = 0;
+
+    public int RoundCount => _roundCount;
+
     private void Awake()
     {
         if (Instance)
@@ -76,6 +84,7 @@ public class RoundManager : NetworkBehaviour
         if(isServer)
         {
             _timer = _roundDuration;
+            RoundCountIncreaseOnServer();
             StartCoroutine(RoundTimer());
         }
     }
@@ -141,6 +150,7 @@ public class RoundManager : NetworkBehaviour
     {
         EndRoundOnClient();
         _timer = _roundDuration;
+        RoundCountIncreaseOnServer();
         _readyPlayer.Clear();
     }
     /// <summary>
@@ -152,7 +162,8 @@ public class RoundManager : NetworkBehaviour
         int minute = Mathf.CeilToInt(_timer) / 60;
         string minuteText = minute < 10 ? "0" + minute.ToString() : minute.ToString();
         string secondText = second< 10 ? "0" + second.ToString() : second.ToString();
-        _timeText = minuteText + ":" + secondText;
+        string countText = $"第{_roundCount}回合 ";
+        _timeText = countText + minuteText + ":" + secondText;
         UpdateTimeUI();   
     }
     /// <summary>
@@ -226,6 +237,20 @@ public class RoundManager : NetworkBehaviour
         if(State == RoundState.Ready)
         {
             readyButton.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = $"等待\n其他玩家\n({_readyPlayerCount}/{newPlayerCount})";
+        }
+    }
+
+    private void RoundCountIncreaseOnServer()
+    {
+        _roundCount += 1;
+        SafeAreaManager.Instance.UpdateSafeAreaOnServer(_roundCount);
+    }
+
+    private void RoundCountChange(int oldRoundCount, int newRoundCount)
+    {
+        if (newRoundCount > 1)
+        {
+            SafeAreaManager.Instance.DoSafeAreaDamageByRoundEnd(oldRoundCount);
         }
     }
 }

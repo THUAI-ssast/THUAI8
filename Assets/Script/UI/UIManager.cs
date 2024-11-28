@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using JetBrains.Annotations;
+using TMPro;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +17,7 @@ public class UIManager : MonoBehaviour
 
     public bool IsUIActivating => _activeUIList.Count > 0;
     public GameObject ExistingOperationMenu;
+    public GameObject ExistingBodyPositionMenu;
 
     /// <summary>
     /// 背包UI界面
@@ -45,6 +48,7 @@ public class UIManager : MonoBehaviour
     private GameObject _craftPanel;
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
+    private GameObject _bigMapPanel;
 
     private bool _isOnBattle = false;
 
@@ -57,6 +61,11 @@ public class UIManager : MonoBehaviour
     /// BattleScene中的Canvas，供其他GameObject直接使用
     /// </summary>
     [SerializeField] public GameObject MainCanvas;
+
+    /// <summary>
+    /// 悬停在屏幕上方的显示UI的列表，仅供DisplayHoverStatusPanel相关的过程使用
+    /// </summary>
+    private List<GameObject> _hoverStatusPanelList = new List<GameObject>();
 
     private void Awake()
     {
@@ -136,13 +145,27 @@ public class UIManager : MonoBehaviour
             .AddListener(() => reverseUIActive(_craftPanel));
         _craftPanel.transform.Find("ApplyButton").GetComponent<Button>().onClick
             .AddListener(() => BackpackManager.Instance.DeployCraft(CraftWayUI.SelectedCraftWay));
+
+        _bigMapPanel = MainCanvas.transform.Find("MapPanel/SmallMapMask/BigMapImage").gameObject;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.E) && !_isOnBattle)
         {
-            ReverseBagPanel();
+            ReversePanel(_bagPanel);
+        }
+        
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            if(MapUIManager.Instance.IsDisplayBigMap)
+            {
+                MapUIManager.Instance.DisplaySmallMap();
+            }
+            else
+            {
+                MapUIManager.Instance.DisplayBigMap();
+            }
         }
 
         // if (Input.GetKeyDown(KeyCode.B))
@@ -195,12 +218,16 @@ public class UIManager : MonoBehaviour
         reverseUIActive(ui);
     }
 
-    public void ReverseBagPanel()
+    public void ReversePanel(GameObject panel)
     {
-        reverseUIActive(_bagPanel);
-        if (_bagPanel.activeSelf == false && ExistingOperationMenu != null)
+        reverseUIActive(panel);
+        if (panel.activeSelf == false && ExistingOperationMenu != null)
         {
             Destroy(ExistingOperationMenu);
+        }
+        if (_bagPanel.activeSelf == false && ExistingBodyPositionMenu != null)
+        {
+            Destroy(ExistingBodyPositionMenu);
         }
     }
 
@@ -227,10 +254,46 @@ public class UIManager : MonoBehaviour
 
     public void DestroyCurrentFollowImage()
     {
+        UIManager.Instance.FollowImage = null;
         if (CurrentSlotMenuTrigger != null)
         {
             CurrentSlotMenuTrigger.DestroyFollowImage();
             CurrentSlotMenuTrigger = null; // 清空引用
         }
+    }
+
+    public int GetActiveUINumber => _activeUIList.Count;
+
+    /// <summary>
+    /// 用于在屏幕上方显示提醒玩家的UI，该UI会在1秒后逐渐淡化至不可见
+    /// </summary>
+    /// <param name="text">提醒玩家的文本内容</param>
+    public void DisplayHoverStatusPanel(string text)
+    {
+        foreach (var panel in _hoverStatusPanelList)
+        {
+            panel.SetActive(false);
+        }
+        GameObject hoverStatusPanel = Instantiate(Resources.Load<GameObject>("UI/HoverStatusPanel"), MainCanvas.transform, false);
+        hoverStatusPanel.GetComponentInChildren<TextMeshProUGUI>().text = text;
+        _hoverStatusPanelList.Add(hoverStatusPanel);
+        StartCoroutine(DisplayHoverStatusPanelCoroutine(hoverStatusPanel));
+    }
+
+    /// <summary>
+    /// 在屏幕上方显示提醒玩家的UI
+    /// </summary>
+    /// <param name="hoverStatusPanel">在屏幕上方显示提醒玩家的UI对象</param>
+    /// <returns></returns>
+    private IEnumerator DisplayHoverStatusPanelCoroutine(GameObject hoverStatusPanel)
+    {
+        hoverStatusPanel.GetComponent<CanvasGroup>().alpha = 1f;
+        hoverStatusPanel.SetActive(true);
+        yield return new WaitForSeconds(1);
+        hoverStatusPanel.GetComponent<CanvasGroup>().DOFade(0f, 1f);
+        yield return new WaitForSeconds(1);
+        hoverStatusPanel.SetActive(false);
+        _hoverStatusPanelList.Remove(hoverStatusPanel);
+        Destroy(hoverStatusPanel);
     }
 }

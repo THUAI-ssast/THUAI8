@@ -13,6 +13,10 @@ public class RPSlot : MonoBehaviour, IPointerClickHandler
     {
         _slotItem = item;
     }
+    public Item GetItem()
+    {
+        return _slotItem;
+    }
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Left && _slotItem != null)

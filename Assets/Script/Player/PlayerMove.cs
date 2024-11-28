@@ -100,6 +100,7 @@ public class PlayerMove : NetworkBehaviour
     private void SetTilePos(Vector3Int tilePosition)
     {
         _tilePosition = tilePosition;
+        PlayerPositionChange();
     }
 
     // 同步玻璃
@@ -155,5 +156,17 @@ public class PlayerMove : NetworkBehaviour
         yield return new WaitForSeconds(duration);
         _pathLineRenderer.enabled = false;
         _isMoving = false;
+    }
+
+    /// <summary>
+    /// 需要在玩家位置改变时调用
+    /// </summary>
+    public void PlayerPositionChange()
+    {
+        if(isLocalPlayer)
+        {
+            // 本地玩家更新在地图UI上的位置显示
+            MapUIManager.Instance.UpdatePlayerPositionImage(_tilePosition);
+        }
     }
 }

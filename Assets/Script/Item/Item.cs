@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Mirror;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -27,8 +24,8 @@ public class Item : NetworkBehaviour
     /// <summary>
     /// 物体耐久度，若无耐久度则为-1，有耐久度的物体耐久度归零会损坏
     /// </summary>
-    public int CurrentDurability { get; private set; } = -1;
-    public int MaxDurability { get; private set; } = -1;
+    public float CurrentDurability { get; set; } = -1;
+    public float MaxDurability { get; private set; } = -1;
     /// <summary> 
     /// 物品的网络ID
     /// </summary>
@@ -74,9 +71,14 @@ public class Item : NetworkBehaviour
         if (itemData is ArmorItemData armorItemData)
         {
             MaxDurability = armorItemData.Durability;
-        }else if (itemData is WeaponItemData weaponItemData)
+        }
+        else if (itemData is WeaponItemData weaponItemData)
         {
             MaxDurability = weaponItemData.Durability;
+        }
+        else if (itemData is MedicineItemData medicineItemData)
+        {
+            MaxDurability = medicineItemData.Durability;
         }
         CurrentDurability = MaxDurability;
     }
@@ -85,11 +87,11 @@ public class Item : NetworkBehaviour
     /// 最终执行耐久度改变的函数，若想调用请通过对应物品拥有者的playerInteractive.DecreaseDurability();
     /// </summary>
     /// <param name="count">减少的耐久度，默认为1</param>
-    public void DecreaseDurability(int count = 1)
+    public void DecreaseDurability(float count = 1)
     {
         if (CurrentDurability==-1)
             return;
-        CurrentDurability -= count;
+        CurrentDurability = (float)Math.Round(CurrentDurability - count,1);
         if (CurrentDurability<=0)
         {
             Item.Destroy(this,PlayerItemInteraction.RandomPlayer.gameObject);
