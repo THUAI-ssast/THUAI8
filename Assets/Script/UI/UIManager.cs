@@ -145,10 +145,10 @@ public class UIManager : MonoBehaviour
             ReverseBagPanel();
         }
 
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            ReverseBattlePanel();
-        }
+        // if (Input.GetKeyDown(KeyCode.B))
+        // {
+        //     ReverseBattlePanel();
+        // }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -204,26 +204,26 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void ReverseBattlePanel()
-    {
-        reverseUIActive(_battlePanel);
+    // public void ReverseBattlePanel()
+    // {
+    //     reverseUIActive(_battlePanel);
 
-        if (_battlePanel.activeSelf)
-        {
-            _isOnBattle = true;
-        }
-        else
-        {
-            _isOnBattle = false;
-        }
+    //     if (_battlePanel.activeSelf)
+    //     {
+    //         _isOnBattle = true;
+    //     }
+    //     else
+    //     {
+    //         _isOnBattle = false;
+    //     }
 
-        if (_battlePanel.activeSelf == false && ExistingOperationMenu != null)
-        {
-            Destroy(ExistingOperationMenu);
-        }
+    //     if (_battlePanel.activeSelf == false && ExistingOperationMenu != null)
+    //     {
+    //         Destroy(ExistingOperationMenu);
+    //     }
 
-        BackpackManager.Instance.RefreshArmorDisplay();
-    }
+    //     BackpackManager.Instance.RefreshArmorDisplay();
+    // }
 
     public void DestroyCurrentFollowImage()
     {

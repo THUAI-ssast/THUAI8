@@ -273,7 +273,7 @@ public class BackpackManager : MonoBehaviour
         }
 
 
-        GameObject enemy = GameObject.FindWithTag("Player");
+        GameObject enemy = null;
         if (enemy != null)
         {
             var enemyHealth = enemy.GetComponent<PlayerHealth>();

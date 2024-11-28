@@ -183,7 +183,7 @@ public class PlayerFight : NetworkBehaviour
             yield return null;
         }
         TargetUpdateInterruptUI(playerID.connectionToClient, 1, roundDuration, timer, attackerName);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(3);
         TargetInterruptUI(playerID.connectionToClient, false);
         playerID.GetComponent<PlayerFight>().TargetEnterStartFighting(playerID.connectionToClient, gameObject.GetComponent<NetworkIdentity>());
     }
