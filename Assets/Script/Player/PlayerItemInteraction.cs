@@ -76,6 +76,10 @@ public class PlayerItemInteraction : NetworkBehaviour
         ItemData itemData = Resources.Load<ItemData>(itemData_pth);
         var spriteRenderer = instance.GetComponent<SpriteRenderer>();
         spriteRenderer.enabled = false;
+        if(itemData == null)
+        {
+            Debug.Log(itemData_pth);
+        }
         spriteRenderer.sprite = itemData.ItemIcon;
         var item = instance.GetComponent<Item>();
         item.Initialize(itemData, owner, playerId);

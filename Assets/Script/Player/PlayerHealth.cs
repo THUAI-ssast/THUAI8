@@ -457,7 +457,7 @@ public class PlayerHealth : NetworkBehaviour
     /// </summary>
     /// <param name="bodyPosition">血量改变部位，需要使用(int)BodyPosition.xxx</param>
     /// <param name="healthChange">血量改变量，正数回血，负数扣血</param>
-    private void ChangeHealth(int bodyPosition, float healthChange)
+    public void ChangeHealth(int bodyPosition, float healthChange)
     {
         if (isServer)
         {

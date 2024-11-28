@@ -144,6 +144,8 @@ public class GridMoveController : MonoBehaviour
 
         if (_targetCellPosition != Vector3Int.back)
         {
+            // debug
+            Debug.Log(_targetCellPosition);
             var targetWorldPosition = _groundTilemap.CellToWorld(_targetCellPosition) + _cellBias;
             _pathSeeker.StartPath(_groundTilemap.CellToWorld(Player.TilePosition) + _cellBias, targetWorldPosition, onPathComplete);
         }
@@ -382,7 +384,7 @@ public class GridMoveController : MonoBehaviour
     /// <returns>到达目标所需要的体力值，如果返回值是0则代表使用JudgeReachable函数出错</returns>
     public float RequiredActionPoint()
     {
-        return _path != null ? ComputeRequiredActionPoint(_path) : 0;
+        return (_path != null && _path.vectorPath != null) ? ComputeRequiredActionPoint(_path) : 0;
     }
 
     /// <summary>
