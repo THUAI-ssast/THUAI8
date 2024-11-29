@@ -100,7 +100,8 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         // 左键生成 followImage
-        if (eventData.button == PointerEventData.InputButton.Left && _slotItem != null)
+        if (eventData.button == PointerEventData.InputButton.Left && gameObject.transform.IsChildOf(_battlePanel.transform) 
+            && _slotItem != null && _slotItem.ItemData is WeaponItemData)
         {
             if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Attacker &&
             GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().QueryRemainingAP() >= (_slotItem.ItemData as WeaponItemData).AttakAPCost)

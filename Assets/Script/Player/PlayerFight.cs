@@ -451,6 +451,7 @@ public class PlayerFight : NetworkBehaviour
     /// <returns></returns>
     public float QueryRemainingAP()
     {
-        return _fightingProcess.GetComponent<FightingProcess>().RoundAPRemaining;
+        float ret = _fightingProcess.GetComponent<FightingProcess>().RoundAPRemaining;
+        return ret;
     }
 }

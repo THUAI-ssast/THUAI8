@@ -46,13 +46,13 @@ public class HealthPanelEnemy : MonoBehaviour
         if (UIManager.Instance.FollowImage != null)
         {
             _localPlayer.GetComponent<PlayerHealth>().CmdAttack(_localPlayer, _enemyPlayer, (int)PlayerHealth.BodyPosition.Head, UIManager.Instance.FollowImage.gameObject);
-            UIManager.Instance.DestroyCurrentFollowImage();
             float costAP = (UIManager.Instance.FollowImage.ItemData as WeaponItemData).AttakAPCost;
             string itemName = UIManager.Instance.FollowImage.ItemData.ItemName;
             PlayerHealth enemyPlayerHealth = EnemyPlayer.GetComponent<PlayerHealth>();
             string enemyName = enemyPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Head, UIManager.Instance.FollowImage);
             string message = $"当前回合：你消耗{costAP}AP使用{itemName}攻击了{enemyName}的头部，造成了{damage}HP伤害。";
+            UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
 
             float currentAP = _localPlayer.GetComponent<PlayerActionPoint>().CurrentActionPoint;
@@ -66,13 +66,13 @@ public class HealthPanelEnemy : MonoBehaviour
         if (UIManager.Instance.FollowImage != null)
         {
             _localPlayer.GetComponent<PlayerHealth>().CmdAttack(_localPlayer, _enemyPlayer, (int)PlayerHealth.BodyPosition.MainBody, UIManager.Instance.FollowImage.gameObject);
-            UIManager.Instance.DestroyCurrentFollowImage();
             float costAP = (UIManager.Instance.FollowImage.ItemData as WeaponItemData).AttakAPCost;
             string itemName = UIManager.Instance.FollowImage.ItemData.ItemName;
             PlayerHealth enemyPlayerHealth = EnemyPlayer.GetComponent<PlayerHealth>();
             string enemyName = enemyPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.MainBody, UIManager.Instance.FollowImage);
             string message = $"当前回合：你消耗{costAP}AP使用{itemName}攻击了{enemyName}的躯干，造成了{damage}HP伤害。";
+            UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
 
             float currentAP = _localPlayer.GetComponent<PlayerActionPoint>().CurrentActionPoint;
@@ -86,13 +86,13 @@ public class HealthPanelEnemy : MonoBehaviour
         if (UIManager.Instance.FollowImage != null)
         {
             _localPlayer.GetComponent<PlayerHealth>().CmdAttack(_localPlayer, _enemyPlayer, (int)PlayerHealth.BodyPosition.Legs, UIManager.Instance.FollowImage.gameObject);
-            UIManager.Instance.DestroyCurrentFollowImage();
             float costAP = (UIManager.Instance.FollowImage.ItemData as WeaponItemData).AttakAPCost;
             string itemName = UIManager.Instance.FollowImage.ItemData.ItemName;
             PlayerHealth enemyPlayerHealth = EnemyPlayer.GetComponent<PlayerHealth>();
             string enemyName = enemyPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Legs, UIManager.Instance.FollowImage);
             string message = $"当前回合：你消耗{costAP}AP使用{itemName}攻击了{enemyName}的腿部，造成了{damage}HP伤害。";
+            UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
 
             float currentAP = _localPlayer.GetComponent<PlayerActionPoint>().CurrentActionPoint;
