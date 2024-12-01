@@ -112,17 +112,26 @@ public class UIManager : MonoBehaviour
         _battlePanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
             {
-                _backButton = _battlePanel.transform.GetChild(9).GetComponent<Button>();
+                _backButton = _battlePanel.transform.Find("BackButton").GetComponent<Button>();
                 _battleUIImage = _battlePanel.GetComponent<Image>();
                 // 遍历 _battleUI 中的所有子物体
                 foreach (Transform child in _battlePanel.transform)
                 {
+                    if(child.name == "InterruptedMessagePanel")
+                    {
+                        if(!FightingProcessManager.Instance.transform.GetChild(0).GetComponent<FightingProcess>().FightingInterrupted)
+                        {
+                            continue;
+                        }
+                    }
                     if (child != _backButton.transform) // 排除 _backButton
                     {
                         child.gameObject.SetActive(true); // 显示其他 UI 元素
                     }
                 }
                 _backButton.gameObject.SetActive(false);
+                GameObject.Find("Canvas").transform.Find("PlayerInfoPanel").gameObject.SetActive(true); // 显示玩家信息面板
+                GameObject.Find("Canvas").transform.Find("Round").gameObject.SetActive(true); // 显示回合信息面板
 
                 if (_battleUIImage != null)
                 {
@@ -159,10 +168,10 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            ReverseBattlePanel();
-        }
+        // if (Input.GetKeyDown(KeyCode.B))
+        // {
+        //     ReverseBattlePanel();
+        // }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -222,30 +231,26 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void ReverseBattlePanel()
-    {
-        reverseUIActive(_battlePanel);
+    // public void ReverseBattlePanel()
+    // {
+    //     reverseUIActive(_battlePanel);
 
-        if (_battlePanel.activeSelf)
-        {
-            _isOnBattle = true;
-        }
-        else
-        {
-            _isOnBattle = false;
-        }
+    //     if (_battlePanel.activeSelf)
+    //     {
+    //         _isOnBattle = true;
+    //     }
+    //     else
+    //     {
+    //         _isOnBattle = false;
+    //     }
 
-        if (_battlePanel.activeSelf == false && ExistingOperationMenu != null)
-        {
-            Destroy(ExistingOperationMenu);
-        }
-        if (_battlePanel.activeSelf == false && ExistingBodyPositionMenu != null)
-        {
-            Destroy(ExistingBodyPositionMenu);
-        }
+    //     if (_battlePanel.activeSelf == false && ExistingOperationMenu != null)
+    //     {
+    //         Destroy(ExistingOperationMenu);
+    //     }
 
-        BackpackManager.Instance.RefreshArmorDisplay();
-    }
+    //     BackpackManager.Instance.RefreshArmorDisplay();
+    // }
 
     public void DestroyCurrentFollowImage()
     {

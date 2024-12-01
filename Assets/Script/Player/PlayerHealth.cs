@@ -253,15 +253,21 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _headMaxHealth, BodyPart.Head);
             BackpackManager.Instance.HeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{_headHealth}/{HeadMaxHealth}";
-            BackpackManager.Instance.BattleHeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
-                $"{_headHealth}/{HeadMaxHealth}";
+            
         }
-        else if (gameObject == HealthPanelEnemy.Instance.EnemyPlayer.gameObject)
+        if(UIManager.Instance.BattlePanel.activeSelf)
         {
-            BackpackManager.Instance.BattleHeadHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
-                $"{HeadHealth}/{HeadMaxHealth}";
+            if (isLocalPlayer)
+            {
+                BackpackManager.Instance.BattleHeadHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                $"{_headHealth}/{HeadMaxHealth}";
+            }
+            else if (gameObject == HealthPanelEnemy.Instance.EnemyPlayer.gameObject)
+            {
+                BackpackManager.Instance.BattleHeadHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                    $"{HeadHealth}/{HeadMaxHealth}";
+            }
         }
-        BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     /// <summary>
@@ -278,15 +284,20 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _bodyMaxHealth, BodyPart.Body);
             BackpackManager.Instance.BodyHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{_bodyHealth}/{BodyMaxHealth}";
-            BackpackManager.Instance.BattleBodyHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
-                $"{_bodyHealth}/{BodyMaxHealth}";
         }
-        else if (gameObject == HealthPanelEnemy.Instance.EnemyPlayer.gameObject)
+        if(UIManager.Instance.BattlePanel.activeSelf)
         {
-            BackpackManager.Instance.BattleBodyHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
+            if (isLocalPlayer)
+            {   
+                BackpackManager.Instance.BattleBodyHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{BodyHealth}/{BodyMaxHealth}";
+            }
+            else if (gameObject == HealthPanelEnemy.Instance.EnemyPlayer.gameObject)
+            {
+                BackpackManager.Instance.BattleBodyHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                    $"{BodyHealth}/{BodyMaxHealth}";
+            }
         }
-        BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     /// <summary>
@@ -303,15 +314,21 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(newHealth, _legMaxHealth, BodyPart.Leg);
             BackpackManager.Instance.LegsHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
                 $"{_legHealth}/{LegMaxHealth}";
-            BackpackManager.Instance.BattleLegsHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
-                $"{_legHealth}/{LegMaxHealth}";
+            
         }
-        else if (gameObject == HealthPanelEnemy.Instance.EnemyPlayer.gameObject)
+        if(UIManager.Instance.BattlePanel.activeSelf)
         {
-            BackpackManager.Instance.BattleLegsHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
-                $"{LegHealth}/{LegMaxHealth}";
+            if (isLocalPlayer)
+            {
+                BackpackManager.Instance.BattleLegsHealthPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                    $"{_legHealth}/{LegMaxHealth}";
+            }
+            else if (gameObject == HealthPanelEnemy.Instance.EnemyPlayer.gameObject)
+            {
+                BackpackManager.Instance.BattleLegsHealthEnemyPanel.GetChild(0).GetComponent<TMP_Text>().text =
+                    $"{LegHealth}/{LegMaxHealth}";
+            }
         }
-        BackpackManager.Instance.RefreshArmorDisplay();
     }
 
     /// <summary>
@@ -501,6 +518,7 @@ public class PlayerHealth : NetworkBehaviour
         {
             NetworkIdentity networkIdentity = GetComponent<NetworkIdentity>();
             TargetCreateRP();
+            TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient);
         }
     }
 
@@ -557,5 +575,13 @@ public class PlayerHealth : NetworkBehaviour
             resourcePointController.AddItemToResourcePoint(item);
         }
     }
-
+    
+    [TargetRpc]
+    public void TargetPlayerDie(NetworkConnection conn)
+    {
+        if(gameObject.GetComponent<PlayerFight>().IsFighting)
+        {
+            gameObject.GetComponent<PlayerFight>().CmdDead();
+        }
+    }
 }

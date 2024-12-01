@@ -338,6 +338,10 @@ public class GridMoveController : MonoBehaviour
         graph.is2D = true;
         _pathBaker.Scan();
     }
+    public void ToggleMovementState(bool state)
+    {
+        _isMovable = state;
+    }
 
     /// <summary>
     /// 判断某个tile位置是否可达。

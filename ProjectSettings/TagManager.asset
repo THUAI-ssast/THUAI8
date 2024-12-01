@@ -6,6 +6,7 @@ TagManager:
   tags:
   - LocalPlayer
   - ResourceUIItem
+  - LocalPlayerAttackRange
   layers:
   - Default
   - TransparentFX

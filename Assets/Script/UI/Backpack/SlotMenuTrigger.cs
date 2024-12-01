@@ -1,7 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+
+using Mirror;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -101,21 +100,25 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         // 左键生成 followImage
-        if (eventData.button == PointerEventData.InputButton.Left && _slotItem != null)
+        if (eventData.button == PointerEventData.InputButton.Left && gameObject.transform.IsChildOf(_battlePanel.transform) 
+            && _slotItem != null && _slotItem.ItemData is WeaponItemData)
         {
-            if (_followImage != null)
+            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Attacker &&
+            GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().QueryRemainingAP() >= (_slotItem.ItemData as WeaponItemData).AttakAPCost)
             {
-                DestroyFollowImage();
-                UIManager.Instance.FollowImage = null;
+                if (_followImage != null)
+                {
+                    DestroyFollowImage();
+                    UIManager.Instance.FollowImage = null;
+                }
+                UIManager.Instance.CurrentSlotMenuTrigger = this; // 注册当前实例
+
+                Image itemImage = transform.GetChild(0).GetComponent<Image>(); // 获取当前slot中item的Image
+                _followImage = Instantiate(itemImage, _battlePanel.transform);  // 在battlePanel上创建跟随Image
+                _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
+                _followImage.raycastTarget = false; // 设置为不可交互
+                UIManager.Instance.FollowImage = _slotItem;
             }
-            UIManager.Instance.CurrentSlotMenuTrigger = this; // 注册当前实例
-
-            Image itemImage = transform.GetChild(0).GetComponent<Image>(); // 获取当前slot中item的Image
-            _followImage = Instantiate(itemImage, _battlePanel.transform);  // 在battlePanel上创建跟随Image
-            _followImage.rectTransform.pivot = new Vector3(0.5f, 0.5f, 0); // 设置锚点为中心
-            _followImage.raycastTarget = false; // 设置为不可交互
-
-            UIManager.Instance.FollowImage = _slotItem;
         }
 
         // 右键生成操作菜单

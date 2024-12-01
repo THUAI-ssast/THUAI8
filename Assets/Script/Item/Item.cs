@@ -89,7 +89,7 @@ public class Item : NetworkBehaviour
     /// <param name="count">减少的耐久度，默认为1</param>
     public void DecreaseDurability(float count = 1)
     {
-        if (CurrentDurability==-1)
+        if (MaxDurability == -1)
             return;
         CurrentDurability = (float)Math.Round(CurrentDurability - count,1);
         if (CurrentDurability<=0)
