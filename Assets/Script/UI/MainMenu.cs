@@ -68,6 +68,12 @@ public class MainMenu : MonoBehaviour
         }
         matchingCoroutine = StartCoroutine(StartMatching());
     }
+
+    public void StartTutorial()
+    {
+        StartGame();
+    }
+
     IEnumerator StartMatching()
     {
         while (playerCount < playerCountLimit)

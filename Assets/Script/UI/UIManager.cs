@@ -156,7 +156,7 @@ public class UIManager : MonoBehaviour
             ReversePanel(_bagPanel);
         }
         
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.M)||Input.GetKeyDown(KeyCode.Tab))
         {
             if(MapUIManager.Instance.IsDisplayBigMap)
             {
