@@ -449,14 +449,14 @@ MonoBehaviour:
   syncInterval: 0
   _serializedProbilityDictionary:
     _pairs:
-    - _key: {fileID: 11400000, guid: 91e31e7232da77d4eb3aafa2e8748bcb, type: 2}
-      _value: 0.4
     - _key: {fileID: 11400000, guid: c20005d58db72f14bb0be192c789233d, type: 2}
       _value: 1
+    - _key: {fileID: 11400000, guid: 91e31e7232da77d4eb3aafa2e8748bcb, type: 2}
+      _value: 0.8
     - _key: {fileID: 11400000, guid: 8d5ba779e561f634a91d1ba65cd6f822, type: 2}
-      _value: 0.4
+      _value: 0.6
     - _key: {fileID: 11400000, guid: 77d8637209286ff48a9db9b9d2bab5fb, type: 2}
-      _value: 0.3
+      _value: 0.4
 --- !u!212 &-2984335712045174694
 SpriteRenderer:
   m_ObjectHideFlags: 0
