@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class PlayerFight : NetworkBehaviour
 {
     /// <summary>
-    /// 是否正在战斗，服务端改变，向客户端同步。
+    /// 是否正在战斗，服务端改变，向所有客户端同步。
     /// </summary>
     [SyncVar] public bool IsFighting;
 
@@ -32,9 +32,11 @@ public class PlayerFight : NetworkBehaviour
     GameObject _selectedUI;
 
     /// <summary>
-    /// 存储开始战斗后生成的战斗流程GameObject，在客户端和服务端都有改变，但无同步。
+    /// 存储开始战斗后生成的战斗流程GameObject，在战斗的客户端和服务端有存储，无同步。
+    /// 战斗结束后，销毁。
     /// </summary>
     GameObject _fightingProcess;
+    public GameObject FightingProcess => _fightingProcess;
 
     /// <summary>
     /// 定位打断战斗后等待战斗的UI。
