@@ -1,7 +1,9 @@
 using System;
 using Mirror;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
+using static PlayerHealth;
 
 /// <summary>
 /// 物品类，表示一个物品，挂载在物品的GameObject上。
@@ -71,14 +73,47 @@ public class Item : NetworkBehaviour
         if (itemData is ArmorItemData armorItemData)
         {
             MaxDurability = armorItemData.Durability;
+            ItemData.ItemDesc = $"防具：装备部位:{BodyToChinese[armorItemData.EquipBodyPosition]}\n";
+            foreach (WeaponItemData.DamageType damageType in Enum.GetValues(typeof(WeaponItemData.DamageType)))
+            {
+                if (armorItemData.DamageTypeDictionary.ContainsKey(damageType))
+                {
+                    float damageMult = armorItemData.DamageTypeDictionary.Get(damageType);
+                    ItemData.ItemDesc += $"{WeaponItemData.DamageTypeToChinese[damageType]}：({damageMult})倍\n";
+                }
+            }
         }
         else if (itemData is WeaponItemData weaponItemData)
         {
             MaxDurability = weaponItemData.Durability;
+            ItemData.ItemDesc = $"武器：AP消耗({weaponItemData.AttakAPCost})\n" +
+                                $"({WeaponItemData.DamageTypeToChinese[weaponItemData.AttackDamageType]})伤害" +
+                                $"({weaponItemData.BasicDamage})HP\n";
+            foreach (BodyPosition bodyPosition in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+            {
+                if (weaponItemData.BodyDamageDictionary.ContainsKey(bodyPosition))
+                {
+                    float damageMult = weaponItemData.BodyDamageDictionary.Get(bodyPosition);
+                    ItemData.ItemDesc += $"{BodyToChinese[bodyPosition]}：({damageMult}倍)\n";
+                }
+                else
+                {
+                    ItemData.ItemDesc += $"{BodyToChinese[bodyPosition]}：{1}倍\n";
+                }
+            }
         }
         else if (itemData is MedicineItemData medicineItemData)
         {
             MaxDurability = medicineItemData.Durability;
+            ItemData.ItemDesc = $"药品："+ (itemData.ItemName == "止痛药" || itemData.ItemName == "肾上腺素" ? "全身回复\n" : "选择部位回复\n");
+            foreach (BodyPosition bodyPosition in Enum.GetValues(typeof(PlayerHealth.BodyPosition)))
+            {
+                if (medicineItemData.BodyHealDictionary.ContainsKey(bodyPosition))
+                {
+                    float healHP = medicineItemData.BodyHealDictionary.Get(bodyPosition);
+                    ItemData.ItemDesc += $"用于{BodyToChinese[bodyPosition]}：({healHP})HP\n";
+                }
+            }
         }
         CurrentDurability = MaxDurability;
     }
