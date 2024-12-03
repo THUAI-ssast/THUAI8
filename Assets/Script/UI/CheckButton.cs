@@ -27,7 +27,7 @@ public class CheckButton : MonoBehaviour
         
         button = GetComponent<Button>();
         buttonText = GetComponentInChildren<TextMeshProUGUI>();
-        buttonText.text = $"Cost {ResourcePoint.GetComponent<ResourcePointController>().RequiredActionPoint} AP to Check";
+        buttonText.text = $"ÏûºÄ {ResourcePoint.GetComponent<ResourcePointController>().RequiredActionPoint} APËÑ¹Î";
         _slots = transform.parent.GetChild(0).GetChild(0).GetChild(0).gameObject;
         _searchIcon = transform.parent.GetChild(2);
         _slots.SetActive(false);
