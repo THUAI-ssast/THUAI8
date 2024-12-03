@@ -10,7 +10,7 @@ using UnityEngine.Rendering.Universal;
 public class PlayerMove : NetworkBehaviour
 {
     private LineRenderer _pathLineRenderer;
-    private bool _isMoving;
+    public bool _isMoving;
     private Transform _spriteDisplay;
 
     [SyncVar] private Vector3Int _tilePosition; // 用于同步的字段

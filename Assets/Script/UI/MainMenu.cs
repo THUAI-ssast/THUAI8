@@ -9,14 +9,33 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Mirror.Examples.TopDownShooter;
 using Unity.VisualScripting;
+using System;
 
 public class MainMenu : MonoBehaviour
 {
     public static MainMenu Instance;
-    public NetPlayer Player;
+    private NetPlayer _player;
+
+    // 定义一个事件，当 Player 被赋值时触发
+    public event Action<NetPlayer> OnPlayerAssigned;
+    public NetPlayer Player
+    {
+        get => _player;
+        set
+        {
+            // 只有当值发生变化时才触发事件
+            if (_player != value)
+            {
+                _player = value;
+                OnPlayerAssigned?.Invoke(_player); // 触发事件
+                OnPlayerAssigned = null;
+            }
+        }
+    }
     [SerializeField] private  GameObject loadingPanel;
     [SerializeField] private  TextMeshProUGUI matchingText;
     [SerializeField] private TextMeshProUGUI playerNameText;
+    private RoomManager _roomManager;
     private int playerCount 
     { 
         get 
@@ -38,6 +57,7 @@ public class MainMenu : MonoBehaviour
     public void Start()
     {
         Instance = this;
+        _roomManager = GameObject.Find("RoomManager").GetComponent<RoomManager>();
         loadingPanel.SetActive(false);
     }
 
@@ -60,7 +80,8 @@ public class MainMenu : MonoBehaviour
  
     }
     public void StartGame()
-    {   
+    {
+        _roomManager.GameplayScene = "BattleScene";
         loadingPanel.SetActive(true);
         if (Player != null)
         {
@@ -71,7 +92,10 @@ public class MainMenu : MonoBehaviour
 
     public void StartTutorial()
     {
-        StartGame();
+        _roomManager.GameplayScene = "TutorialScene";
+        //TODO:改端口号
+        _roomManager.StartHost();
+        OnPlayerAssigned += player => { player.StartMatching(playerNameText.text);};
     }
 
     IEnumerator StartMatching()
