@@ -32,6 +32,10 @@ public class PlayerMove : NetworkBehaviour
         _playerSound = GetComponent<PlayerSound>();
         if (this.isLocalPlayer)
         {
+            var tempposition = transform.position;
+            tempposition.x += 1.5f;
+            tempposition.y += 2.5f;
+            transform.position = tempposition;
             GridMoveController.Instance.InitLocalPlayer(this);
             tag = "LocalPlayer";
         }
@@ -40,7 +44,6 @@ public class PlayerMove : NetworkBehaviour
             GetComponentInChildren<Light2D>().enabled = false;
         }
     }
-
 
     public bool SetPosition(Vector3 worldPosition, Vector3Int tilePosition)
     {
