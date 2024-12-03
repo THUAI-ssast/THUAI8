@@ -15,7 +15,7 @@ public class PlayerBorn : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void ChangeGridCellColor(int oldIndex, int newIndex) // 还需要把别人的旧的currentredcell的显示给同步修改掉，但是不修改其currentredcell
+    public void ChangeGridCellColor(int oldIndex, int newIndex)
     {
         if (oldIndex >= 0)
         {
@@ -24,16 +24,6 @@ public class PlayerBorn : NetworkBehaviour
             oldCellComponent.PlayerAmount -= 1;
             UpdateCellDisplay(oldCell, oldCellComponent.PlayerAmount);
         }
-
-        //if (BornUIManager.Instance.CurrentRedCell != null)
-        //{
-        //    GameObject oldCell = BornUIManager.Instance.CurrentRedCell;
-        //    GridCell oldCellComponent = oldCell.GetComponent<GridCell>();
-
-        //    oldCellComponent.PlayerAmount -= 1;
-
-        //    UpdateCellDisplay(oldCell, oldCellComponent.PlayerAmount);
-        //}
 
         GameObject clickedCell = BornUIManager.Instance.GridCells[newIndex];
         GridCell gridCellComponent = clickedCell.GetComponent<GridCell>();
@@ -53,7 +43,8 @@ public class PlayerBorn : NetworkBehaviour
         if (amount > 0)
         {
             // 显示红色背景和文本
-            cellImage.color = Color.red;
+            if (cell != BornUIManager.Instance.CurrentRedCell)
+                cellImage.color = Color.red;
             textComponent.gameObject.SetActive(true);
             textComponent.text = amount.ToString();
         }
@@ -73,6 +64,24 @@ public class PlayerBorn : NetworkBehaviour
     [TargetRpc]
     public void TargetChangeCurrentRedCell(NetworkConnection target, int index)
     {
+        if (BornUIManager.Instance.CurrentRedCell != null)
+        {
+            GameObject currentCell = BornUIManager.Instance.CurrentRedCell;
+            Image oldCellImage = currentCell.GetComponent<Image>();
+            TextMeshProUGUI oldTextComponent = currentCell.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+            if (currentCell.GetComponent<GridCell>().PlayerAmount > 0)
+                oldCellImage.color = Color.red;
+            else
+            {
+                Color currentColor = Color.white;
+                currentColor.a = 100f / 255f;
+                oldCellImage.color = currentColor;
+                oldTextComponent.gameObject.SetActive(false);
+            }
+        }
         BornUIManager.Instance.CurrentRedCell = BornUIManager.Instance.GridCells[index];
+        GameObject clickedCell = BornUIManager.Instance.CurrentRedCell;
+        Image cellImage = clickedCell.GetComponent<Image>();
+        cellImage.color = Color.blue;
     }
 }
