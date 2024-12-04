@@ -5,13 +5,27 @@ using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 using System;
+using UnityEngine.UIElements;
+using Pathfinding;
 
 public class BornUIManager : NetworkBehaviour
 {
     public static BornUIManager Instance;
 
+    public float delayTime;
+
+    private Vector3Int _bornPos;
+
+    //public Vector3Int BornPos
+    //{
+    //    get => _bornPos;
+    //}
+
+    private PlayerMove _playerMove;
+
     private GameObject _mapPanel;
     private GameObject _bigMapPanel;
+    private GameObject _blockerPanel;
     public GameObject GridCellPrefab;
     public int Rows;
     public int Columns;
@@ -46,15 +60,39 @@ public class BornUIManager : NetworkBehaviour
     {
         _mapPanel = UIManager.Instance.MainCanvas.transform.Find("BornMapPanel").gameObject;
         _bigMapPanel = _mapPanel.transform.Find("BigMapImage").gameObject;
+        _blockerPanel = UIManager.Instance.MainCanvas.transform.Find("BlockerPanel").gameObject;
+
+        UIManager.Instance.ActiveUIList.Add(_bigMapPanel);
 
         GenerateGrid();
+
+        StartCoroutine(CloseAfterDelay());
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (_bigMapPanel.activeSelf && Input.GetMouseButtonDown(0))
         {
             HandleClick();
+        }
+    }
+
+    IEnumerator CloseAfterDelay()
+    {
+        yield return new WaitForSeconds(delayTime);
+        Debug.Log("----------------");
+        Debug.Log(GameObject.FindWithTag("LocalPlayer"));
+        Debug.Log(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerMove>());
+        _playerMove = GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerMove>();
+        if (_bigMapPanel != null)
+        {
+            _bigMapPanel.SetActive(false);
+            _blockerPanel.SetActive(false);
+            UIManager.Instance.ActiveUIList.Remove(_bigMapPanel);
+
+            var tilePosition = GridMoveController.Instance.GroundTilemap.WorldToCell(_bornPos);
+            _playerMove.transform.position = _bornPos;
+            _playerMove.CmdSetPosition(_bornPos, tilePosition, null);
         }
     }
 
@@ -108,10 +146,10 @@ public class BornUIManager : NetworkBehaviour
         );
 
         // 根据格子中心位置计算 tilePos
-        Vector3Int tilePos = MapUIManager.Instance.ImagePosToTilePos(cellCenterPos);
+        _bornPos = MapUIManager.Instance.ImagePosToTilePos(cellCenterPos);
 
         // 输出计算的 tilePos
-        Debug.Log($"Tile position for clicked cell center: {tilePos}");
+        Debug.Log($"Tile position for clicked cell center: {_bornPos}");
 
         int newIndex = clickedRow * Columns + clickedColumn;
 

@@ -21,6 +21,19 @@ public class GridMoveController : MonoBehaviour
     private Seeker _pathSeeker;
     private AstarPath _pathBaker;
 
+    public Seeker PathSeeker
+    {
+        get => _pathSeeker;
+        set => _pathSeeker = value;
+    }
+
+    public AstarPath PathBaker
+    {
+        get => _pathBaker;
+        set => _pathBaker = value;
+    }
+
+
     // 所用Tilemaps
     private Tilemap _groundTilemap;
     private Tilemap _wallTilemap;
@@ -39,6 +52,12 @@ public class GridMoveController : MonoBehaviour
     private Vector3 _cellBias;
 
     private Vector3Int? _lastAdjacentDoor; // 相邻门的位置
+
+    public Tilemap GroundTilemap
+    {
+        get => _groundTilemap;
+        private set => _groundTilemap = value;
+    }
 
     public Tilemap FurnitureTilemap
     {
@@ -108,7 +127,7 @@ public class GridMoveController : MonoBehaviour
         var finderObj = Instantiate(Resources.Load<GameObject>(("PathFinder")), Player.transform);
         _pathBaker = finderObj.GetComponent<AstarPath>();
         _pathSeeker = finderObj.GetComponent<Seeker>();
-        updateGraph();
+        UpdateGraph();
         _gridLine.position = position + new Vector3(0.5f, 0.5f);
     }
 
@@ -237,7 +256,7 @@ public class GridMoveController : MonoBehaviour
 
                 StartCoroutine(Player.drawPathLine(pathArray, duration)); // 绘制路径
                 // 调用网络同步方法,改变位置并生成对应动画
-                Player.SetPosition(targetWorldPosition, _targetCellPosition, pathArray);
+                Player.CmdSetPosition(targetWorldPosition, _targetCellPosition, pathArray);
                 StartCoroutine(setMoveCD(duration));
 
                 //移动消耗体力
@@ -325,15 +344,16 @@ public class GridMoveController : MonoBehaviour
         yield return new WaitForSeconds(cd);
         _gridLine.position = Player.transform.position + new Vector3(0.5f, 0.5f);
         _isMovable = true;
-        updateGraph();
+        UpdateGraph();
     }
 
     /// <summary>
     /// 更新用于寻路的graph位置到玩家处，并重新扫描附近障碍。
     /// </summary>
-    private void updateGraph()
+    public void UpdateGraph()
     {
         var graph = _pathBaker.data.gridGraph;
+        Debug.Log(Player.TilePosition);
         graph.RelocateNodes(_groundTilemap.WorldToCell(Player.TilePosition), Quaternion.identity, 1);
         graph.is2D = true;
         _pathBaker.Scan();
