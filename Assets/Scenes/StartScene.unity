@@ -497,7 +497,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0db93201b9738f44a58550076a200e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 0}
   loadingPanel: {fileID: 122337429}
   matchingText: {fileID: 338229181}
   playerNameText: {fileID: 341151051}
@@ -1032,7 +1031,7 @@ MonoBehaviour:
   minPlayers: 1
   roomPlayerPrefab: {fileID: 9146896800030117036, guid: ecaa81a92e68d33499de74dbaf33c88f, type: 3}
   RoomScene: Assets/Scenes/StartScene.unity
-  GameplayScene: Assets/Scenes/TutorialScene.unity
+  GameplayScene: Assets/Scenes/BattleScene.unity
   _allPlayersReady: 0
   clientIndex: 0
 --- !u!114 &461385728
