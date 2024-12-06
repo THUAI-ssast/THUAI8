@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: "\u94C1\u94FE"
   m_EditorClassIdentifier: 
   ItemName: "\u94C1\u94FE"
-  ItemIcon: {fileID: 21300000, guid: 41fa272bb4c794b4e83336651da1b36e, type: 3}
+  ItemIcon: {fileID: 21300000, guid: 565746be64d134446bf34478e868a262, type: 3}
   ItemDesc: 
   ItemType: 0
   ItemValue: 0
