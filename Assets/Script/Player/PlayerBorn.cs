@@ -17,7 +17,7 @@ public class PlayerBorn : NetworkBehaviour
     [ClientRpc]
     public void ChangeGridCellColor(int oldIndex, int newIndex)
     {
-        if (oldIndex >= 0)
+        if (oldIndex >= 0 && BornUIManager.Instance.GridCells[oldIndex] != null)
         {
             GameObject oldCell = BornUIManager.Instance.GridCells[oldIndex];
             GridCell oldCellComponent = oldCell.GetComponent<GridCell>();
@@ -25,14 +25,17 @@ public class PlayerBorn : NetworkBehaviour
             UpdateCellDisplay(oldCell, oldCellComponent.PlayerAmount);
         }
 
-        GameObject clickedCell = BornUIManager.Instance.GridCells[newIndex];
-        GridCell gridCellComponent = clickedCell.GetComponent<GridCell>();
+        if (BornUIManager.Instance.GridCells[newIndex] != null)
+        {
+            GameObject clickedCell = BornUIManager.Instance.GridCells[newIndex];
+            GridCell gridCellComponent = clickedCell.GetComponent<GridCell>();
 
-        // 更新 PlayerAmount
-        gridCellComponent.PlayerAmount += 1;
+            // 更新 PlayerAmount
+            gridCellComponent.PlayerAmount += 1;
 
-        // 更新当前客户端的显示状态
-        UpdateCellDisplay(clickedCell, gridCellComponent.PlayerAmount);
+            // 更新当前客户端的显示状态
+            UpdateCellDisplay(clickedCell, gridCellComponent.PlayerAmount);
+        }
     }
 
     private void UpdateCellDisplay(GameObject cell, int amount)
@@ -43,7 +46,7 @@ public class PlayerBorn : NetworkBehaviour
         if (amount > 0)
         {
             // 显示红色背景和文本
-            if (cell != BornUIManager.Instance.CurrentRedCell)
+            if (cell != BornUIManager.Instance.CurrentSelectedCell)
                 cellImage.color = Color.red;
             textComponent.gameObject.SetActive(true);
             textComponent.text = amount.ToString();
@@ -64,9 +67,9 @@ public class PlayerBorn : NetworkBehaviour
     [TargetRpc]
     public void TargetChangeCurrentRedCell(NetworkConnection target, int index)
     {
-        if (BornUIManager.Instance.CurrentRedCell != null)
+        if (BornUIManager.Instance.CurrentSelectedCell != null)
         {
-            GameObject currentCell = BornUIManager.Instance.CurrentRedCell;
+            GameObject currentCell = BornUIManager.Instance.CurrentSelectedCell;
             Image oldCellImage = currentCell.GetComponent<Image>();
             TextMeshProUGUI oldTextComponent = currentCell.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
             if (currentCell.GetComponent<GridCell>().PlayerAmount > 0)
@@ -79,9 +82,17 @@ public class PlayerBorn : NetworkBehaviour
                 oldTextComponent.gameObject.SetActive(false);
             }
         }
-        BornUIManager.Instance.CurrentRedCell = BornUIManager.Instance.GridCells[index];
-        GameObject clickedCell = BornUIManager.Instance.CurrentRedCell;
-        Image cellImage = clickedCell.GetComponent<Image>();
-        cellImage.color = Color.blue;
+
+        if (index >= 0 && BornUIManager.Instance.GridCells[index] != null)
+        {
+            BornUIManager.Instance.CurrentSelectedCell = BornUIManager.Instance.GridCells[index];
+            GameObject clickedCell = BornUIManager.Instance.CurrentSelectedCell;
+            Image cellImage = clickedCell.GetComponent<Image>();
+            cellImage.color = Color.blue;
+        }
+        else
+        {
+            Debug.LogWarning($"TargetChangeCurrentRedCell: GridCells[{index}] is null, skipping update.");
+        }
     }
 }

@@ -31,12 +31,12 @@ public class BornUIManager : NetworkBehaviour
     public int Columns;
 
     private List<GameObject> _gridCells = new List<GameObject>();
-    private GameObject _currentRedCell;
+    private GameObject _currentSelectedCell;
 
-    public GameObject CurrentRedCell
+    public GameObject CurrentSelectedCell
     {
-        get => _currentRedCell;
-        set => _currentRedCell = value;
+        get => _currentSelectedCell;
+        set => _currentSelectedCell = value;
     }
 
     public List<GameObject> GridCells
@@ -80,9 +80,6 @@ public class BornUIManager : NetworkBehaviour
     IEnumerator CloseAfterDelay()
     {
         yield return new WaitForSeconds(delayTime);
-        Debug.Log("----------------");
-        Debug.Log(GameObject.FindWithTag("LocalPlayer"));
-        Debug.Log(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerMove>());
         _playerMove = GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerMove>();
         if (_bigMapPanel != null)
         {
@@ -102,11 +99,21 @@ public class BornUIManager : NetworkBehaviour
         float cellWidth = bigMapRect.rect.width / Columns;
         float cellHeight = bigMapRect.rect.height / Rows;
 
-        // 创建小方格
+        // 初始化网格为null
+        _gridCells = new List<GameObject>(new GameObject[Rows * Columns]);
+
         for (int i = 0; i < Rows; i++)
         {
             for (int j = 0; j < Columns; j++)
             {
+                // 判断是否是海洋区域
+                if (i == 0 || i == Rows - 1 || j < 2 || j >= Columns - 2)
+                {
+                    // 海洋区域对应的格子设置为null
+                    _gridCells[i * Columns + j] = null;
+                    continue;
+                }
+
                 GameObject gridCell = Instantiate(GridCellPrefab, _bigMapPanel.transform);
                 RectTransform cellRect = gridCell.GetComponent<RectTransform>();
 
@@ -117,10 +124,12 @@ public class BornUIManager : NetworkBehaviour
                 cellRect.localPosition = new Vector2(xPos, yPos);
                 cellRect.sizeDelta = new Vector2(cellWidth, cellHeight); // 设置小方格的大小
 
-                _gridCells.Add(gridCell);
+                // 保存格子
+                _gridCells[i * Columns + j] = gridCell;
             }
         }
     }
+
 
     private void HandleClick()
     {
@@ -140,13 +149,22 @@ public class BornUIManager : NetworkBehaviour
         int clickedColumn = Mathf.FloorToInt((localPos.x + bigMapRect.rect.width / 2) / cellWidth);
         int clickedRow = Mathf.FloorToInt((localPos.y + bigMapRect.rect.height / 2) / cellHeight);
 
-        Vector2 cellCenterPos = new Vector2(
-        (clickedColumn + 0.5f) * cellWidth - bigMapRect.rect.width / 2,
-        (clickedRow + 0.5f) * cellHeight - bigMapRect.rect.height / 2
+        Vector2 cellBottomLeftPos = new Vector2(
+        clickedColumn * cellWidth - bigMapRect.rect.width / 2,
+        clickedRow * cellHeight - bigMapRect.rect.height / 2
         );
 
-        // 根据格子中心位置计算 tilePos
-        _bornPos = MapUIManager.Instance.ImagePosToTilePos(cellCenterPos);
+        while (true)
+        {
+            float randomOffsetX = UnityEngine.Random.Range(0, cellWidth);
+            float randomOffsetY = UnityEngine.Random.Range(0, cellHeight);
+            Vector2 randomPosInCell = cellBottomLeftPos + new Vector2(randomOffsetX, randomOffsetY);
+            _bornPos = MapUIManager.Instance.ImagePosToTilePos(randomPosInCell);
+            if (!GridMoveController.Instance.WallTilemap.HasTile(_bornPos)
+                && !GridMoveController.Instance.GlassTilemap.HasTile(_bornPos)
+                && !GridMoveController.Instance.FurnitureTilemap.HasTile(_bornPos))
+                break;
+        }
 
         // 输出计算的 tilePos
         Debug.Log($"Tile position for clicked cell center: {_bornPos}");
@@ -157,9 +175,9 @@ public class BornUIManager : NetworkBehaviour
         {
             int oldIndex = -1;
 
-            if (_currentRedCell != null)
+            if (_currentSelectedCell != null)
             {
-                oldIndex = _gridCells.IndexOf(_currentRedCell);
+                oldIndex = _gridCells.IndexOf(_currentSelectedCell);
             }
 
             GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerBorn>().CmdHandleCellClick(oldIndex, newIndex);

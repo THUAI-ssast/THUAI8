@@ -59,6 +59,18 @@ public class GridMoveController : MonoBehaviour
         private set => _groundTilemap = value;
     }
 
+    public Tilemap WallTilemap
+    {
+        get => _wallTilemap;
+        private set => _wallTilemap = value;
+    }
+
+    public Tilemap GlassTilemap
+    {
+        get => _glassTilemap;
+        private set => _glassTilemap = value;
+    }
+
     public Tilemap FurnitureTilemap
     {
         get => _furnitureTilemap;
@@ -344,7 +356,6 @@ public class GridMoveController : MonoBehaviour
         yield return new WaitForSeconds(cd);
         _gridLine.position = Player.transform.position + new Vector3(0.5f, 0.5f);
         _isMovable = true;
-        UpdateGraph();
     }
 
     /// <summary>
