@@ -6,6 +6,7 @@ using DG.Tweening;
 using UnityEngine;
 using Mirror;
 using UnityEngine.Rendering.Universal;
+using Unity.Burst.CompilerServices;
 
 public class PlayerMove : NetworkBehaviour
 {
@@ -32,7 +33,11 @@ public class PlayerMove : NetworkBehaviour
         _playerSound = GetComponent<PlayerSound>();
         if (this.isLocalPlayer)
         {
-            GridMoveController.Instance.InitLocalPlayer(this);
+            var tempposition = transform.position;
+            tempposition.x += 1.5f;
+            tempposition.y += 2.5f;
+            transform.position = tempposition;
+            GridMoveController.Instance.InitLocalPlayer(this); // here
             tag = "LocalPlayer";
         }
         else
@@ -40,7 +45,6 @@ public class PlayerMove : NetworkBehaviour
             GetComponentInChildren<Light2D>().enabled = false;
         }
     }
-
 
     public bool SetPosition(Vector3 worldPosition, Vector3Int tilePosition)
     {
@@ -64,10 +68,20 @@ public class PlayerMove : NetworkBehaviour
     /// <param name="tilePosition">目标位置的Tilemap坐标</param>
     /// <param name="path">移动路径，使用世界坐标，用于生成移动动画</param>
     [Command]
-    public void SetPosition(Vector3 worldPosition, Vector3Int tilePosition, Vector3[] path)
+    public void CmdSetPosition(Vector3 worldPosition, Vector3Int tilePosition, Vector3[] path)
     {
+        // 瞬移
+        if (path == null)
+        {
+            _isMoving = false;
+            transform.position = worldPosition; // 直接瞬移到目标位置
+            SetTilePos(tilePosition); // 更新同步位置
+            return;
+        }
+
         if (_isMoving || path.Length < 2)
             return;
+
         _isMoving = true;
         float duration = (path.Length - 1) * 0.6f;
         StartCoroutine(drawPathLine(path, duration));
@@ -167,6 +181,7 @@ public class PlayerMove : NetworkBehaviour
         {
             // 本地玩家更新在地图UI上的位置显示
             MapUIManager.Instance.UpdatePlayerPositionImage(_tilePosition);
+            GridMoveController.Instance.UpdateGraph();
         }
     }
 }

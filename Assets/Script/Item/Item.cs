@@ -8,6 +8,7 @@ using static PlayerHealth;
 /// <summary>
 /// 物品类，表示一个物品，挂载在物品的GameObject上。
 /// </summary>
+[System.Serializable]
 public class Item : NetworkBehaviour
 {
     /// <summary>
