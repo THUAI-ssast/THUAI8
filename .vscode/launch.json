@@ -4,8 +4,7 @@
         {
             "name": "Unity Debugger",
             "type": "vstuc",
-            "request": "attach",
-            "projectPath": "${workspaceFolder}"
+            "request": "attach"
         }
      ]
 }

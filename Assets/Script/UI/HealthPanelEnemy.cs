@@ -48,10 +48,14 @@ public class HealthPanelEnemy : MonoBehaviour
             _localPlayer.GetComponent<PlayerHealth>().CmdAttack(_localPlayer, _enemyPlayer, (int)PlayerHealth.BodyPosition.Head, UIManager.Instance.FollowImage.gameObject);
             float costAP = (UIManager.Instance.FollowImage.ItemData as WeaponItemData).AttakAPCost;
             string itemName = UIManager.Instance.FollowImage.ItemData.ItemName;
-            PlayerHealth enemyPlayerHealth = EnemyPlayer.GetComponent<PlayerHealth>();
+            PlayerHealth enemyPlayerHealth = _enemyPlayer.GetComponent<PlayerHealth>();
+            PlayerHealth localPlayerHealth = _localPlayer.GetComponent<PlayerHealth>();
             string enemyName = enemyPlayerHealth.Name;
+            string localName = localPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Head, UIManager.Instance.FollowImage);
-            string message = $"当前回合：你消耗{costAP}AP使用{itemName}攻击了{enemyName}的头部，造成了{damage}HP伤害。";
+            string message = $"当前回合：{localName}消耗{costAP}AP使用{itemName}攻击了{enemyName}的头部，造成了{damage}HP伤害。";
+            string enemyDeadMsg = $"被{localName}用{itemName}攻击了头部…";
+            _localPlayer.GetComponent<PlayerLog>().CmdAddLog(_enemyPlayer, enemyDeadMsg, LogInfo.DamageType.fight);
             UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
 
@@ -68,10 +72,14 @@ public class HealthPanelEnemy : MonoBehaviour
             _localPlayer.GetComponent<PlayerHealth>().CmdAttack(_localPlayer, _enemyPlayer, (int)PlayerHealth.BodyPosition.MainBody, UIManager.Instance.FollowImage.gameObject);
             float costAP = (UIManager.Instance.FollowImage.ItemData as WeaponItemData).AttakAPCost;
             string itemName = UIManager.Instance.FollowImage.ItemData.ItemName;
-            PlayerHealth enemyPlayerHealth = EnemyPlayer.GetComponent<PlayerHealth>();
+            PlayerHealth enemyPlayerHealth = _enemyPlayer.GetComponent<PlayerHealth>();
+            PlayerHealth localPlayerHealth = _localPlayer.GetComponent<PlayerHealth>();
             string enemyName = enemyPlayerHealth.Name;
+            string localName = localPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.MainBody, UIManager.Instance.FollowImage);
-            string message = $"当前回合：你消耗{costAP}AP使用{itemName}攻击了{enemyName}的躯干，造成了{damage}HP伤害。";
+            string message = $"当前回合：{localName}消耗{costAP}AP使用{itemName}攻击了{enemyName}的躯干，造成了{damage}HP伤害。";
+            string enemyDeadMsg = $"被{localName}用{itemName}攻击了躯干…";
+            _localPlayer.GetComponent<PlayerLog>().CmdAddLog(_enemyPlayer, enemyDeadMsg, LogInfo.DamageType.fight);
             UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
 
@@ -88,10 +96,14 @@ public class HealthPanelEnemy : MonoBehaviour
             _localPlayer.GetComponent<PlayerHealth>().CmdAttack(_localPlayer, _enemyPlayer, (int)PlayerHealth.BodyPosition.Legs, UIManager.Instance.FollowImage.gameObject);
             float costAP = (UIManager.Instance.FollowImage.ItemData as WeaponItemData).AttakAPCost;
             string itemName = UIManager.Instance.FollowImage.ItemData.ItemName;
-            PlayerHealth enemyPlayerHealth = EnemyPlayer.GetComponent<PlayerHealth>();
+            PlayerHealth enemyPlayerHealth = _enemyPlayer.GetComponent<PlayerHealth>();
+            PlayerHealth localPlayerHealth = _localPlayer.GetComponent<PlayerHealth>();
             string enemyName = enemyPlayerHealth.Name;
+            string localName = localPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Legs, UIManager.Instance.FollowImage);
-            string message = $"当前回合：你消耗{costAP}AP使用{itemName}攻击了{enemyName}的腿部，造成了{damage}HP伤害。";
+            string message = $"当前回合：{localName}消耗{costAP}AP使用{itemName}攻击了{enemyName}的腿部，造成了{damage}HP伤害。";
+            string enemyDeadMsg = $"被{localName}用{itemName}攻击了腿部…";
+            _localPlayer.GetComponent<PlayerLog>().CmdAddLog(_enemyPlayer, enemyDeadMsg, LogInfo.DamageType.fight);
             UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
 

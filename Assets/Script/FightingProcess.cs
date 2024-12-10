@@ -208,8 +208,8 @@ public class FightingProcess : NetworkBehaviour
     {
         _attacker.GetComponent<PlayerFight>().IsFighting = false;
         _defender.GetComponent<PlayerFight>().IsFighting = false;
-        BattleLogManager.Instance.TargetDestroyAllLog(_attacker.GetComponent<NetworkIdentity>().connectionToClient);
-        BattleLogManager.Instance.TargetDestroyAllLog(_defender.GetComponent<NetworkIdentity>().connectionToClient);
+        LogManager.Instance.TargetDestroyAllLogDisplay(_attacker.GetComponent<NetworkIdentity>().connectionToClient);
+        LogManager.Instance.TargetDestroyAllLogDisplay(_defender.GetComponent<NetworkIdentity>().connectionToClient);
         if(_escapePlayer != null)
         {
             // 玩家逃跑
@@ -286,7 +286,7 @@ public class FightingProcess : NetworkBehaviour
         if(isDead)
         {
             _battleUI.SetActive(false);
-            GameObject.Find("Canvas").transform.Find("PlayerDead").gameObject.SetActive(true);
+            // GameObject.Find("Canvas").transform.Find("PlayerDead").gameObject.SetActive(true);
             GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
         }
         else
@@ -507,6 +507,14 @@ public class FightingProcess : NetworkBehaviour
     /// <param name="player">死亡的玩家</param>
     public void DeployPlayerDead(GameObject player)
     {
+        if(_deadPlayer.GetComponent<PlayerFight>().FightingState == PlayerState.Attacker)
+        {
+            _defender.GetComponent<PlayerLog>().DeployAddEliminationCount();
+        }
+        else
+        {
+            _attacker.GetComponent<PlayerLog>().DeployAddEliminationCount();
+        }
         _deadPlayer = player;
     }
 
@@ -561,8 +569,8 @@ public class FightingProcess : NetworkBehaviour
     /// <param name="message">一条战斗日志的文字</param>
     public void DeployAddLog(string message)
     {
-        BattleLogManager.Instance.TargetAddLog(_attacker.GetComponent<NetworkIdentity>().connectionToClient, message);
-        BattleLogManager.Instance.TargetAddLog(_defender.GetComponent<NetworkIdentity>().connectionToClient, message);
+        LogManager.Instance.TargetAddLog(_attacker.GetComponent<NetworkIdentity>().connectionToClient, message);
+        LogManager.Instance.TargetAddLog(_defender.GetComponent<NetworkIdentity>().connectionToClient, message);
     }
 
     /// <summary>

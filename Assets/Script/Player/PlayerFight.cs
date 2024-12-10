@@ -1,5 +1,6 @@
 using System.Collections;
 using Mirror;
+using Mirror.Examples.Basic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
