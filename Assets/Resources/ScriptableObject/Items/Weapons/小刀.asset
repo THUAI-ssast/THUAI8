@@ -23,5 +23,5 @@ MonoBehaviour:
   BodyDamageDictionary:
     _pairs:
     - _key: 1
-      _value: 1.5
+      _value: 6
   AttackDamageType: 1
