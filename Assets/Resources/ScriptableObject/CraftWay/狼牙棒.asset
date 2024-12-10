@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: "\u72FC\u7259\u68D2"
   m_EditorClassIdentifier: 
   CostItems:
-  - {fileID: 11400000, guid: ca8fda709dc920c4c8a9f54a9901452b, type: 2}
+  - {fileID: 11400000, guid: c9a19fe86a46a9a40a4e75ce7785416f, type: 2}
   - {fileID: 11400000, guid: 8d5ba779e561f634a91d1ba65cd6f822, type: 2}
   CatalystItems:
-  - {fileID: 11400000, guid: 241c97ed3dc1e1e43b59884b55c70f58, type: 2}
+  - {fileID: 11400000, guid: 013ec09ad8d1cee45a7432add8236653, type: 2}
   ProductItem: {fileID: 11400000, guid: 62e6dd93db0011f4dbff2527638bc9a2, type: 2}

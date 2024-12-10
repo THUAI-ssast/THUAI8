@@ -140,6 +140,7 @@ public class ResourcePointController : NetworkBehaviour
         {
             UIManager.Instance.AddActiveUI(_resourceUIPanelInstance);
             _resourceUIPanelInstance.SetActive(true);
+            _resourceUIPanelInstance.GetComponentInChildren<ScrollRect>().normalizedPosition = new Vector2(0, 1);
         }
     }
 
