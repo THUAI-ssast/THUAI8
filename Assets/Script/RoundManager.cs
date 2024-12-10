@@ -116,6 +116,14 @@ public class RoundManager : NetworkBehaviour
     /// <returns></returns>
     IEnumerator RoundTimer()
     {
+        float shortTimer = BornUIManager.Instance.delayTime; // 15秒倒计时
+        while (shortTimer > 0)
+        {
+            shortTimer -= Time.deltaTime;
+            UpdateTimerText(shortTimer); // 更新显示的短时间计时
+            yield return null;
+        }
+
         StartRound();
         yield return new WaitForSeconds(2);
         while (true)
@@ -165,6 +173,21 @@ public class RoundManager : NetworkBehaviour
         string countText = $"第{_roundCount}回合 ";
         _timeText = countText + minuteText + ":" + secondText;
         UpdateTimeUI();   
+    }
+
+    /// <summary>
+    /// 更新计时器显示文本
+    /// </summary>
+    /// <param name="time">计时器剩余时间</param>
+    void UpdateTimerText(float time)
+    {
+        int second = Mathf.CeilToInt(time) % 60;
+        int minute = Mathf.CeilToInt(time) / 60;
+        string minuteText = minute < 10 ? "0" + minute.ToString() : minute.ToString();
+        string secondText = second < 10 ? "0" + second.ToString() : second.ToString();
+        string countText = $"选择出生地点 ";
+        _timeText = countText + minuteText + ":" + secondText;
+        UpdateTimeUI();  // 更新UI显示
     }
     /// <summary>
     /// 客户端更新回合计时器文本UI显示。

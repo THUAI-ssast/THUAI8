@@ -49,6 +49,12 @@ public class UIManager : MonoBehaviour
 
     private List<GameObject> _activeUIList = new List<GameObject>();
 
+    public List<GameObject> ActiveUIList
+    {
+        get => _activeUIList;
+        set => _activeUIList = value;
+    }
+
     /// <summary>
     /// BattleScene中的Canvas，供其他GameObject直接使用
     /// </summary>

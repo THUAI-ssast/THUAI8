@@ -101,7 +101,7 @@ public class MapUIManager : MonoBehaviour
         return _playerPositionImageBias + _lengthPerTile * new Vector2(tilePos.x, tilePos.y);
     }
 
-    private Vector3Int ImagePosToTilePos(Vector2 imagePos)
+    public Vector3Int ImagePosToTilePos(Vector2 imagePos)
     {
         Vector2 tilePos = (imagePos - _playerPositionImageBias) / _lengthPerTile;
         return new Vector3Int((int)Math.Round(tilePos.x), (int)Math.Round(tilePos.y), 0);
