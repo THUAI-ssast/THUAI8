@@ -16,11 +16,6 @@ public class BornUIManager : NetworkBehaviour
 
     private Vector3Int _bornPos;
 
-    //public Vector3Int BornPos
-    //{
-    //    get => _bornPos;
-    //}
-
     private PlayerMove _playerMove;
 
     private GameObject _mapPanel;
@@ -88,8 +83,9 @@ public class BornUIManager : NetworkBehaviour
             UIManager.Instance.ActiveUIList.Remove(_bigMapPanel);
 
             var tilePosition = GridMoveController.Instance.GroundTilemap.WorldToCell(_bornPos);
-            _playerMove.transform.position = _bornPos;
-            _playerMove.CmdSetPosition(_bornPos, tilePosition, null);
+            _playerMove.transform.position = _bornPos + GridMoveController.Instance.GroundTilemap.cellSize * 0.5f;
+            Vector3 bornPos = _playerMove.transform.position;
+            _playerMove.CmdSetPosition(bornPos, tilePosition, null);
         }
     }
 
@@ -149,6 +145,10 @@ public class BornUIManager : NetworkBehaviour
         int clickedColumn = Mathf.FloorToInt((localPos.x + bigMapRect.rect.width / 2) / cellWidth);
         int clickedRow = Mathf.FloorToInt((localPos.y + bigMapRect.rect.height / 2) / cellHeight);
 
+        int newIndex = clickedRow * Columns + clickedColumn;
+        if (_gridCells[newIndex] == null)
+            return;
+
         Vector2 cellBottomLeftPos = new Vector2(
         clickedColumn * cellWidth - bigMapRect.rect.width / 2,
         clickedRow * cellHeight - bigMapRect.rect.height / 2
@@ -168,8 +168,6 @@ public class BornUIManager : NetworkBehaviour
 
         // Êä³ö¼ÆËãµÄ tilePos
         Debug.Log($"Tile position for clicked cell center: {_bornPos}");
-
-        int newIndex = clickedRow * Columns + clickedColumn;
 
         if (newIndex >= 0 && newIndex < _gridCells.Count)
         {
