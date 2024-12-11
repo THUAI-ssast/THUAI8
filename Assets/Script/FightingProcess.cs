@@ -507,7 +507,8 @@ public class FightingProcess : NetworkBehaviour
     /// <param name="player">死亡的玩家</param>
     public void DeployPlayerDead(GameObject player)
     {
-        if(_deadPlayer.GetComponent<PlayerFight>().FightingState == PlayerState.Attacker)
+        _deadPlayer = player;
+        if (_deadPlayer.GetComponent<PlayerFight>().FightingState == PlayerState.Attacker)
         {
             _defender.GetComponent<PlayerLog>().DeployAddEliminationCount();
         }
@@ -515,7 +516,6 @@ public class FightingProcess : NetworkBehaviour
         {
             _attacker.GetComponent<PlayerLog>().DeployAddEliminationCount();
         }
-        _deadPlayer = player;
     }
 
     /// <summary>
