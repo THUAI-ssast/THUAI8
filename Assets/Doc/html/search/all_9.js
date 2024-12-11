@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['increaseactionpoint_0',['IncreaseActionPoint',['../class_player_action_point.html#ae4a1a7946227243d70b3bc952ba968d1',1,'PlayerActionPoint']]],
+  ['initialize_1',['Initialize',['../class_item.html#a4419cdbd04127a482c9093353b4db948',1,'Item']]],
+  ['initlocalplayer_2',['InitLocalPlayer',['../class_grid_move_controller.html#a558a1c6ffb50aff72de45cc56d863c9d',1,'GridMoveController']]],
+  ['instance_3',['Instance',['../class_audio_manager.html#af96f8bc4f9a0ad3f1a63a028bb31f790',1,'AudioManager.Instance'],['../class_fighting_process_manager.html#abaf42aa4f6298ce4de1b4c9f2b5f178b',1,'FightingProcessManager.Instance'],['../class_room_manager.html#a548236718cbd816bd2b87f1c5e79353f',1,'RoomManager.Instance'],['../class_round_manager.html#ad2c9ab8e6cb32555885cc8a9ba5671a8',1,'RoundManager.Instance'],['../class_safe_area_manager.html#a227d464e821032cd86f82632f4393dca',1,'SafeAreaManager.Instance'],['../class_backpack_manager.html#a87e572ad229c183650eb627049650968',1,'BackpackManager.Instance'],['../class_battle_log_manager.html#a0c5ca90c6d4f86d092c516c2e3654c6b',1,'BattleLogManager.Instance']]],
+  ['interruptfighting_4',['InterruptFighting',['../class_fighting_process.html#ae6346c57a71189fac3fce400269f7b06',1,'FightingProcess']]],
+  ['iscraftsatisfied_5',['IsCraftSatisfied',['../class_backpack_manager.html#a2bd5f187c00552b86a744ea10cb8992e',1,'BackpackManager']]],
+  ['isfighting_6',['IsFighting',['../class_player_fight.html#afcd793b3538dbcdca0f9f0431473e660',1,'PlayerFight']]],
+  ['isinboundary_7',['IsInBoundary',['../class_grid_move_controller.html#a91021b8e2914bb987b1ae31eb83600c8',1,'GridMoveController']]],
+  ['ismovable_8',['IsMovable',['../class_grid_move_controller.html#aef02bd040cc640f810de423f7f362c7a',1,'GridMoveController']]],
+  ['isreachable_9',['IsReachable',['../class_grid_move_controller.html#a7bf3cbcb45e4bafc6ccfe6a916b395f5',1,'GridMoveController']]],
+  ['item_10',['Item',['../class_item.html',1,'']]],
+  ['itemdata_11',['ItemData',['../class_item_data.html',1,'ItemData'],['../class_item.html#abc9c5bbcc9accd219939287dbde22ca2',1,'Item.ItemData']]],
+  ['itemdesc_12',['ItemDesc',['../class_item_data.html#a588ed565b79757cb1a5617c396d31620',1,'ItemData']]],
+  ['itemicon_13',['ItemIcon',['../class_item_data.html#a750fe705a8f962dd8590a1dcbb68622b',1,'ItemData']]],
+  ['itemlocation_14',['ItemLocation',['../class_item.html#a54a3b2eb2b26b38ea272030a3084b31f',1,'Item']]],
+  ['itemlocationupdate_15',['ItemLocationUpdate',['../class_item.html#a9c398666bc48b278370b29c4d48eb052',1,'Item']]],
+  ['itemname_16',['ItemName',['../class_item_data.html#ad83ec933e645a3713298fe0ae551d7f4',1,'ItemData']]],
+  ['itemownerinfo_17',['ItemOwnerInfo',['../class_item_owner_info.html',1,'']]],
+  ['itemtype_18',['ItemType',['../class_item_data.html#a6a3daa46ea2be3fd3a8611c8e773bb0e',1,'ItemData']]],
+  ['itemtypeenum_19',['ItemTypeEnum',['../class_item_data.html#a89468fbaf625e7985a6ce5a10a5df759',1,'ItemData']]],
+  ['itemvalue_20',['ItemValue',['../class_item_data.html#a70ea07b9b2485b38233ce3d4d04f2149',1,'ItemData']]]
+];
