@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,16 +8,28 @@ using Mirror;
 using UnityEngine.Rendering.Universal;
 using Unity.Burst.CompilerServices;
 
+/// <summary>
+/// ç©å®¶è¡Œä¸ºç±»ï¼Œæ§åˆ¶è§’è‰²çš„ç§»åŠ¨
+/// </summary>
 public class PlayerMove : NetworkBehaviour
 {
+    /// <summary>
+    /// ç”¨äºæ˜¾ç¤ºè·¯å¾„æŒ‡ç¤ºå™¨
+    /// </summary>
     private LineRenderer _pathLineRenderer;
+    /// <summary>
+    /// æ˜¯å¦æ­£åœ¨ç§»åŠ¨ï¼Œç”¨äºé˜»å¡ç§»åŠ¨çš„å‘èµ·
+    /// </summary>
     public bool _isMoving;
     private Transform _spriteDisplay;
 
-    [SyncVar] private Vector3Int _tilePosition; // ÓÃÓÚÍ¬²½µÄ×Ö¶Î
+    [SyncVar] private Vector3Int _tilePosition; // ç”¨äºåŒæ­¥çš„å­—æ®µ
 
     private PlayerSound _playerSound;
 
+    /// <summary>
+    /// ç©å®¶åœ¨Tilemapä¸Šçš„åæ ‡
+    /// </summary>
     public Vector3Int TilePosition
     {
         get => _tilePosition;
@@ -45,7 +57,11 @@ public class PlayerMove : NetworkBehaviour
             GetComponentInChildren<Light2D>().enabled = false;
         }
     }
-
+    /// <summary>
+    /// å°†playerè®¾ç½®åˆ°å¯¹åº”ä½ç½®ä¸Šï¼Œç”Ÿæˆè·¯å¾„ç§»åŠ¨åŠ¨ç”»
+    /// </summary>
+    /// <param name="worldPosition">ç›®æ ‡ä½ç½®çš„ä¸–ç•Œåæ ‡</param>
+    /// <param name="tilePosition">ç›®æ ‡ä½ç½®çš„Tilemapåæ ‡</param>
     public bool SetPosition(Vector3 worldPosition, Vector3Int tilePosition)
     {
         if (_isMoving)
@@ -58,24 +74,24 @@ public class PlayerMove : NetworkBehaviour
         float angle = (moveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, moveVector);
         transform.DORotate(new Vector3(0, 0, angle), 0.2f).SetEase(Ease.Linear);
         transform.DOMove(worldPosition, duration);
-        TilePosition = tilePosition; // ¸üĞÂÍ¬²½Î»ÖÃ
+        TilePosition = tilePosition; // æ›´æ–°åŒæ­¥ä½ç½®
         return true;
     }
     /// <summary>
-    /// ½«playerÉèÖÃµ½¶ÔÓ¦Î»ÖÃÉÏ£¬Éú³ÉÂ·¾¶ÒÆ¶¯¶¯»­
+    /// å°†playerè®¾ç½®åˆ°å¯¹åº”ä½ç½®ä¸Šï¼Œç”Ÿæˆè·¯å¾„ç§»åŠ¨åŠ¨ç”»
     /// </summary>
-    /// <param name="worldPosition">Ä¿±êÎ»ÖÃµÄÊÀ½ç×ø±ê</param>
-    /// <param name="tilePosition">Ä¿±êÎ»ÖÃµÄTilemap×ø±ê</param>
-    /// <param name="path">ÒÆ¶¯Â·¾¶£¬Ê¹ÓÃÊÀ½ç×ø±ê£¬ÓÃÓÚÉú³ÉÒÆ¶¯¶¯»­</param>
+    /// <param name="worldPosition">ç›®æ ‡ä½ç½®çš„ä¸–ç•Œåæ ‡</param>
+    /// <param name="tilePosition">ç›®æ ‡ä½ç½®çš„Tilemapåæ ‡</param>
+    /// <param name="path">ç§»åŠ¨è·¯å¾„ï¼Œä½¿ç”¨ä¸–ç•Œåæ ‡ï¼Œç”¨äºç”Ÿæˆç§»åŠ¨åŠ¨ç”»</param>
     [Command]
     public void CmdSetPosition(Vector3 worldPosition, Vector3Int tilePosition, Vector3[] path)
     {
-        // Ë²ÒÆ
+        // ç¬ç§»
         if (path == null)
         {
             _isMoving = false;
-            transform.position = worldPosition; // Ö±½ÓË²ÒÆµ½Ä¿±êÎ»ÖÃ
-            SetTilePos(tilePosition); // ¸üĞÂÍ¬²½Î»ÖÃ
+            transform.position = worldPosition; // ç›´æ¥ç¬ç§»åˆ°ç›®æ ‡ä½ç½®
+            SetTilePos(tilePosition); // æ›´æ–°åŒæ­¥ä½ç½®
             return;
         }
 
@@ -93,15 +109,15 @@ public class PlayerMove : NetworkBehaviour
 
         transform.DOPath(path, duration);
         SetTilePos(tilePosition);
-        //_tilePosition = tilePosition; // ¸üĞÂÍ¬²½Î»ÖÃ
+        //_tilePosition = tilePosition; // æ›´æ–°åŒæ­¥ä½ç½®
         return;
     }
 
     /// <summary>
-    /// Í¬²½Íæ¼ÒĞı×ªµÄ¶¯»­
+    /// åŒæ­¥ç©å®¶æ—‹è½¬çš„åŠ¨ç”»
     /// </summary>
-    /// <param name="firstAngle">µÚÒ»¸öĞı×ª½Ç</param>
-    /// <param name="angle">µÚ¶ş¸öĞı×ª½Ç</param>
+    /// <param name="firstAngle">ç¬¬ä¸€ä¸ªæ—‹è½¬è§’</param>
+    /// <param name="angle">ç¬¬äºŒä¸ªæ—‹è½¬è§’</param>
     /// <param name="duration"></param>
     [ClientRpc]
     private void setRotateAnimation(float firstAngle,float angle,float duration)
@@ -117,7 +133,7 @@ public class PlayerMove : NetworkBehaviour
         PlayerPositionChange();
     }
 
-    // Í¬²½²£Á§
+    // åŒæ­¥ç»ç’ƒ
     [Command]
     public void CmdBreakGlass(Vector3Int cellPosition)
     {
@@ -130,7 +146,7 @@ public class PlayerMove : NetworkBehaviour
         GridMoveController.Instance.BreakGlass(cellPosition,_playerSound);
     }
 
-    // Í¬²½ÃÅ
+    // åŒæ­¥é—¨
     [Command]
     public void CmdRotateDoor(Vector3Int doorPosition)
     {
@@ -144,10 +160,10 @@ public class PlayerMove : NetworkBehaviour
     }
 
     /// <summary>
-    /// ÏÔÊ¾Íæ¼Òµ±Ç°Î»ÖÃºÍÄ¿±êÎ»ÖÃ¼äµÄÖ±ÏßÂ·¾¶Ö¸Ê¾Æ÷
+    /// æ˜¾ç¤ºç©å®¶å½“å‰ä½ç½®å’Œç›®æ ‡ä½ç½®é—´çš„ç›´çº¿è·¯å¾„æŒ‡ç¤ºå™¨
     /// </summary>
-    /// <param name="target">Ä¿±êÎ»ÖÃ£¬Ê¹ÓÃÊÀ½ç×ø±ê</param>
-    /// <param name="duration">ÏÔÊ¾³ÖĞøÊ±¼ä</param>
+    /// <param name="target">ç›®æ ‡ä½ç½®ï¼Œä½¿ç”¨ä¸–ç•Œåæ ‡</param>
+    /// <param name="duration">æ˜¾ç¤ºæŒç»­æ—¶é—´</param>
     public IEnumerator drawPathLine(Vector3 target, float duration)
     {
         _pathLineRenderer.SetPositions(new[] { transform.position, target });
@@ -158,10 +174,10 @@ public class PlayerMove : NetworkBehaviour
     }
 
     /// <summary>
-    /// ÏÔÊ¾Â·ÏßÖ¸Ê¾Æ÷
+    /// æ˜¾ç¤ºè·¯çº¿æŒ‡ç¤ºå™¨
     /// </summary>
-    /// <param name="path">ÏÔÊ¾µÄÂ·¾¶£¬Ê¹ÓÃÊÀ½ç×ø±ê</param>
-    /// <param name="duration">ÏÔÊ¾³ÖĞøÊ±¼ä</param>
+    /// <param name="path">æ˜¾ç¤ºçš„è·¯å¾„ï¼Œä½¿ç”¨ä¸–ç•Œåæ ‡</param>
+    /// <param name="duration">æ˜¾ç¤ºæŒç»­æ—¶é—´</param>
     public IEnumerator drawPathLine(Vector3[] path, float duration)
     {
         _pathLineRenderer.positionCount = path.Length;
@@ -173,13 +189,13 @@ public class PlayerMove : NetworkBehaviour
     }
 
     /// <summary>
-    /// ĞèÒªÔÚÍæ¼ÒÎ»ÖÃ¸Ä±äÊ±µ÷ÓÃ
+    /// éœ€è¦åœ¨ç©å®¶ä½ç½®æ”¹å˜æ—¶è°ƒç”¨
     /// </summary>
     public void PlayerPositionChange()
     {
         if(isLocalPlayer)
         {
-            // ±¾µØÍæ¼Ò¸üĞÂÔÚµØÍ¼UIÉÏµÄÎ»ÖÃÏÔÊ¾
+            // æœ¬åœ°ç©å®¶æ›´æ–°åœ¨åœ°å›¾UIä¸Šçš„ä½ç½®æ˜¾ç¤º
             MapUIManager.Instance.UpdatePlayerPositionImage(_tilePosition);
             GridMoveController.Instance.UpdateGraph();
         }

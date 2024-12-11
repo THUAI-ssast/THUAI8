@@ -5,7 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
-/// 玩家回合类，管理玩家准备状态，挂载在player上，定义[Command]方法。
+/// 玩家行为类，管理回合、玩家准备状态，挂载在player上，定义[Command]方法。
 /// </summary>
 public class PlayerRound : NetworkBehaviour
 {

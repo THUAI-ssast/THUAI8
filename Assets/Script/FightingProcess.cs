@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Mirror.Examples.Basic;
 
 /// <summary>
-/// 战斗流程。在两个玩家发生战斗时动态生成，客户端完成所有流程后由战斗流程管理器销毁。所有非ui变量均在服务端发生改变。
+/// 战斗流程类，在两个玩家发生战斗时动态生成，客户端完成所有流程后由战斗流程管理器销毁。所有非ui变量均在服务端发生改变
 /// </summary>
 public class FightingProcess : NetworkBehaviour
 {

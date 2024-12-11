@@ -1,11 +1,17 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using kcp2k;
 using Mirror;
 using UnityEngine;
 
+/// <summary>
+/// 网络类，开启时自动连接至云服务器
+/// </summary>
 public class AddService : MonoBehaviour
 {
+    /// <summary>
+    /// 是否以服务器模式启动
+    /// </summary>
     public bool AppIsServer = false;
     private NetworkManager networkManager;
     void Start()
@@ -21,12 +27,6 @@ public class AddService : MonoBehaviour
         {
             networkManager.StartClient();
         }
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
 
     }
 }

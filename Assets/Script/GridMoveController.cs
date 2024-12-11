@@ -7,14 +7,27 @@ using Mirror;
 using Pathfinding;
 using Unity.VisualScripting;
 
+/// <summary>
+/// 单例Manager，地图交互类，管理本机角色点击地图的移动行为
+/// </summary>
 public class GridMoveController : MonoBehaviour
 {
     public static GridMoveController Instance;
+    /// <summary>
+    /// 本机玩家
+    /// </summary>
     public PlayerMove Player;
-
+    /// <summary>
+    /// 破碎的玻璃对应的Tile
+    /// </summary>
     public Tile brokenGlassTile;
-
+    /// <summary>
+    /// 水平的门Tile
+    /// </summary>
     public Tile doorTileHorizontal;
+    /// <summary>
+    /// 垂直的门Tile
+    /// </summary>
     public Tile doorTileVertical;
 
     // A* 寻路相关

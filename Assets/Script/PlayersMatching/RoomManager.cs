@@ -5,12 +5,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
-/// ¼Ì³Ğ×ÔNetworkRoomManager£¬ÓÃÓÚ¹ÜÀí³¡¾°Í¬²½¼ÓÔØ¡¢·¿¼äÆ¥Åä¡¢Ô¤ÖÆÌåÉú³ÉµÈ
+/// å•ä¾‹Managerç±»ï¼Œç”¨äºç®¡ç†åœºæ™¯åŒæ­¥åŠ è½½ã€æˆ¿é—´åŒ¹é…ã€é¢„åˆ¶ä½“ç”Ÿæˆç­‰
 /// </summary>
 public class RoomManager : NetworkRoomManager
 {
     /// <summary>
-    /// RoomManagerµÄµ¥Àı
+    /// RoomManagerçš„å•ä¾‹
     /// </summary>
     public static RoomManager Instance;
 

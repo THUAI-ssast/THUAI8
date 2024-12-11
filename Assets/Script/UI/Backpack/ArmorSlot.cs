@@ -5,6 +5,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/// <summary>
+/// UI显示类，展示单个护甲的槽位UI
+/// </summary>
 public class ArmorSlot : MonoBehaviour, IPointerClickHandler
 {
     private Item _armorItem = null;
@@ -21,7 +24,11 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
         _menuPrefab = Resources.Load<GameObject>("UI/OperationMenuArmor");
         UpdateDisplay();
     }
-
+    /// <summary>
+    /// 取下原护甲，将新护甲放置在槽位上
+    /// </summary>
+    /// <param name="item">要展示的新护甲</param>
+    /// <returns>原来展示的护甲</returns>
     public Item SetItem(Item item)
     {
         Item oldItem = _armorItem;
@@ -29,12 +36,17 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
         UpdateDisplay();
         return oldItem;
     }
-
+    /// <summary>
+    /// 获得当前正在展示的护甲
+    /// </summary>
+    /// <returns>当前正在展示的护甲</returns>
     public Item GetItem()
     {
         return _armorItem;
     }
-
+    /// <summary>
+    /// 刷新护甲的展示
+    /// </summary>
     public void UpdateDisplay()
     {
         if (_armorItem == null && _displayImage && _armorName && _armorDurability)
@@ -56,12 +68,12 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
     private GameObject _menuObject;
 
     /// <summary>
-    /// ��������Ҽ�����¼�������ȫ��Ψһ�˵�������˵���ť����¼���
+    /// 处理右键点击唤起卸下菜单
     /// </summary>
     /// <param name="eventData"></param>
     public void OnPointerClick(PointerEventData eventData)
     {
-        // _battlePanel ҳ�治����ж��װ��
+        // _battlePanel 为空
         if (UIManager.Instance.BattlePanel.activeSelf)
         {
             return;

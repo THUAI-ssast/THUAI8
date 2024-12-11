@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 管理战斗场景内所有UI的展示、交互行为
+/// 单例Manager，UI类，管理BattleScene内所有需要阻塞的UI的展示、交互行为
 /// </summary>
 public class UIManager : MonoBehaviour
 {

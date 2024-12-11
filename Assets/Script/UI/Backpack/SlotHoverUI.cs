@@ -1,31 +1,31 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// ÓÃÓÚ¹ÜÀíÊó±êĞüÍ£ÔÚ²ÛÉÏÊ±³öÏÖµÄUI£¬Ã¿¸ö²ÛÀàĞÍµÄGameObject¶¼ĞèÒª¹ÒÔØ£¨°üÀ¨±³°üÖĞµÄÎïÆ·²Û¡¢×ÊÔ´µãÖĞµÄÎïÆ·²ÛµÈ£©
+/// UIæ˜¾ç¤ºç±»ï¼Œç”¨äºç®¡ç†é¼ æ ‡æ‚¬åœåœ¨æ§½ä¸Šæ—¶å‡ºç°çš„UIï¼Œæ¯ä¸ªæ§½ç±»å‹çš„GameObjectéƒ½éœ€è¦æŒ‚è½½ï¼ˆåŒ…æ‹¬èƒŒåŒ…ä¸­çš„ç‰©å“æ§½ã€èµ„æºç‚¹ä¸­çš„ç‰©å“æ§½ç­‰ï¼‰
 /// </summary>
 public class SlotHoverUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     /// <summary>
-    /// Êó±êĞüÍ£ÏÔÊ¾UI
+    /// é¼ æ ‡æ‚¬åœæ˜¾ç¤ºUI
     /// </summary>
     private GameObject _mouseHoverPanel = null;
 
     /// <summary>
-    /// UI¸úËæÊó±êÒÆ¶¯µÄĞ­³Ì
+    /// UIè·Ÿéšé¼ æ ‡ç§»åŠ¨çš„åç¨‹
     /// </summary>
     private Coroutine _followMouseCoroutine = null;
 
     /// <summary>
-    /// UIÏà¶ÔÊó±êÎ»ÖÃµÄÆ«ÒÆ
+    /// UIç›¸å¯¹é¼ æ ‡ä½ç½®çš„åç§»
     /// </summary>
     private Vector3 _panelBias;
 
     /// <summary>
-    /// ²ÛÖĞ¶ÔÓ¦µÄItemÀàÎïÆ·
+    /// æ§½ä¸­å¯¹åº”çš„Itemç±»ç‰©å“
     /// </summary>
     private Item _item;
 
@@ -37,7 +37,7 @@ public class SlotHoverUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     private void OnDisable()
     {
-        // ÔÚ²Û±»ÉèÖÃÎª·Ç¼¤»î×´Ì¬Ê±£¬ĞèÒª½«ĞüÍ£ÏÔÊ¾µÄUIÒ²½ûÓÃ
+        // åœ¨æ§½è¢«è®¾ç½®ä¸ºéæ¿€æ´»çŠ¶æ€æ—¶ï¼Œéœ€è¦å°†æ‚¬åœæ˜¾ç¤ºçš„UIä¹Ÿç¦ç”¨
         if (_followMouseCoroutine != null)
         {
             StopCoroutine(_followMouseCoroutine);
@@ -53,7 +53,7 @@ public class SlotHoverUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         _item = GetSlotItem();
         if (_item == null)
             return;
-        // ¸üĞÂÊó±êĞüÍ£UIµÄÎÄ±¾ÄÚÈİ£¬²¢Æô¶¯Ğ­³Ì²»¶ÏÊ¹UI¸úËæÊó±ê
+        // æ›´æ–°é¼ æ ‡æ‚¬åœUIçš„æ–‡æœ¬å†…å®¹ï¼Œå¹¶å¯åŠ¨åç¨‹ä¸æ–­ä½¿UIè·Ÿéšé¼ æ ‡
         _mouseHoverPanel.GetComponentInChildren<TextMeshProUGUI>().text = _item.ItemData.ItemDesc;
         _panelBias = (new Vector2(40,30) + _mouseHoverPanel.GetComponent<RectTransform>().rect.size * new Vector2(1.2f,1.2f)) * new Vector2(1,-1);
         _followMouseCoroutine = StartCoroutine(FollowMousePosition());
@@ -70,7 +70,7 @@ public class SlotHoverUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     }
 
     /// <summary>
-    /// ²»¶ÏÊ¹UI¸úËæÊó±êÒÆ¶¯
+    /// ä¸æ–­ä½¿UIè·Ÿéšé¼ æ ‡ç§»åŠ¨
     /// </summary>
     /// <returns></returns>
     private IEnumerator FollowMousePosition()
@@ -83,9 +83,9 @@ public class SlotHoverUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     }
 
     /// <summary>
-    /// »ñÈ¡²ÛÖĞµÄItemÀàÎïÆ·£¨°üÀ¨±³°üÖĞµÄÎïÆ·²Û¡¢×ÊÔ´µãÖĞµÄÎïÆ·²ÛµÈ£©
+    /// è·å–æ§½ä¸­çš„Itemç±»ç‰©å“ï¼ˆåŒ…æ‹¬èƒŒåŒ…ä¸­çš„ç‰©å“æ§½ã€èµ„æºç‚¹ä¸­çš„ç‰©å“æ§½ç­‰ï¼‰
     /// </summary>
-    /// <returns>²ÛÖĞµÄItemÀàÎïÆ·</returns>
+    /// <returns>æ§½ä¸­çš„Itemç±»ç‰©å“</returns>
     private Item GetSlotItem()
     {
         Item item = null;

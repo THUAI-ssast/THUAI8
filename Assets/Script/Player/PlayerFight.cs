@@ -4,6 +4,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 玩家行为类，管理玩家战斗的发起和打断相关
+/// </summary>
 public class PlayerFight : NetworkBehaviour
 {
     /// <summary>

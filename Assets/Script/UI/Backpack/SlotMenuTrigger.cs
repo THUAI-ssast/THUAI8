@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// 物品槽右键菜单触发器。挂载在每一个slot上，用于触发右键菜单。
+/// UI行为类，物品槽右键菜单触发器。挂载在每一个slot上，用于触发右键菜单
 /// </summary>
 public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
 {

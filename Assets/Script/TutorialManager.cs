@@ -5,8 +5,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// å•ä¾‹Managerï¼Œç®¡ç†æ•™ç¨‹æç¤ºçš„é€æ­¥æ˜¾ç¤º
+/// </summary>
 public class TutorialManager : MonoBehaviour
 {
+    /// <summary>
+    /// æ•™ç¨‹çŠ¶æ€ï¼ŒåŒ…å«äº†æç¤ºä¿¡æ¯çš„å›¾æ–‡å†…å®¹ï¼Œä»¥åŠçŠ¶æ€åˆ‡æ¢æ¡ä»¶
+    /// </summary>
     private class TutorialState
     {
         public TutorialState(string description, string spritePath1, string spritePath2, boolFunc finishCondition,
@@ -25,7 +31,9 @@ public class TutorialManager : MonoBehaviour
         public readonly float DelayTime;
 
         public delegate bool boolFunc();
-
+        /// <summary>
+        /// çŠ¶æ€é€€å‡ºæ¡ä»¶ï¼Œè¿”å›trueæ—¶åº”é€€å‡ºå¹¶åˆ‡æ¢åˆ°ä¸‹ä¸€çŠ¶æ€
+        /// </summary>
         public readonly boolFunc IsTutorialFinished;
     }
 
@@ -54,97 +62,97 @@ public class TutorialManager : MonoBehaviour
         _firstRPSlots = _firstResourcePoitnUI.transform.Find("Scroll View/Viewport/Slots").gameObject;
         _craftPanel = UIManager.Instance.BagPanel.transform.Find("CraftPanel").gameObject;
 
-        setState(new TutorialState("µã»÷(C¼ü)´ò¿ªĞüÍ£ÏÔÊ¾\n½«Êó±êĞüÍ£ÔÚµØ¿éÉÏ¿ÉÒÔ²é¿´ĞÅÏ¢",
+        setState(new TutorialState("ç‚¹å‡»(Cé”®)æ‰“å¼€æ‚¬åœæ˜¾ç¤º\nå°†é¼ æ ‡æ‚¬åœåœ¨åœ°å—ä¸Šå¯ä»¥æŸ¥çœ‹ä¿¡æ¯",
             "UI/Sprite/KeyboardSprite/C", null, () => Input.GetKeyDown(KeyCode.C)));
-        _stateQueue.Enqueue(new TutorialState("ÔÚµØ¿éÉÏµã»÷(Êó±ê×ó¼ü)ÒÆ¶¯\nÃ¿ÒÆ¶¯1¸ñ»áÏûºÄ0.2AP",
+        _stateQueue.Enqueue(new TutorialState("åœ¨åœ°å—ä¸Šç‚¹å‡»(é¼ æ ‡å·¦é”®)ç§»åŠ¨\næ¯ç§»åŠ¨1æ ¼ä¼šæ¶ˆè€—0.2AP",
     "UI/Sprite/KeyboardSprite/Mouse0", null,
     () => _playerObject.transform.position.x > 3));
-        _stateQueue.Enqueue(new TutorialState("ÒÆ¶¯µ½ÎïÆ·ÅÔ\n(Êó±êÓÒ¼ü)µã»÷ÎïÆ·½øĞĞÊ°È¡",
+        _stateQueue.Enqueue(new TutorialState("ç§»åŠ¨åˆ°ç‰©å“æ—\n(é¼ æ ‡å³é”®)ç‚¹å‡»ç‰©å“è¿›è¡Œæ‹¾å–",
             "UI/Sprite/Tutorial/ItemExample", "UI/Sprite/KeyboardSprite/Mouse1",
             () => _medicine.GetComponent<SpriteRenderer>().enabled == false, 0.8f));
-        _stateQueue.Enqueue(new TutorialState("µã»÷±³°üÍ¼±ê»ò°´(E¼ü)´ò¿ª±³°ü\nÔÙ´Î°´(E¼ü)»ò°´(Esc¼ü)ÍË³ö",
+        _stateQueue.Enqueue(new TutorialState("ç‚¹å‡»èƒŒåŒ…å›¾æ ‡æˆ–æŒ‰(Eé”®)æ‰“å¼€èƒŒåŒ…\nå†æ¬¡æŒ‰(Eé”®)æˆ–æŒ‰(Escé”®)é€€å‡º",
             "UI/Sprite/Tutorial/BagExample", "UI/Sprite/KeyboardSprite/E",
             () => UIManager.Instance.BagPanel.activeSelf));
-        _stateQueue.Enqueue(new TutorialState("ÓÒ²àÊÇÏÖÓĞÎïÆ·,ĞüÍ£¿ÉÏÔÊ¾ĞÅÏ¢\nÊ¹ÓÃ(Êó±ê¹öÂÖ)¿É»¬¶¯ÏÔÊ¾ÇøÓò",
+        _stateQueue.Enqueue(new TutorialState("å³ä¾§æ˜¯ç°æœ‰ç‰©å“,æ‚¬åœå¯æ˜¾ç¤ºä¿¡æ¯\nä½¿ç”¨(é¼ æ ‡æ»šè½®)å¯æ»‘åŠ¨æ˜¾ç¤ºåŒºåŸŸ",
             null, "UI/Sprite/KeyboardSprite/Mouse2",
             () => Input.GetAxis("Mouse ScrollWheel") < 0f, 3f));
-        _stateQueue.Enqueue(new TutorialState("×ó²àÊÇ×´Ì¬À¸,·ÖÎªÍ·¡¢Çû¸É¡¢ÍÈ\nÃ¿¸ö²¿Î»ÓĞ¶ÀÁ¢µÄÑªÁ¿ºÍ×°±¸",
+        _stateQueue.Enqueue(new TutorialState("å·¦ä¾§æ˜¯çŠ¶æ€æ ,åˆ†ä¸ºå¤´ã€èº¯å¹²ã€è…¿\næ¯ä¸ªéƒ¨ä½æœ‰ç‹¬ç«‹çš„è¡€é‡å’Œè£…å¤‡",
             "UI/Sprite/Tutorial/HealthExample", "UI/Sprite/Tutorial/ArmorExample",
             () => true, 7f));
-        _stateQueue.Enqueue(new TutorialState("Í·²¿»òÇû¸ÉÑªÁ¿¹éÁãÔò½ÇÉ«ËÀÍö\nÑªÁ¿¿ÉÒÔÍ¨¹ıÊ¹ÓÃÒ©Æ·»Ø¸´",
+        _stateQueue.Enqueue(new TutorialState("å¤´éƒ¨æˆ–èº¯å¹²è¡€é‡å½’é›¶åˆ™è§’è‰²æ­»äº¡\nè¡€é‡å¯ä»¥é€šè¿‡ä½¿ç”¨è¯å“å›å¤",
             null, "UI/Sprite/Tutorial/MedicineExample",
             () => true, 7f));
-        _stateQueue.Enqueue(new TutorialState("Çû¸ÉºÍÍÈ²¿ÊÜÉËÁË,ĞèÒª´¦Àí\n(Êó±êÓÒ¼ü)µã»÷±³°üÄÚÎïÆ·Ê¹ÓÃ",
+        _stateQueue.Enqueue(new TutorialState("èº¯å¹²å’Œè…¿éƒ¨å—ä¼¤äº†,éœ€è¦å¤„ç†\n(é¼ æ ‡å³é”®)ç‚¹å‡»èƒŒåŒ…å†…ç‰©å“ä½¿ç”¨",
             "UI/Sprite/Tutorial/MedicineExample", "UI/Sprite/Tutorial/UseExample",
             () => !_medicine.gameObject.activeSelf));
-        _stateQueue.Enqueue(new TutorialState("Ö»¿¿Ò»¸ö±Á´ø²»ÄÜÍêÈ«¿µ¸´\n¹Ø±Õ±³°ü,ËÑÑ°¸ü¶àÒ©Æ·",
-            "UI/Sprite/KeyboardSprite/Escape", "UI/Sprite/KeyboardSprite/Esc",
+        _stateQueue.Enqueue(new TutorialState("åªé ä¸€ä¸ªç»·å¸¦ä¸èƒ½å®Œå…¨åº·å¤\nå…³é—­èƒŒåŒ…,æœå¯»æ›´å¤šè¯å“",
+            "UI/Sprite/KeyboardSprite/Escape",null,
             () => !UIManager.Instance.BagPanel.activeSelf));
-        _stateQueue.Enqueue(new TutorialState("ÒÆ¶¯µ½Î¢Èõ·¢¹âµÄ×ÊÔ´µãµØ¿éÅÔ\n(Êó±êÓÒ¼ü)µã»÷×ÊÔ´µã½øĞĞËÑ¹Î",
+        _stateQueue.Enqueue(new TutorialState("ç§»åŠ¨åˆ°å¾®å¼±å‘å…‰çš„èµ„æºç‚¹åœ°å—æ—\n(é¼ æ ‡å³é”®)ç‚¹å‡»èµ„æºç‚¹è¿›è¡Œæœåˆ®",
             "UI/Sprite/Tutorial/ResourcePointExample", "UI/Sprite/KeyboardSprite/Mouse1",
             () => _firstResourcePoitnUI.activeSelf));
-        _stateQueue.Enqueue(new TutorialState("µã»÷ÏÂ·½°´Å¥ÏûºÄAPËÑ¹Î\n(Êó±ê×ó¼ü)µã»÷ÎïÆ·½«Æä¼ÓÈë±³°ü",
+        _stateQueue.Enqueue(new TutorialState("ç‚¹å‡»ä¸‹æ–¹æŒ‰é’®æ¶ˆè€—APæœåˆ®\n(é¼ æ ‡å·¦é”®)ç‚¹å‡»ç‰©å“å°†å…¶åŠ å…¥èƒŒåŒ…",
             null, "UI/Sprite/KeyboardSprite/Mouse0",
             () => _firstRPSlots.activeSelf, 2));
-        _stateQueue.Enqueue(new TutorialState("ËÑµ½ÁËÒ©Æ·,°´(Esc)ÍË³ö×ÊÔ´µã\n´ò¿ª±³°üÖÎÁÆ×Ô¼º",
+        _stateQueue.Enqueue(new TutorialState("æœåˆ°äº†è¯å“,æŒ‰(Esc)é€€å‡ºèµ„æºç‚¹\næ‰“å¼€èƒŒåŒ…æ²»ç–—è‡ªå·±",
             "UI/Sprite/KeyboardSprite/Escape", "UI/Sprite/Tutorial/BagExample",
             () => UIManager.Instance.BagPanel.activeSelf, 2));
-        _stateQueue.Enqueue(new TutorialState("¹Ø±Õ±³°ü,¼ÌĞøËÑ¹Î\n×ßµ½ÃÅÅÔµã»÷(Êó±êÓÒ¼ü)¿ª/¹ØÃÅ",
+        _stateQueue.Enqueue(new TutorialState("å…³é—­èƒŒåŒ…,ç»§ç»­æœåˆ®\nèµ°åˆ°é—¨æ—ç‚¹å‡»(é¼ æ ‡å³é”®)å¼€/å…³é—¨",
             "UI/Sprite/KeyboardSprite/Escape", "UI/Sprite/KeyboardSprite/Mouse1",
             () => _secondResourcePoitnSlots.activeInHierarchy));
-        _stateQueue.Enqueue(new TutorialState("ÓÃ½º´øºÍÄ¾°å¿ÉÒÔÖÆ×÷¼Ğ°å\n´ò¿ª±³°ü½øĞĞºÏ³É",
+        _stateQueue.Enqueue(new TutorialState("ç”¨èƒ¶å¸¦å’Œæœ¨æ¿å¯ä»¥åˆ¶ä½œå¤¹æ¿\næ‰“å¼€èƒŒåŒ…è¿›è¡Œåˆæˆ",
             "UI/Sprite/Tutorial/BagExample", "UI/Sprite/Tutorial/CraftExample",
             () => _craftPanel.activeSelf));
-        _stateQueue.Enqueue(new TutorialState("ÄÜ¹»ºÏ³ÉµÄÅä·½×óÉÏ½ÇÎªÂÌÉ«\n(×ó¼ü)Ñ¡ÖĞºóµã»÷ºÏ³É°´Å¥",
+        _stateQueue.Enqueue(new TutorialState("èƒ½å¤Ÿåˆæˆçš„é…æ–¹å·¦ä¸Šè§’ä¸ºç»¿è‰²\n(å·¦é”®)é€‰ä¸­åç‚¹å‡»åˆæˆæŒ‰é’®",
             null, "UI/Sprite/Tutorial/CraftDeployExample",
-            () => BackpackManager.Instance.ItemList.Find(i => i.ItemData.ItemName == "¼Ğ°å")));
-        _stateQueue.Enqueue(new TutorialState("¹Ø±Õ±³°ü,¼ÌĞøËÑ¹Î\n",
+            () => BackpackManager.Instance.ItemList.Find(i => i.ItemData.ItemName == "å¤¹æ¿")));
+        _stateQueue.Enqueue(new TutorialState("å…³é—­èƒŒåŒ…,ç»§ç»­æœåˆ®\n",
             "UI/Sprite/KeyboardSprite/Escape", null,
             () => !UIManager.Instance.BagPanel.activeSelf));
-        _stateQueue.Enqueue(new TutorialState("ÒÆ¶¯ºÍËÑ¹Î¶¼»áÏûºÄAPµã\nÏÔÊ¾ÔÚ×ó²à½ÇÉ«Ãæ°å",
+        _stateQueue.Enqueue(new TutorialState("ç§»åŠ¨å’Œæœåˆ®éƒ½ä¼šæ¶ˆè€—APç‚¹\næ˜¾ç¤ºåœ¨å·¦ä¾§è§’è‰²é¢æ¿",
             "UI/Sprite/Tutorial/PlayerInfoExample", null,
             () => true, 5));
-        _stateQueue.Enqueue(new TutorialState("ÆÁÄ»ÉÏ·½ÏÔÊ¾ÁËµ±Ç°ÊÀ½ç»ØºÏ\nÃ¿¸öÊÀ½ç»ØºÏ¿ªÊ¼Ê±»á»ñµÃ12AP",
+        _stateQueue.Enqueue(new TutorialState("å±å¹•ä¸Šæ–¹æ˜¾ç¤ºäº†å½“å‰ä¸–ç•Œå›åˆ\næ¯ä¸ªä¸–ç•Œå›åˆå¼€å§‹æ—¶ä¼šè·å¾—12AP",
             "UI/Sprite/Tutorial/TurnDisplayExample", null,
             () => true, 10));
-        _stateQueue.Enqueue(new TutorialState("µã»÷ÓÒÏÂ½Ç°´Å¥Á½´ÎÍ¶Æ±½áÊø»ØºÏ\nËùÓĞÍæ¼Ò¾ùÍ¶Æ±Ôò½øÈëÏÂÒ»»ØºÏ",
+        _stateQueue.Enqueue(new TutorialState("ç‚¹å‡»å³ä¸‹è§’æŒ‰é’®ä¸¤æ¬¡æŠ•ç¥¨ç»“æŸå›åˆ\næ‰€æœ‰ç©å®¶å‡æŠ•ç¥¨åˆ™è¿›å…¥ä¸‹ä¸€å›åˆ",
             "UI/Sprite/Tutorial/EndTurnExample", "UI/Sprite/Tutorial/ConfirmEndExample",
             () => _playerActionPoint.CurrentActionPoint >= 12, 2));
-        _stateQueue.Enqueue(new TutorialState("×óÉÏ½ÇÏÔÊ¾ÁËĞ¡µØÍ¼\n°´(M¼ü)´ò¿ª´óµØÍ¼",
-            "UI/Sprite/Tutorial/MiniMapExample", "UI/Sprite/KeyboardSprite/M",
-            () => Input.GetKeyDown(KeyCode.M), 1));
-        _stateQueue.Enqueue(new TutorialState("µØÍ¼ÉÏÏÔÊ¾ÁËµ±Ç°°²È«Çø\n°×¿òÄÚÊÇÏÂÒ»¸ö°²È«Çø",
+        _stateQueue.Enqueue(new TutorialState("å·¦ä¸Šè§’æ˜¾ç¤ºäº†å°åœ°å›¾\næŒ‰(Tabé”®)æ‰“å¼€å¤§åœ°å›¾",
+            "UI/Sprite/Tutorial/MiniMapExample", "UI/Sprite/KeyboardSprite/Tab",
+            () => Input.GetKeyDown(KeyCode.Tab), 1));
+        _stateQueue.Enqueue(new TutorialState("åœ°å›¾ä¸Šæ˜¾ç¤ºäº†å½“å‰å®‰å…¨åŒº\nç™½æ¡†å†…æ˜¯ä¸‹ä¸€ä¸ªå®‰å…¨åŒº",
             null, null,
             () => true, 5));
-        _stateQueue.Enqueue(new TutorialState("Ã¿2¸öÊÀ½ç»ØºÏ»áËõĞ¡°²È«Çø\n°²È«ÇøÍâ»î¶¯»áµôÑª",
+        _stateQueue.Enqueue(new TutorialState("æ¯2ä¸ªä¸–ç•Œå›åˆä¼šç¼©å°å®‰å…¨åŒº\nå®‰å…¨åŒºå¤–æ´»åŠ¨ä¼šæ‰è¡€",
             null, null,
             () => true, 6));
-        _stateQueue.Enqueue(new TutorialState("¼ÌĞøËÑ¹Î\nÑ°ÕÒÓĞÓÃµÄÎï×Ê",
+        _stateQueue.Enqueue(new TutorialState("ç»§ç»­æœåˆ®\nå¯»æ‰¾æœ‰ç”¨çš„ç‰©èµ„",
             null, null,
             () => _thirdResourcePoitnSlots.activeInHierarchy, 0));
-        _stateQueue.Enqueue(new TutorialState("ÎäÆ÷¾ßÓĞÉËº¦ÀàĞÍºÍ»ù´¡ÉËº¦\n¹¥»÷²»Í¬²¿Î»ÉËº¦±¶ÂÊ²»Í¬",
+        _stateQueue.Enqueue(new TutorialState("æ­¦å™¨å…·æœ‰ä¼¤å®³ç±»å‹å’ŒåŸºç¡€ä¼¤å®³\næ”»å‡»ä¸åŒéƒ¨ä½ä¼¤å®³å€ç‡ä¸åŒ",
             "UI/Sprite/Tutorial/WeaponExample", null,
             () => !_thirdResourcePoitnSlots.activeInHierarchy, 2));
-        _stateQueue.Enqueue(new TutorialState("ÏÖÔÚµÄ²ÄÁÏ¿ÉÒÔºÏ³ÉÖ½ÖÊ»¤¼×ÁË\nµã»÷ÓÒ¼ü¿É×°±¸»¤¼×",
+        _stateQueue.Enqueue(new TutorialState("ç°åœ¨çš„ææ–™å¯ä»¥åˆæˆçº¸è´¨æŠ¤ç”²äº†\nç‚¹å‡»å³é”®å¯è£…å¤‡æŠ¤ç”²",
             "UI/Sprite/Tutorial/ArmorExample2", "UI/Sprite/Tutorial/EquipExample",
             () => BackpackManager.Instance.ItemList.Find(
-                i => i.ItemData.ItemName == "Ö½ÖÊ»¤¼×")));
-        _stateQueue.Enqueue(new TutorialState("»¤¼×»á¼õÉÙÌØ¶¨ÀàĞÍµÄÉËº¦\nÆä³ĞÉËÖµ¹éÁãºó»áËğ»µ",
+                i => i.ItemData.ItemName == "çº¸è´¨æŠ¤ç”²")));
+        _stateQueue.Enqueue(new TutorialState("æŠ¤ç”²ä¼šå‡å°‘ç‰¹å®šç±»å‹çš„ä¼¤å®³\nå…¶æ‰¿ä¼¤å€¼å½’é›¶åä¼šæŸå",
             "UI/Sprite/Tutorial/ArmorExample2", null,
             () => UIManager.Instance.BagPanel.activeSelf));
-        _stateQueue.Enqueue(new TutorialState("¹Ø±Õ±³°ü\n»Øµ½³¡¾°ÖĞ¼ÌĞøÌ½Ë÷",
+        _stateQueue.Enqueue(new TutorialState("å…³é—­èƒŒåŒ…\nå›åˆ°åœºæ™¯ä¸­ç»§ç»­æ¢ç´¢",
             "UI/Sprite/KeyboardSprite/Escape", null,
             () => !UIManager.Instance.BagPanel.activeSelf, 0.5f));
-        _stateQueue.Enqueue(new TutorialState("ÓÒ²àÓĞ²£Á§,´©¹ı»áÆÆËé·¢³öÉùÒô\n¿ÉÄÜ»áÏò¸½½üÍæ¼Ò±©Â¶ÄãµÄÎ»ÖÃ",
+        _stateQueue.Enqueue(new TutorialState("å³ä¾§æœ‰ç»ç’ƒ,ç©¿è¿‡ä¼šç ´ç¢å‘å‡ºå£°éŸ³\nå¯èƒ½ä¼šå‘é™„è¿‘ç©å®¶æš´éœ²ä½ çš„ä½ç½®",
             null, "UI/Sprite/Tutorial/GlassExample",
             () => _playerObject.transform.position.x > 20, 1));
-        _stateQueue.Enqueue(new TutorialState("·¢ÏÖÁËÒ»¸öµĞÈË\n°´×¡altµã»÷µĞÈË,·¢Æğ¹¥»÷",
-            null, "UI/Sprite/Tutorial/FightExample",
+        _stateQueue.Enqueue(new TutorialState("å‘ç°äº†ä¸€ä¸ªæ•Œäºº\næŒ‰ä½altç‚¹å‡»æ•Œäºº,å‘èµ·æ”»å‡»",
+            "UI/Sprite/KeyboardSprite/LeftAlt", "UI/Sprite/Tutorial/FightExample",
             () => true, 5));
-        _stateQueue.Enqueue(new TutorialState("ÔÚ×Ô¼ºµÄ»ØºÏµã»÷×ó¼üÑ¡È¡ÎäÆ÷\nÃ¿»ØºÏ×î¶à¿ÉÏûºÄ1AP",
+        _stateQueue.Enqueue(new TutorialState("åœ¨è‡ªå·±çš„å›åˆç‚¹å‡»å·¦é”®é€‰å–æ­¦å™¨\næ¯å›åˆæœ€å¤šå¯æ¶ˆè€—1AP",
             null, null,
             () => true, 5));
-        _stateQueue.Enqueue(new TutorialState("ÑµÁ·½áÊø,Õ½¶·ĞèÊµÕ½Ñ§Ï°\n¼´½«ÍË»ØÖ÷²Ëµ¥",
+        _stateQueue.Enqueue(new TutorialState("è®­ç»ƒç»“æŸ,æˆ˜æ–—éœ€å®æˆ˜å­¦ä¹ \nå³å°†é€€å›ä¸»èœå•",
             null, null,
             () => true, 6));
         _stateQueue.Enqueue(new TutorialState("",

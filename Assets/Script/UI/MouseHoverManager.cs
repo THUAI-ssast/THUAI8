@@ -1,4 +1,4 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using Pathfinding;
 using System;
 using System.Collections;
@@ -10,81 +10,81 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 /// <summary>
-/// ¹©Íæ¼ÒÔÚµØÍ¼ÉÏÍ¨¹ıÊó±êĞüÍ£²é¿´ĞÅÏ¢µÄ¹ÜÀíÀà
+/// å•ä¾‹Managerï¼ŒUIæ˜¾ç¤ºç±»ï¼Œç®¡ç†ä¾›ç©å®¶åœ¨åœ°å›¾ä¸Šé€šè¿‡é¼ æ ‡æ‚¬åœæŸ¥çœ‹çš„ä¿¡æ¯
 /// </summary>
 public class MouseHoverManager : MonoBehaviour
 {
-    // ËùÓÃTilemaps
+    // æ‰€ç”¨Tilemaps
     private Tilemap _groundTilemap;
     private Tilemap _wallTilemap;
     private Tilemap _furnitureTilemap;
     private Tilemap _glassTilemap;
     private Tilemap _itemTilemap;
 
-    // ÓÃÓÚÀàĞÍÅĞ¶ÏµÄ¸÷ÖÖTile
+    // ç”¨äºç±»å‹åˆ¤æ–­çš„å„ç§Tile
     public Tile DoorTileHorizontal;
     public Tile DoorTileVertical;
     public Tile BrokenGlassTile;
 
     /// <summary>
-    /// Êó±êĞüÍ£ÏÔÊ¾µÄUI
+    /// é¼ æ ‡æ‚¬åœæ˜¾ç¤ºçš„UI
     /// </summary>
     private GameObject _mouseHoverPanel;
     /// <summary>
-    /// ĞüÍ£ÏÔÊ¾UIÏà¶ÔÓÚÊó±êÎ»ÖÃµÄÆ«ÖÃ
+    /// æ‚¬åœæ˜¾ç¤ºUIç›¸å¯¹äºé¼ æ ‡ä½ç½®çš„åç½®
     /// </summary>
     private Vector3 _panelBias;
     /// <summary>
-    /// ĞüÍ£ÏÔÊ¾UIÏÂµÄÎÄ±¾UI
+    /// æ‚¬åœæ˜¾ç¤ºUIä¸‹çš„æ–‡æœ¬UI
     /// </summary>
     private TextMeshProUGUI _panelText;
 
     /// <summary>
-    /// ¼ÇÂ¼ÉÏÒ»´ÎÊó±êĞüÍ£Î»ÖÃµÄtile×ø±ê
+    /// è®°å½•ä¸Šä¸€æ¬¡é¼ æ ‡æ‚¬åœä½ç½®çš„tileåæ ‡
     /// </summary>
     private Vector3Int _lastCellPosition;
 
     /// <summary>
-    /// Êó±êĞüÍ£ÏÔÊ¾µÄĞ­³Ì
+    /// é¼ æ ‡æ‚¬åœæ˜¾ç¤ºçš„åç¨‹
     /// </summary>
     private Coroutine _showCoroutine;
 
     /// <summary>
-    /// ´ÓÍæ¼Ò½«Êó±ê·ÅÔÚtileÉÏµ½ĞüÍ£ÏÔÊ¾UIÄÚÈİµÄÊ±ÑÓ
+    /// ä»ç©å®¶å°†é¼ æ ‡æ”¾åœ¨tileä¸Šåˆ°æ‚¬åœæ˜¾ç¤ºUIå†…å®¹çš„æ—¶å»¶
     /// </summary>
     private float _showDelay = 0.6f;
 
     /// <summary>
-    /// ÊÇ·ñÔÚĞüÍ£Ê±ÏÔÊ¾UIµÄÖ¸Ê¾±äÁ¿£¬ÓÉÍæ¼Ò¿ØÖÆ
+    /// æ˜¯å¦åœ¨æ‚¬åœæ—¶æ˜¾ç¤ºUIçš„æŒ‡ç¤ºå˜é‡ï¼Œç”±ç©å®¶æ§åˆ¶
     /// </summary>
     private bool _isShowUI = false;
 
     /// <summary>
-    /// ±íÊ¾Íæ¼ÒÇĞ»»ĞüÍ£ÏÔÊ¾×´Ì¬µÄCD£¬Ö»ÓĞÖµÎªfalseÊ±ÇĞ»»²Ù×÷²ÅÓĞĞ§
+    /// è¡¨ç¤ºç©å®¶åˆ‡æ¢æ‚¬åœæ˜¾ç¤ºçŠ¶æ€çš„CDï¼Œåªæœ‰å€¼ä¸ºfalseæ—¶åˆ‡æ¢æ“ä½œæ‰æœ‰æ•ˆ
     /// </summary>
     private bool _isSwitchCD = false;
 
     /// <summary>
-    /// ÓÃÓÚÏÔÊ¾Êó±êĞüÍ£ÊÇ·ñ´ò¿ªµÄĞÅÏ¢µÄĞ­³Ì
+    /// ç”¨äºæ˜¾ç¤ºé¼ æ ‡æ‚¬åœæ˜¯å¦æ‰“å¼€çš„ä¿¡æ¯çš„åç¨‹
     /// </summary>
     private Coroutine _displayCoroutine;
 
     /// <summary>
-    /// ¼ÇÂ¼µ±Íæ¼Ò´ò¿ªÆäËû×èÈûÊ½UIÖ®Ç°Êó±êĞüÍ£ÏÔÊ¾µÄ×´Ì¬£¬ÓÃÓÚÔÚÍæ¼Ò¹Ø±ÕËùÓĞ×èÈûÊ½UIºó»Ö¸´Ö®Ç°µÄÉèÖÃ
+    /// è®°å½•å½“ç©å®¶æ‰“å¼€å…¶ä»–é˜»å¡å¼UIä¹‹å‰é¼ æ ‡æ‚¬åœæ˜¾ç¤ºçš„çŠ¶æ€ï¼Œç”¨äºåœ¨ç©å®¶å…³é—­æ‰€æœ‰é˜»å¡å¼UIåæ¢å¤ä¹‹å‰çš„è®¾ç½®
     /// </summary>
     private bool _isShowUIBefore;
 
 
     private void Start()
     {
-        // »ñÈ¡ËùÓĞµÄtilemap
+        // è·å–æ‰€æœ‰çš„tilemap
         _groundTilemap = transform.GetChild(0).Find("GroundTilemap").GetComponent<Tilemap>();
         _wallTilemap = transform.GetChild(0).Find("WallTilemap").GetComponent<Tilemap>();
         _furnitureTilemap = transform.GetChild(0).Find("FurnitureTilemap").GetComponent<Tilemap>();
         _glassTilemap = transform.GetChild(0).Find("GlassTilemap").GetComponent<Tilemap>();
         _itemTilemap = transform.GetChild(0).Find("ItemTilemap").GetComponent<Tilemap>();
 
-        // ³õÊ¼»¯ĞüÍ£ÏÔÊ¾UIÏà¹ØµÄ¶ÔÏó
+        // åˆå§‹åŒ–æ‚¬åœæ˜¾ç¤ºUIç›¸å…³çš„å¯¹è±¡
         _mouseHoverPanel = UIManager.Instance.MainCanvas.transform.Find("MouseHoverPanel").gameObject;
         _panelBias = new Vector3(120,-60);
         _panelText = _mouseHoverPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
@@ -100,9 +100,9 @@ public class MouseHoverManager : MonoBehaviour
 
     private void Update()
     {
-        if (UIManager.Instance.GetActiveUINumber == 0)  // µ±´æÔÚÆäËû×èÈûÊ½UIÊ±£¬½ûÖ¹Êó±êĞüÍ£¹¦ÄÜ£¨ÀıÈç±³°üUI¡¢×ÊÔ´µãUI¡¢Õ½¶·½çÃæUIµÈ£©
+        if (UIManager.Instance.GetActiveUINumber == 0)  // å½“å­˜åœ¨å…¶ä»–é˜»å¡å¼UIæ—¶ï¼Œç¦æ­¢é¼ æ ‡æ‚¬åœåŠŸèƒ½ï¼ˆä¾‹å¦‚èƒŒåŒ…UIã€èµ„æºç‚¹UIã€æˆ˜æ–—ç•Œé¢UIç­‰ï¼‰
         {   
-            if (Input.GetKeyDown(KeyCode.C) && !_isSwitchCD)    // ¼üÅÌ°´CÇĞ»»ÊÇ·ñÆôÓÃÊó±êĞüÍ£¹¦ÄÜµÄ×´Ì¬
+            if (Input.GetKeyDown(KeyCode.C) && !_isSwitchCD)    // é”®ç›˜æŒ‰Cåˆ‡æ¢æ˜¯å¦å¯ç”¨é¼ æ ‡æ‚¬åœåŠŸèƒ½çš„çŠ¶æ€
             {
                 _isSwitchCD = true;
                 ReverseShowUIStatus();
@@ -118,7 +118,7 @@ public class MouseHoverManager : MonoBehaviour
         }
         else
         {
-            // µ±ÆäËû×èÈûÊ½UI±»´ò¿ªÊ±£¬¹Ø±ÕÊó±êĞüÍ£¹¦ÄÜ
+            // å½“å…¶ä»–é˜»å¡å¼UIè¢«æ‰“å¼€æ—¶ï¼Œå…³é—­é¼ æ ‡æ‚¬åœåŠŸèƒ½
             if (_isShowUI)
             {
                 _isShowUIBefore = true;
@@ -128,96 +128,96 @@ public class MouseHoverManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ³ÖĞø½øĞĞĞüÍ£ÏÔÊ¾µÄĞ­³Ì
+    /// æŒç»­è¿›è¡Œæ‚¬åœæ˜¾ç¤ºçš„åç¨‹
     /// </summary>
     /// <returns></returns>
     private IEnumerator ShowUI()
     {
         while (true)
         {
-            // »ñÈ¡Êó±êÎ»ÖÃºÍ¶ÔÓ¦µÄcellPosition
+            // è·å–é¼ æ ‡ä½ç½®å’Œå¯¹åº”çš„cellPosition
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3Int targetCellPos = _groundTilemap.WorldToCell(mousePos);
 
-            if (targetCellPos == _lastCellPosition) // Èç¹ûÊó±êÎ»ÖÃËùÔÚµÄtileÓëÉÏ´Î¼ì²âÊ±ÏàÍ¬£¬ÔòÖ±½ÓÊ¹Õ¹Ê¾µÄÄÚÈİ¸úËæÊó±êÎ»ÖÃÒÆ¶¯£¬¶ø²»ÔÙ¼ÌĞøºóĞøÅĞ¶Ï
+            if (targetCellPos == _lastCellPosition) // å¦‚æœé¼ æ ‡ä½ç½®æ‰€åœ¨çš„tileä¸ä¸Šæ¬¡æ£€æµ‹æ—¶ç›¸åŒï¼Œåˆ™ç›´æ¥ä½¿å±•ç¤ºçš„å†…å®¹è·Ÿéšé¼ æ ‡ä½ç½®ç§»åŠ¨ï¼Œè€Œä¸å†ç»§ç»­åç»­åˆ¤æ–­
             {
-                yield return new WaitForSeconds(0.05f); // ¸úËæÊó±êµÄ¼ä¸ôÎª0.05s
+                yield return new WaitForSeconds(0.05f); // è·Ÿéšé¼ æ ‡çš„é—´éš”ä¸º0.05s
                 _mouseHoverPanel.GetComponent<RectTransform>().position = Input.mousePosition + _panelBias;
                 continue;
             }
 
-            // Èç¹ûÊó±êÎ»ÖÃËùÔÚµÄtileÓëÉÏ´Î¼ì²âÊ±²»Í¬£¬ÔòÏÈÒş²Ø¾ÉµÄUI£¬ºóĞøÔÙ½øĞĞ¸üĞÂ
+            // å¦‚æœé¼ æ ‡ä½ç½®æ‰€åœ¨çš„tileä¸ä¸Šæ¬¡æ£€æµ‹æ—¶ä¸åŒï¼Œåˆ™å…ˆéšè—æ—§çš„UIï¼Œåç»­å†è¿›è¡Œæ›´æ–°
             _mouseHoverPanel.SetActive(false);
             _lastCellPosition = targetCellPos;
 
-            // Êó±êĞüÍ£ÔÚ¿É¼û·¶Î§Íâ£¬ÔòÖ±½Ó·µ»Ø
+            // é¼ æ ‡æ‚¬åœåœ¨å¯è§èŒƒå›´å¤–ï¼Œåˆ™ç›´æ¥è¿”å›
             if (!GridMoveController.Instance.IsInBoundary(targetCellPos))
             {
                 continue;
             }
 
-            // ´ÓÍæ¼Ò½«Êó±ê·ÅÔÚtileÉÏµ½ĞüÍ£ÏÔÊ¾UIÄÚÈİÊÇ´æÔÚÊ±ÑÓµÄ£¬ÕıºÃÀûÓÃ¸ÃÊ±ÑÓ½øĞĞÑ°Â·ÅĞ¶Ï
+            // ä»ç©å®¶å°†é¼ æ ‡æ”¾åœ¨tileä¸Šåˆ°æ‚¬åœæ˜¾ç¤ºUIå†…å®¹æ˜¯å­˜åœ¨æ—¶å»¶çš„ï¼Œæ­£å¥½åˆ©ç”¨è¯¥æ—¶å»¶è¿›è¡Œå¯»è·¯åˆ¤æ–­
             GridMoveController.Instance.JudgeReachable(targetCellPos);
             yield return new WaitForSeconds(_showDelay);
 
             bool isTileOccupied = false;
             string descriptionText = "";
-            // ÅĞ¶ÏĞüÍ£ÔÚÄÄÀàtileÉÏ
-            if (_wallTilemap.HasTile(targetCellPos))    // WallTilemap£¨°üÀ¨Ç½¡¢ÃÅºÍÆäËûÀàĞÍµÄÕÏ°­Îï£©
+            // åˆ¤æ–­æ‚¬åœåœ¨å“ªç±»tileä¸Š
+            if (_wallTilemap.HasTile(targetCellPos))    // WallTilemapï¼ˆåŒ…æ‹¬å¢™ã€é—¨å’Œå…¶ä»–ç±»å‹çš„éšœç¢ç‰©ï¼‰
             {
                 isTileOccupied = true;
-                descriptionText = IsDoorTile(targetCellPos) ? "ÃÅ£º¿¿½ü  <sprite=1>ÓÒ¼ü´ò¿ª»ò¹Ø±Õ\n" : "´Ë´¦ÎŞ·¨µ½´ï\n"; // TextMeshProµÄ¸»ÎÄ±¾¹¦ÄÜ£¬¿ÉÒÔ²åÈëÍ¼Æ¬
+                descriptionText = IsDoorTile(targetCellPos) ? "é—¨ï¼šé è¿‘  <sprite=1>å³é”®æ‰“å¼€æˆ–å…³é—­\n" : "æ­¤å¤„æ— æ³•åˆ°è¾¾\n"; // TextMeshProçš„å¯Œæ–‡æœ¬åŠŸèƒ½ï¼Œå¯ä»¥æ’å…¥å›¾ç‰‡
             }
             else if (_furnitureTilemap.HasTile(targetCellPos))  // FurnitureTilemap
             {
                 isTileOccupied = true;
-                descriptionText = "´Ë´¦ÎŞ·¨µ½´ï\n";
+                descriptionText = "æ­¤å¤„æ— æ³•åˆ°è¾¾\n";
             }
-            else if (_groundTilemap.HasTile(targetCellPos)) // GroundTilemap£¬¸ÃÀàĞÍµÄtileÔÚµØÍ¼·¶Î§ÄÚµÄÃ¿Ò»¸ñ¶¼´æÔÚ
+            else if (_groundTilemap.HasTile(targetCellPos)) // GroundTilemapï¼Œè¯¥ç±»å‹çš„tileåœ¨åœ°å›¾èŒƒå›´å†…çš„æ¯ä¸€æ ¼éƒ½å­˜åœ¨
             {
                 isTileOccupied = true;
-                if (GridMoveController.Instance.IsMovable)  // Íæ¼ÒÒÆ¶¯Ê±½ûÓÃĞüÍ£ÏÔÊ¾
+                if (GridMoveController.Instance.IsMovable)  // ç©å®¶ç§»åŠ¨æ—¶ç¦ç”¨æ‚¬åœæ˜¾ç¤º
                 {
-                    // »ñÈ¡Ö®Ç°¼ÆËãºÃµÄÑ°Â·½á¹û
+                    // è·å–ä¹‹å‰è®¡ç®—å¥½çš„å¯»è·¯ç»“æœ
                     bool isReachable = GridMoveController.Instance.IsReachable;
                     string requiredActionPoint = GridMoveController.Instance.RequiredActionPoint().ToString("0.0");
-                    descriptionText = isReachable ? $"<sprite=0>×ó¼üÒÆ¶¯µ½ÕâÀï {requiredActionPoint}AP\n" : "´Ë´¦ÎŞ·¨µ½´ï\n";
+                    descriptionText = isReachable ? $"<sprite=0>å·¦é”®ç§»åŠ¨åˆ°è¿™é‡Œ {requiredActionPoint}AP\n" : "æ­¤å¤„æ— æ³•åˆ°è¾¾\n";
                 }
             }
 
-            // µ¥¶ÀÅĞ¶ÏÊÇ·ñĞüÍ£ÔÚ²£Á§ÉÏ
-            if (_glassTilemap.HasTile(targetCellPos) && !IsGlassBroken(targetCellPos))  // GlassTilemap£¬ºöÂÔÆÆËéµÄ²£Á§
+            // å•ç‹¬åˆ¤æ–­æ˜¯å¦æ‚¬åœåœ¨ç»ç’ƒä¸Š
+            if (_glassTilemap.HasTile(targetCellPos) && !IsGlassBroken(targetCellPos))  // GlassTilemapï¼Œå¿½ç•¥ç ´ç¢çš„ç»ç’ƒ
             {
-                descriptionText += "²£Á§£ºÒÆ¶¯¾­¹ı¿É×²ÆÆ\n";
+                descriptionText += "ç»ç’ƒï¼šç§»åŠ¨ç»è¿‡å¯æ’ç ´\n";
             }
 
-            // ÅĞ¶ÏÊÇ·ñĞüÍ£ÔÚ×ÊÔ´µãÉÏ
+            // åˆ¤æ–­æ˜¯å¦æ‚¬åœåœ¨èµ„æºç‚¹ä¸Š
             bool resourcePointExists = ResourcePointController.ResourcePointDictionary.ContainsKey(targetCellPos);
             if (resourcePointExists)
             {
-                descriptionText += "×ÊÔ´µã£º¿¿½ü  <sprite=1>ÓÒ¼ü²é¿´×ÊÔ´\n";
+                descriptionText += "èµ„æºç‚¹ï¼šé è¿‘  <sprite=1>å³é”®æŸ¥çœ‹èµ„æº\n";
             }
 
-            // ÅĞ¶ÏÊÇ·ñĞüÍ£ÔÚÎïÆ·ÉÏ£¬Ê¹ÓÃÉäÏß¼ì²â·½·¨
+            // åˆ¤æ–­æ˜¯å¦æ‚¬åœåœ¨ç‰©å“ä¸Šï¼Œä½¿ç”¨å°„çº¿æ£€æµ‹æ–¹æ³•
             RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
             bool isFirst = true;
             if (hits.Length > 0)
             {
                 foreach (var item in hits)
                 {
-                    if (item.collider.GetComponent<Item>() != null) // ÒªÇóÅö×²Ìå±ØĞëÊÇItemÀà
+                    if (item.collider.GetComponent<Item>() != null) // è¦æ±‚ç¢°æ’ä½“å¿…é¡»æ˜¯Itemç±»
                     {
-                        if (isFirst)    // ÔÚÏÔÊ¾ÎïÆ·ÁĞ±íÇ°ÌáÊ¾ÎïÆ·µÄÊ°È¡ĞÅÏ¢
+                        if (isFirst)    // åœ¨æ˜¾ç¤ºç‰©å“åˆ—è¡¨å‰æç¤ºç‰©å“çš„æ‹¾å–ä¿¡æ¯
                         {
-                            descriptionText += "¿¿½ü  <sprite=1>ÓÒ¼üÊ°È¡ÎïÆ·\n";
+                            descriptionText += "é è¿‘  <sprite=1>å³é”®æ‹¾å–ç‰©å“\n";
                             isFirst = false;
                         }
-                        descriptionText += $"ÎïÆ·£º{item.collider.GetComponent<Item>().ItemData.ItemName}\n";
+                        descriptionText += $"ç‰©å“ï¼š{item.collider.GetComponent<Item>().ItemData.ItemName}\n";
                     }
                 }
             }
 
-            // ¸üĞÂĞüÍ£ÏÔÊ¾UIµÄÎÄ±¾ÄÚÈİ¡¢Î»ÖÃ£¨¸úËæÊó±ê£©¡¢¿É¼û×´Ì¬
+            // æ›´æ–°æ‚¬åœæ˜¾ç¤ºUIçš„æ–‡æœ¬å†…å®¹ã€ä½ç½®ï¼ˆè·Ÿéšé¼ æ ‡ï¼‰ã€å¯è§çŠ¶æ€
             _panelText.text = descriptionText;
             if (isTileOccupied && descriptionText != "")
             {
@@ -228,10 +228,10 @@ public class MouseHoverManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÅĞ¶ÏtileÊÇ·ñÎªÃÅ
+    /// åˆ¤æ–­tileæ˜¯å¦ä¸ºé—¨
     /// </summary>
-    /// <param name="position">ĞèÒª½øĞĞÅĞ¶ÏµÄtilePosition</param>
-    /// <returns>·µ»ØtrueÔò±íÊ¾ÅĞ¶ÏµÄtileÊÇÃÅ</returns>
+    /// <param name="position">éœ€è¦è¿›è¡Œåˆ¤æ–­çš„tilePosition</param>
+    /// <returns>è¿”å›trueåˆ™è¡¨ç¤ºåˆ¤æ–­çš„tileæ˜¯é—¨</returns>
     private bool IsDoorTile(Vector3Int position)
     {
         TileBase tile = _wallTilemap.GetTile(position);
@@ -239,10 +239,10 @@ public class MouseHoverManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÅĞ¶ÏtileÊÇ·ñÎªÆÆËéµÄ²£Á§
+    /// åˆ¤æ–­tileæ˜¯å¦ä¸ºç ´ç¢çš„ç»ç’ƒ
     /// </summary>
-    /// <param name="position">ĞèÒª½øĞĞÅĞ¶ÏµÄtilePosition</param>
-    /// <returns>·µ»ØtrueÔò±íÊ¾ÅĞ¶ÏµÄtileÊÇÆÆËéµÄ²£Á§</returns>
+    /// <param name="position">éœ€è¦è¿›è¡Œåˆ¤æ–­çš„tilePosition</param>
+    /// <returns>è¿”å›trueåˆ™è¡¨ç¤ºåˆ¤æ–­çš„tileæ˜¯ç ´ç¢çš„ç»ç’ƒ</returns>
     private bool IsGlassBroken(Vector3Int position)
     {
         TileBase tile = _glassTilemap.GetTile(position);
@@ -250,18 +250,18 @@ public class MouseHoverManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÇĞ»»ÊÇ·ñÆôÓÃÊó±êĞüÍ£¹¦ÄÜµÄ×´Ì¬
+    /// åˆ‡æ¢æ˜¯å¦å¯ç”¨é¼ æ ‡æ‚¬åœåŠŸèƒ½çš„çŠ¶æ€
     /// </summary>
     private void ReverseShowUIStatus(bool isDisplayText=true)
     {
         string displayText;
         _isShowUI = !_isShowUI;
-        if (_isShowUI)  // ÆôÓÃÊó±êĞüÍ£¹¦ÄÜ
+        if (_isShowUI)  // å¯ç”¨é¼ æ ‡æ‚¬åœåŠŸèƒ½
         {
             _showCoroutine = StartCoroutine(ShowUI());
-            displayText = "Êó±êĞüÍ£ÏÔÊ¾ÒÑ¿ª";
+            displayText = "é¼ æ ‡æ‚¬åœæ˜¾ç¤ºå·²å¼€";
         }
-        else  // ¹Ø±ÕÊó±êĞüÍ£¹¦ÄÜ
+        else  // å…³é—­é¼ æ ‡æ‚¬åœåŠŸèƒ½
         {
             if (_showCoroutine != null)
             {
@@ -269,9 +269,9 @@ public class MouseHoverManager : MonoBehaviour
             }
             _mouseHoverPanel.SetActive(false);
             _lastCellPosition = Vector3Int.back;
-            displayText = "Êó±êĞüÍ£ÏÔÊ¾ÒÑ¹Ø";
+            displayText = "é¼ æ ‡æ‚¬åœæ˜¾ç¤ºå·²å…³";
         }
-        // ÏÔÊ¾UIÒÔÌáÊ¾Íæ¼Òµ±Ç°Êó±êĞüÍ£¹¦ÄÜÊÇ·ñÆôÓÃ
+        // æ˜¾ç¤ºUIä»¥æç¤ºç©å®¶å½“å‰é¼ æ ‡æ‚¬åœåŠŸèƒ½æ˜¯å¦å¯ç”¨
         if(isDisplayText)
         {
             UIManager.Instance.DisplayHoverStatusPanel(displayText);

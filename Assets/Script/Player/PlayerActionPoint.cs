@@ -6,6 +6,9 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using DG.Tweening;
 
+/// <summary>
+/// 玩家数据类，管理玩家的行动点(AP)相关
+/// </summary>
 public class PlayerActionPoint : NetworkBehaviour
 {
     /// <summary>
@@ -13,6 +16,9 @@ public class PlayerActionPoint : NetworkBehaviour
     /// </summary>
     [SyncVar(hook = nameof(ActionPointChange))] private float _currentActionPoint = 15;
 
+    /// <summary>
+    /// 玩家当前的AP值
+    /// </summary>
     public float CurrentActionPoint { get => _currentActionPoint; }
 
     /// <summary>
@@ -104,7 +110,7 @@ public class PlayerActionPoint : NetworkBehaviour
     }
 
     /// <summary>
-    /// 改变玩家体力的统一接口。
+    /// 改变玩家体力的统一接口
     /// </summary>
     /// <param name="increase">要改变的体力值：当increase大于0时，增加相应的体力值，最高增加至体力值上限；当increase小于0时，减少相应的体力值</param>
     private void ChangeActionPoint(float increase)
@@ -123,7 +129,10 @@ public class PlayerActionPoint : NetworkBehaviour
     {
         DeployChangeActionPoint(increase);
     }
-
+    /// <summary>
+    /// 应用AP改变
+    /// </summary>
+    /// <param name="increase">变动值，正数为增加AP，负数为减少AP</param>
     private void DeployChangeActionPoint(float increase)
     {
         float tempActionPoint = _currentActionPoint + increase;

@@ -1,19 +1,32 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using TMPro;
 using UnityEngine.UI;
 
+/// <summary>
+/// ç©å®¶è¡Œä¸ºç±»ï¼Œæ§åˆ¶æ¸¸æˆå¼€å§‹æ—¶ç©å®¶å‡ºç”Ÿä½ç½®
+/// </summary>
 public class PlayerBorn : NetworkBehaviour
 {
+    /// <summary>
+    /// å¤„ç†ç‚¹å‡»è·³ä¼åœ°å›¾æ ¼å­äº‹ä»¶
+    /// </summary>
+    /// <param name="oldIndex"></param>
+    /// <param name="newIndex"></param>
+    /// <param name="conn"></param>
     [Command]
     public void CmdHandleCellClick(int oldIndex, int newIndex, NetworkConnectionToClient conn = null)
     {
         ChangeGridCellColor(oldIndex, newIndex);
         TargetChangeCurrentRedCell(conn, newIndex);
     }
-
+    /// <summary>
+    /// æ›´æ–°è·³ä¼åœ°å›¾æ ¼å­é¢œè‰²
+    /// </summary>
+    /// <param name="oldIndex"></param>
+    /// <param name="newIndex"></param>
     [ClientRpc]
     public void ChangeGridCellColor(int oldIndex, int newIndex)
     {
@@ -30,14 +43,18 @@ public class PlayerBorn : NetworkBehaviour
             GameObject clickedCell = BornUIManager.Instance.GridCells[newIndex];
             GridCell gridCellComponent = clickedCell.GetComponent<GridCell>();
 
-            // ¸üĞÂ PlayerAmount
+            // æ›´æ–° PlayerAmount
             gridCellComponent.PlayerAmount += 1;
 
-            // ¸üĞÂµ±Ç°¿Í»§¶ËµÄÏÔÊ¾×´Ì¬
+            // æ›´æ–°å½“å‰å®¢æˆ·ç«¯çš„æ˜¾ç¤ºçŠ¶æ€
             UpdateCellDisplay(clickedCell, gridCellComponent.PlayerAmount);
         }
     }
-
+    /// <summary>
+    /// æ›´æ–°è·³ä¼åœ°å›¾ä¸Šå¯¹åº”æ ¼å­çš„UIæ˜¾ç¤º
+    /// </summary>
+    /// <param name="cell"></param>
+    /// <param name="amount"></param>
     private void UpdateCellDisplay(GameObject cell, int amount)
     {
         Image cellImage = cell.GetComponent<Image>();
@@ -45,7 +62,7 @@ public class PlayerBorn : NetworkBehaviour
 
         if (amount > 0)
         {
-            // ÏÔÊ¾ºìÉ«±³¾°ºÍÎÄ±¾
+            // æ˜¾ç¤ºçº¢è‰²èƒŒæ™¯å’Œæ–‡æœ¬
             if (cell != BornUIManager.Instance.CurrentSelectedCell)
                 cellImage.color = Color.red;
             textComponent.gameObject.SetActive(true);
@@ -53,7 +70,7 @@ public class PlayerBorn : NetworkBehaviour
         }
         else
         {
-            // »Ö¸´°×É«±³¾°²¢Òş²ØÎÄ±¾
+            // æ¢å¤ç™½è‰²èƒŒæ™¯å¹¶éšè—æ–‡æœ¬
             Color currentColor = Color.white;
             currentColor.a = 100f / 255f;
             cellImage.color = currentColor;
@@ -62,7 +79,7 @@ public class PlayerBorn : NetworkBehaviour
     }
 
     /// <summary>
-    /// ²ÉÓÃ»Øµ÷£¬±ÜÃâÔÚĞŞ¸Ä¾ÉµÄCurrentRedCellÖ®Ç°£¬¾ÍÒÑ¾­°ÑCurrentRedCell¸üĞÂ
+    /// é‡‡ç”¨å›è°ƒï¼Œé¿å…åœ¨ä¿®æ”¹æ—§çš„CurrentRedCellä¹‹å‰ï¼Œå°±å·²ç»æŠŠCurrentRedCellæ›´æ–°
     /// </summary>
     [TargetRpc]
     public void TargetChangeCurrentRedCell(NetworkConnection target, int index)

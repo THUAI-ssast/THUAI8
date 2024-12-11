@@ -1,8 +1,11 @@
-using System;
+﻿using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 单例Manager，UI显示类，管理大小地图及安全区的显示
+/// </summary>
 public class MapUIManager : MonoBehaviour
 {
     public static MapUIManager Instance;
@@ -47,10 +50,6 @@ public class MapUIManager : MonoBehaviour
 
         xBound = (_bigMapPanel.GetComponent<RectTransform>().rect.width - _smallMapMask.GetComponent<RectTransform>().rect.width) / 2;
         yBound = (_bigMapPanel.GetComponent<RectTransform>().rect.height - _smallMapMask.GetComponent<RectTransform>().rect.height) / 2;
-    }
-
-    void Update()
-    {
     }
 
     public void UpdatePlayerPositionImage(Vector3Int playerTilePos)

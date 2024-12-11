@@ -1,8 +1,11 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// UI数据类，选择出生点时的跳伞地图方格
+/// </summary>
 public class GridCell : MonoBehaviour
 {
     private int _playerAmount;
@@ -17,11 +20,5 @@ public class GridCell : MonoBehaviour
     void Start()
     {
         _playerAmount = 0;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }

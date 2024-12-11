@@ -1,15 +1,24 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-//�����������¼�ʱ��ʹ��Camera��Դ���Ŷ�Ӧ��Ƶ
+/// 工具component，根据所处的GameObject的状态播放音频
 /// </summary>
 public class GameObjectAudioTrigger : MonoBehaviour
 {
+    /// <summary>
+    /// 当此component被enable时播放的音频
+    /// </summary>
     [SerializeField] private AudioClip _onEnableAudioClip;
+    /// <summary>
+    /// 当此component被disable时播放的音频
+    /// </summary>
     [SerializeField] private AudioClip _onDisableAudioClip;
+    /// <summary>
+    /// 当此gameObject被destroy时播放的音频
+    /// </summary>
     [SerializeField] private AudioClip _onDestroyAudioClip;
 
     private void OnEnable()

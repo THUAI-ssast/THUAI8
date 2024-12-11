@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// 战斗流程管理类。负责创建和销毁战斗流程。
+/// 单例Manager，战斗流程管理类。负责创建和销毁战斗流程
 /// </summary>
 public class FightingProcessManager : NetworkBehaviour
 {

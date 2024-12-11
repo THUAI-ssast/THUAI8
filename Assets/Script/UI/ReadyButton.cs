@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 准备按钮类，管理准备按钮的行为。
+/// UI行为类，界面右下角世界回合准备按钮的行为。
 /// </summary>
 public class ReadyButton : MonoBehaviour
 {

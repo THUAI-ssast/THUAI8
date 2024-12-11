@@ -1,9 +1,11 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+/// <summary>
+/// UIè¡Œä¸ºç±»ï¼Œåœ¨èµ„æºç‚¹UIå†…çš„æœåˆ®æŒ‰é’®
+/// </summary>
 public class CheckButton : MonoBehaviour
 {
     private string newText = "Resources Checkable";
@@ -22,12 +24,12 @@ public class CheckButton : MonoBehaviour
         ResourcePoint = transform.parent.parent.parent.gameObject;
         if (_checkAudioClip==null)
         {
-            _checkAudioClip = Resources.Load<AudioClip>("Sound/Action/·­ÕÒÎïÆ·½ğÊô");
+            _checkAudioClip = Resources.Load<AudioClip>("Sound/Action/ç¿»æ‰¾ç‰©å“é‡‘å±");
         }
         
         button = GetComponent<Button>();
         buttonText = GetComponentInChildren<TextMeshProUGUI>();
-        buttonText.text = $"ÏûºÄ {ResourcePoint.GetComponent<ResourcePointController>().RequiredActionPoint} APËÑ¹Î";
+        buttonText.text = $"æ¶ˆè€— {ResourcePoint.GetComponent<ResourcePointController>().RequiredActionPoint} APæœåˆ®";
         _slots = transform.parent.GetChild(0).GetChild(0).GetChild(0).gameObject;
         _searchIcon = transform.parent.GetChild(2);
         _slots.SetActive(false);

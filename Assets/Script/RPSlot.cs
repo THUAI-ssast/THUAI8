@@ -1,10 +1,13 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/// <summary>
+/// UI行为类，点击资源点内物品槽拾取物品
+/// </summary>
 public class RPSlot : MonoBehaviour, IPointerClickHandler
 {
     private Item _slotItem;

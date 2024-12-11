@@ -1,32 +1,37 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// UIæ˜¾ç¤ºç±»ï¼Œç®¡ç†åˆæˆè·¯å¾„æ˜¾ç¤ºï¼Œæ”¾ç½®åœ¨èƒŒåŒ…å†…æ¯ä¸€æ¡è·¯å¾„UIä¸Š
+/// </summary>
 public class CraftWayUI : MonoBehaviour
 {
     private static GameObject _craftWayItemImage;
     private static GameObject _catalystItemUI;
     private static Sprite _craftDefault;
     private static Sprite _craftSatisfied;
+
     /// <summary>
-    /// ËùÓĞµÄCraftWayUI
+    /// æ‰€æœ‰çš„CraftWayUI
     /// </summary>
     private static List<CraftWayUI> _uiList = new List<CraftWayUI>();
+
     public static void ClearItemList()
     {
         _uiList.Clear();
     }
 
     /// <summary>
-    /// µ±Ç°Ñ¡ÖĞµÄºÏ³ÉÂ·ÏßÊı¾İ£¬µã»÷Ó¦ÓÃºÏ³ÉÊ±»á±»deploy
+    /// å½“å‰é€‰ä¸­çš„åˆæˆè·¯çº¿æ•°æ®ï¼Œç‚¹å‡»åº”ç”¨åˆæˆæ—¶ä¼šè¢«deploy
     /// </summary>
     public static CraftWayData SelectedCraftWay { get; private set; }
 
-        /// <summary>
-    /// ¶ÔÓÚËùÓĞµÄCraftWayUI£¬¸üĞÂÆäÒÑÂú×ãµÄÎïÆ·¸öÊı²¢¾İ´Ë´Ó´óµ½Ğ¡ÅÅĞò
+    /// <summary>
+    /// å¯¹äºæ‰€æœ‰çš„CraftWayUIï¼Œæ›´æ–°å…¶å·²æ»¡è¶³çš„ç‰©å“ä¸ªæ•°å¹¶æ®æ­¤ä»å¤§åˆ°å°æ’åº
     /// </summary>
     public static void UpdateSatisfiedAll()
     {
@@ -54,8 +59,9 @@ public class CraftWayUI : MonoBehaviour
     private Image _backgroundImage;
     private Transform _equalsIcon;
     private Transform _targetIcon;
+
     /// <summary>
-    /// ÅÅĞòÊ¹ÓÃµÄÊôĞÔ£¬È«²¿Âú×ãÔòÎª100+Âú×ãÎïÆ·¸öÊı£¬·ñÔòÎªÂú×ãÎïÆ·¸öÊı
+    /// æ’åºä½¿ç”¨çš„å±æ€§ï¼Œå…¨éƒ¨æ»¡è¶³åˆ™ä¸º100+æ»¡è¶³ç‰©å“ä¸ªæ•°ï¼Œå¦åˆ™ä¸ºæ»¡è¶³ç‰©å“ä¸ªæ•°
     /// </summary>
     private int _satisfiedItemCount;
 
@@ -75,8 +81,9 @@ public class CraftWayUI : MonoBehaviour
         _backgroundImage = GetComponent<Image>();
         GetComponent<Button>().onClick.AddListener(() => SelectedCraftWay = this.CraftWayData);
     }
+
     /// <summary>
-    /// ¸üĞÂ´ËºÏ³ÉÂ·¾¶µÄËùĞèÎïÆ·IconÏÔÊ¾
+    /// æ›´æ–°æ­¤åˆæˆè·¯å¾„çš„æ‰€éœ€ç‰©å“Iconæ˜¾ç¤º
     /// </summary>
     private void updateDisplay()
     {
@@ -101,14 +108,15 @@ public class CraftWayUI : MonoBehaviour
         _targetIcon.GetChild(1).GetComponent<TMP_Text>().text = _craftWayData.ProductItem.ItemName;
         _targetIcon.SetAsLastSibling();
     }
+
     /// <summary>
-    /// ¸üĞÂ´ËuiµÄÂú×ã×´Ì¬£¬²¢¾İ´Ë¸ü¸ÄÏÔÊ¾×´Ì¬£¨±³¾°Í¼£©
+    /// æ›´æ–°æ­¤uiçš„æ»¡è¶³çŠ¶æ€ï¼Œå¹¶æ®æ­¤æ›´æ”¹æ˜¾ç¤ºçŠ¶æ€ï¼ˆèƒŒæ™¯å›¾ï¼‰
     /// </summary>
     public void UpdateSatisfied()
     {
-        _backgroundImage.sprite = (_satisfiedItemCount = BackpackManager.Instance.IsCraftSatisfied(_craftWayData)) >=100
-            ? _craftSatisfied
-            : _craftDefault;
+        _backgroundImage.sprite =
+            (_satisfiedItemCount = BackpackManager.Instance.IsCraftSatisfied(_craftWayData)) >= 100
+                ? _craftSatisfied
+                : _craftDefault;
     }
-
 }

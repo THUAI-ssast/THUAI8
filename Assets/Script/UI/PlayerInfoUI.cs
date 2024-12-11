@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// 左下角玩家信息面板UI
+/// UI显示类，世界探索下左下角玩家信息面板UI
 /// </summary>
 public class PlayerInfoUI : MonoBehaviour
 {

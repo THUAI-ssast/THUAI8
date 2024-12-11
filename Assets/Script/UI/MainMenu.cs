@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,23 +11,26 @@ using Mirror.Examples.TopDownShooter;
 using Unity.VisualScripting;
 using System;
 
+/// <summary>
+/// å•ä¾‹Managerï¼Œç®¡ç†å¼€å§‹èœå•ç•Œé¢çš„è¡Œä¸º
+/// </summary>
 public class MainMenu : MonoBehaviour
 {
     public static MainMenu Instance;
     private NetPlayer _player;
 
-    // ¶¨ÒåÒ»¸öÊÂ¼ş£¬µ± Player ±»¸³ÖµÊ±´¥·¢
+    // å®šä¹‰ä¸€ä¸ªäº‹ä»¶ï¼Œå½“ Player è¢«èµ‹å€¼æ—¶è§¦å‘
     public event Action<NetPlayer> OnPlayerAssigned;
     public NetPlayer Player
     {
         get => _player;
         set
         {
-            // Ö»ÓĞµ±Öµ·¢Éú±ä»¯Ê±²Å´¥·¢ÊÂ¼ş
+            // åªæœ‰å½“å€¼å‘ç”Ÿå˜åŒ–æ—¶æ‰è§¦å‘äº‹ä»¶
             if (_player != value)
             {
                 _player = value;
-                OnPlayerAssigned?.Invoke(_player); // ´¥·¢ÊÂ¼ş
+                OnPlayerAssigned?.Invoke(_player); // è§¦å‘äº‹ä»¶
                 OnPlayerAssigned = null;
             }
         }
@@ -93,7 +96,7 @@ public class MainMenu : MonoBehaviour
     public void StartTutorial()
     {
         _roomManager.GameplayScene = "TutorialScene";
-        //TODO:¸Ä¶Ë¿ÚºÅ
+        //TODO:æ”¹ç«¯å£å·
         _roomManager.StartHost();
         OnPlayerAssigned += player => { player.StartMatching(playerNameText.text);};
     }

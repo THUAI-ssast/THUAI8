@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 世界回合管理类。
+/// 单例Manager，管理世界回合
 /// </summary>
 public class RoundManager : NetworkBehaviour
 {

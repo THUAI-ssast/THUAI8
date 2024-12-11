@@ -1,31 +1,32 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 /// <summary>
-/// ĞèÒªÒ»¸öisTriggerµÄCollider2D£¬ËùÓĞtarget tagÎïÌåĞèÒªcollider2DºÍrigidbody2D¡£
-/// µ±¾ßÓĞtarget TagsµÄÎïÌå½øÈëÊ±£¬½«ËùÓĞtarget ComponentsµÄenableÉèÖÃÎªenableStateWhileInside£»
-/// µ±ÍË³öÊ±£¬Ôò·´Ö®£¬ÉèÎª!activeWhenEnter¡£
+/// å·¥å…·ç±»ï¼Œ
+/// éœ€è¦ä¸€ä¸ªisTriggerçš„Collider2Dï¼Œæ‰€æœ‰target tagç‰©ä½“éœ€è¦collider2Då’Œrigidbody2Dã€‚
+/// å½“å…·æœ‰target Tagsçš„ç‰©ä½“è¿›å…¥æ—¶ï¼Œå°†æ‰€æœ‰target Componentsçš„enableè®¾ç½®ä¸ºenableStateWhileInsideï¼›
+/// å½“é€€å‡ºæ—¶ï¼Œåˆ™åä¹‹ï¼Œè®¾ä¸º!activeWhenEnterã€‚
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class AreaTagTrigger : MonoBehaviour
 {
     /// <summary>
-    /// Ä¿±êtag£¬ÒÔ×Ö·û´®ĞÎÊ½´«Èë£¬ËùÓĞÎïÌåĞèÒªcollider2DºÍrigidbody2D
+    /// ç›®æ ‡tagï¼Œä»¥å­—ç¬¦ä¸²å½¢å¼ä¼ å…¥ï¼Œæ‰€æœ‰ç‰©ä½“éœ€è¦collider2Då’Œrigidbody2D
     /// </summary>
     [SerializeField] private List<string> _targetTags;
     /// <summary>
-    /// ĞèÒª±»´ò¿ª/¹Ø±ÕµÄËùÓĞBehaviourÁĞ±í
+    /// éœ€è¦è¢«æ‰“å¼€/å…³é—­çš„æ‰€æœ‰Behaviouråˆ—è¡¨
     /// </summary>
     [SerializeField] private List<Behaviour> _targetComponents;
     /// <summary>
-    /// µ±Ä¿±êÎïÌå½øÈëºó£¬target Component.enableµÄÄ¿±êÖµ
+    /// å½“ç›®æ ‡ç‰©ä½“è¿›å…¥åï¼Œtarget Component.enableçš„ç›®æ ‡å€¼
     /// </summary>
     [SerializeField] private bool _enableStateWhileInside = true;
     /// <summary>
-    /// ÍË³öÊ±ÊÇ·ñĞèÒª°Ñtarget Component.enableÉèÎª!activeWhenEnter
+    /// é€€å‡ºæ—¶æ˜¯å¦éœ€è¦æŠŠtarget Component.enableè®¾ä¸º!activeWhenEnter
     /// </summary>
     [SerializeField] private bool _exitTrigger = true;
 

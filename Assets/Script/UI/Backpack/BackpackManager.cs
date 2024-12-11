@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 背包管理类。管理背包中的一切行为，包括对物品丢弃、使用、添加等。
+/// 单例Manager，管理背包中的一切行为，包括对物品丢弃、使用、添加等。
 /// </summary>
 public class BackpackManager : MonoBehaviour
 {

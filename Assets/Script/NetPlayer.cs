@@ -1,10 +1,10 @@
-using Mirror;
+ï»¿using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Æ¥Åä½×¶ÎµÄÍæ¼ÒÔ¤ÖÆÌå£¬ÔÚStartSceneÖĞÉú³É£¬ÓÃÓÚ´¦ÀíÔÚÆ¥Åä½×¶ÎÍæ¼Ò¿Í»§¶ËÓë·şÎñ¶ËµÄÍ¨ĞÅÊÂ¼ş
+/// ç½‘ç»œç±»ï¼ŒåŒ¹é…é˜¶æ®µçš„ç©å®¶é¢„åˆ¶ä½“ï¼Œåœ¨StartSceneä¸­ç”Ÿæˆï¼Œç”¨äºå¤„ç†åœ¨åŒ¹é…é˜¶æ®µç©å®¶å®¢æˆ·ç«¯ä¸æœåŠ¡ç«¯çš„é€šä¿¡äº‹ä»¶
 /// </summary>
 public class NetPlayer : NetworkRoomPlayer
 {
@@ -16,23 +16,23 @@ public class NetPlayer : NetworkRoomPlayer
 
 
     /// <summary>
-    /// Í¨Öª·şÎñ¶ËÍæ¼Ò¿ªÊ¼Æ¥Åä£¬Í¬Ê±¼ÇÂ¼ÓĞ¹Ø¸ÃÍæ¼ÒµÄĞÅÏ¢
+    /// é€šçŸ¥æœåŠ¡ç«¯ç©å®¶å¼€å§‹åŒ¹é…ï¼ŒåŒæ—¶è®°å½•æœ‰å…³è¯¥ç©å®¶çš„ä¿¡æ¯
     /// </summary>
-    /// <param name="playerName">Íæ¼ÒµÄÃû×Ö</param>
+    /// <param name="playerName">ç©å®¶çš„åå­—</param>
     public void StartMatching(string playerName)
     {
-        // Í¨Öª·şÎñ¶Ë¸ÃÍæ¼ÒÒÑ×¼±¸
+        // é€šçŸ¥æœåŠ¡ç«¯è¯¥ç©å®¶å·²å‡†å¤‡
         CmdChangeReadyState(true);
-        // ¼ÇÂ¼¸ÃÍæ¼ÒµÄÃû×Ö
+        // è®°å½•è¯¥ç©å®¶çš„åå­—
         PlayerPrefs.SetString("Name", playerName);  
     } 
 
     /// <summary>
-    /// Í¨Öª·şÎñ¶Ë¸ÃÍæ¼ÒÈ¡ÏûÆ¥Åä
+    /// é€šçŸ¥æœåŠ¡ç«¯è¯¥ç©å®¶å–æ¶ˆåŒ¹é…
     /// </summary>
     public void CancelMatching()
     {
-        // Í¨Öª·şÎñ¶Ë¸ÃÍæ¼ÒÈ¡Ïû×¼±¸
+        // é€šçŸ¥æœåŠ¡ç«¯è¯¥ç©å®¶å–æ¶ˆå‡†å¤‡
         CmdChangeReadyState(false); 
     }
 

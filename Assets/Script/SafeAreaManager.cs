@@ -1,4 +1,4 @@
-using Mirror;
+ï»¿using Mirror;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,17 +6,20 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+/// <summary>
+/// å•ä¾‹Managerï¼Œç®¡ç†å®‰å…¨åŒºçš„ç¼©å°å’Œåœ¨ä¸–ç•Œä¸­çš„æ˜¾ç¤º
+/// </summary>
 public class SafeAreaManager : NetworkBehaviour
 {
     /// <summary>
-    /// °²È«Çø¹ÜÀíÕßµÄµ¥Àı
+    /// å®‰å…¨åŒºç®¡ç†è€…çš„å•ä¾‹
     /// </summary>
     public static SafeAreaManager Instance;
 
     /// <summary>
-    /// °²È«ÇøµÄ´óĞ¡¸Ä±ä²ßÂÔ£¬ÄÜ¹»±íÊ¾°²È«ÇøÔÚÄ³Ò»¸ö»ØºÏµÄ´óĞ¡¡£
-    /// key£ºÊÀ½ç»ØºÏ¼ÆÊı£»value£º°²È«ÇøµÄ±ß³¤£¨°²È«ÇøÊ¼ÖÕÊÇÕı·½ĞÎ£©¡£
-    /// µ½ÁËkeyÖ¸¶¨µÄÊÀ½ç»ØºÏ£¬°²È«ÇøµÄ±ß³¤¾Í¸üĞÂÎª¶ÔÓ¦µÄvalue
+    /// å®‰å…¨åŒºçš„å¤§å°æ”¹å˜ç­–ç•¥ï¼Œèƒ½å¤Ÿè¡¨ç¤ºå®‰å…¨åŒºåœ¨æŸä¸€ä¸ªå›åˆçš„å¤§å°ã€‚
+    /// keyï¼šä¸–ç•Œå›åˆè®¡æ•°ï¼›valueï¼šå®‰å…¨åŒºçš„è¾¹é•¿ï¼ˆå®‰å…¨åŒºå§‹ç»ˆæ˜¯æ­£æ–¹å½¢ï¼‰ã€‚
+    /// åˆ°äº†keyæŒ‡å®šçš„ä¸–ç•Œå›åˆï¼Œå®‰å…¨åŒºçš„è¾¹é•¿å°±æ›´æ–°ä¸ºå¯¹åº”çš„value
     /// </summary>
     [Mirror.ReadOnly]
     private Dictionary<int, int> _safeAreaChangePlan = new Dictionary<int, int>
@@ -33,35 +36,35 @@ public class SafeAreaManager : NetworkBehaviour
     };
 
     /// <summary>
-    /// °²È«ÇøµÄ±ß³¤
+    /// å®‰å…¨åŒºçš„è¾¹é•¿
     /// </summary>
     [SyncVar] private int _safeAreaLength;
 
     /// <summary>
-    /// °²È«Çø×óÏÂ½ÇËùÔÚµÄcellPosition
+    /// å®‰å…¨åŒºå·¦ä¸‹è§’æ‰€åœ¨çš„cellPosition
     /// </summary>
     [SyncVar] private Vector2Int _safeAreaOrigin ;
 
     /// <summary>
-    /// ÏÂÒ»´Î°²È«ÇøµÄ±ß³¤
+    /// ä¸‹ä¸€æ¬¡å®‰å…¨åŒºçš„è¾¹é•¿
     /// </summary>
     [SyncVar] private int _nextSafeAreaLength = 168;
 
     /// <summary>
-    /// ÏÂÒ»´Î°²È«ÇøµÄ×óÏÂ½Ç×ø±ê£¬³õÊ¼»¯Ê±ĞèÒªÉèÖÃÎªÈ«Í¼µÄ×óÏÂ½Ç
+    /// ä¸‹ä¸€æ¬¡å®‰å…¨åŒºçš„å·¦ä¸‹è§’åæ ‡ï¼Œåˆå§‹åŒ–æ—¶éœ€è¦è®¾ç½®ä¸ºå…¨å›¾çš„å·¦ä¸‹è§’
     /// </summary>
     [SyncVar(hook = nameof(DisplaySafeArea))] private Vector2Int _nextSafeAreaOrigin = new(-84,-84);
 
     /// <summary>
-    /// ÓÃÓÚÏÔÊ¾°²È«Çø£¬¸²¸ÇÈ«Í¼
+    /// ç”¨äºæ˜¾ç¤ºå®‰å…¨åŒºï¼Œè¦†ç›–å…¨å›¾
     /// </summary>
     private Transform _wholeArea;
     /// <summary>
-    /// ÓÃÓÚÏÔÊ¾°²È«Çø£¬¸²¸Ç°²È«Çø²¿·Ö
+    /// ç”¨äºæ˜¾ç¤ºå®‰å…¨åŒºï¼Œè¦†ç›–å®‰å…¨åŒºéƒ¨åˆ†
     /// </summary>
     private Transform _safeAreaMask;
     /// <summary>
-    /// ÓÃÓÚÏÔÊ¾°²È«Çø£¬Îª°²È«ÇøÃè±ß
+    /// ç”¨äºæ˜¾ç¤ºå®‰å…¨åŒºï¼Œä¸ºå®‰å…¨åŒºæè¾¹
     /// </summary>
     private Transform _safeAreaOutline;
 
@@ -92,9 +95,9 @@ public class SafeAreaManager : NetworkBehaviour
 
 
     /// <summary>
-    /// ¸üĞÂ°²È«Çø£¬°üÀ¨Âß¼­ÉÏµÄ¸üĞÂºÍÏÔÊ¾ÉÏµÄ¸üĞÂ
+    /// æ›´æ–°å®‰å…¨åŒºï¼ŒåŒ…æ‹¬é€»è¾‘ä¸Šçš„æ›´æ–°å’Œæ˜¾ç¤ºä¸Šçš„æ›´æ–°
     /// </summary>
-    /// <param name="currentRoundCount">µ±Ç°µÄÊÀ½ç»ØºÏ¼ÆÊı</param>
+    /// <param name="currentRoundCount">å½“å‰çš„ä¸–ç•Œå›åˆè®¡æ•°</param>
     public void UpdateSafeAreaOnServer(int currentRoundCount)
     {
         int newLength;
@@ -107,12 +110,12 @@ public class SafeAreaManager : NetworkBehaviour
                 Debug.Log("SafeArea has error");
                 return;
             }
-            // È·¶¨ĞÂ±ß³¤
+            // ç¡®å®šæ–°è¾¹é•¿
             _safeAreaLength = _nextSafeAreaLength;
-            // È·¶¨×óÏÂ½ÇµÄĞÂ×ø±ê
+            // ç¡®å®šå·¦ä¸‹è§’çš„æ–°åæ ‡
             _safeAreaOrigin = _nextSafeAreaOrigin;
             
-            // ¼ÆËã²¢´æ´¢ÏÂÒ»´Î°²È«ÇøµÄ±ß³¤ºÍ×óÏÂ½Ç×ø±ê
+            // è®¡ç®—å¹¶å­˜å‚¨ä¸‹ä¸€æ¬¡å®‰å…¨åŒºçš„è¾¹é•¿å’Œå·¦ä¸‹è§’åæ ‡
             for (int i = 1; i < newLength; i++)
             {
                 int nextLength;
@@ -156,15 +159,15 @@ public class SafeAreaManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// ¸ù¾İµ±Ç°°²È«ÇøµÄ±ß³¤ºÍ×óÏÂ½Ç×ø±ê»æÖÆ°²È«ÇøµÄÏÔÊ¾
+    /// æ ¹æ®å½“å‰å®‰å…¨åŒºçš„è¾¹é•¿å’Œå·¦ä¸‹è§’åæ ‡ç»˜åˆ¶å®‰å…¨åŒºçš„æ˜¾ç¤º
     /// </summary>
     private void DisplaySafeArea(Vector2Int oldOrigin, Vector2Int newOrigin)
     {
-        // »æÖÆ°²È«Çø£¬È·¶¨positionÎªÕı·½ĞÎµÄÖĞĞÄ×ø±ê£¬scaleµÈÓÚ±ß³¤
+        // ç»˜åˆ¶å®‰å…¨åŒºï¼Œç¡®å®špositionä¸ºæ­£æ–¹å½¢çš„ä¸­å¿ƒåæ ‡ï¼Œscaleç­‰äºè¾¹é•¿
         float halfLength = _safeAreaLength / 2.0f;
         _safeAreaMask.position = new Vector3(_safeAreaOrigin.x, _safeAreaOrigin.y) + new Vector3(halfLength, halfLength);
         _safeAreaMask.localScale = new(_safeAreaLength, _safeAreaLength);
-        // »æÖÆ°²È«ÇøÂÖÀª
+        // ç»˜åˆ¶å®‰å…¨åŒºè½®å»“
         _safeAreaOutline.position = _safeAreaMask.position;
         _safeAreaOutline.localScale = _safeAreaMask.localScale + new Vector3(0.1f,0.1f);
 
@@ -188,9 +191,9 @@ public class SafeAreaManager : NetworkBehaviour
 
     private PlayerHealth.BodyPosition RandomSelectBodyPosition()
     {
-        // »ñÈ¡Ã¶¾ÙÀàĞÍµÄËùÓĞÖµ
+        // è·å–æšä¸¾ç±»å‹çš„æ‰€æœ‰å€¼
         var bodyPositions = Enum.GetValues(typeof(PlayerHealth.BodyPosition));
-        // Ëæ»úÑ¡ÔñÒ»¸öÃ¶¾ÙÖµ
+        // éšæœºé€‰æ‹©ä¸€ä¸ªæšä¸¾å€¼
         var randomBody = (PlayerHealth.BodyPosition)bodyPositions.GetValue(UnityEngine.Random.Range(0, bodyPositions.Length));
         return randomBody;
     }

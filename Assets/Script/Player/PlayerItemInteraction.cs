@@ -7,10 +7,13 @@ using UnityEditor;
 using Mirror.BouncyCastle.Asn1.X509;
 using TMPro;
 /// <summary>
-/// 玩家与物品的交互类，挂载在player的GameObject上。执行[Command]方法。
+/// 玩家行为类，管理玩家与物品的交互，多执行[Command]方法。
 /// </summary>
 public class PlayerItemInteraction : NetworkBehaviour
 {
+    /// <summary>
+    /// 随机玩家，用于处理Item行为需要发command但不属于特定玩家的事件
+    /// </summary>
     public static PlayerItemInteraction RandomPlayer;
     private void Awake()
     {

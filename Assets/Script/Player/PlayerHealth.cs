@@ -11,7 +11,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 
 /// <summary>
-/// 该类中保存了玩家的名字、血量上限和当前血量，以及处理血量变化逻辑的方法
+/// 玩家数据类，保存了玩家的名字、血量上限和当前血量，以及处理血量变化逻辑的方法
 /// </summary>
 public class PlayerHealth : NetworkBehaviour
 {
@@ -24,25 +24,37 @@ public class PlayerHealth : NetworkBehaviour
     /// 玩家的名字
     /// </summary>
     [SyncVar] private string _name;
-
+    /// <summary>
+    /// 玩家的名字，会显示在角色下方
+    /// </summary>
     public string Name => _name;
-
+    /// <summary>
+    /// 玩家健康的部位
+    /// </summary>
     public enum BodyPosition
     {
         Head,
         MainBody,
         Legs
     }
-
+    /// <summary>
+    /// 将部位信息转换成中文string的字典
+    /// </summary>
     public static Dictionary<BodyPosition, string> BodyToChinese = new Dictionary<BodyPosition, string>()
     {
         { BodyPosition.Head, "头部" },
         { BodyPosition.MainBody, "躯干" },
         { BodyPosition.Legs, "腿部" }
     };
-
+    /// <summary>
+    /// 玩家护甲信息，记录了每个部位的装备情况
+    /// </summary>
     private Dictionary<BodyPosition, Item> _armorEquipments = new Dictionary<BodyPosition, Item>();
-
+    /// <summary>
+    /// 获取玩家对应部位的护甲Item
+    /// </summary>
+    /// <param name="position">部位信息</param>
+    /// <returns>玩家对应部位的护甲Item，若无护甲则为null</returns>
     public Item GetItemAt(BodyPosition position)
     {
         if (_armorEquipments.TryGetValue(position, out var armorItem))
@@ -52,7 +64,12 @@ public class PlayerHealth : NetworkBehaviour
 
         return null;
     }
-
+    /// <summary>
+    /// 卸下原有护甲，装备护甲到对应部位
+    /// </summary>
+    /// <param name="position">角色部位</param>
+    /// <param name="armorItem">要装备的护甲Item</param>
+    /// <returns>此部位原有的护甲，若无则为null</returns>
     public Item EquipArmor(BodyPosition position, Item armorItem)
     {
         Item oldArmor = null;
@@ -68,7 +85,11 @@ public class PlayerHealth : NetworkBehaviour
 
         return oldArmor;
     }
-
+    /// <summary>
+    /// 卸下对应部位的装备
+    /// </summary>
+    /// <param name="position">角色部位</param>
+    /// <returns>此部位原有的护甲</returns>
     public Item UnEquipArmor(BodyPosition position)
     {
         Item oldArmor = null;
@@ -138,17 +159,23 @@ public class PlayerHealth : NetworkBehaviour
     /// 玩家的腿部血量上限
     /// </summary>
     private readonly float _legMaxHealth = 10;
-
+    /// <summary>
+    /// 玩家头部血量上限
+    /// </summary>
     public float HeadMaxHealth
     {
         get => _headMaxHealth;
     }
-
+    /// <summary>
+    /// 玩家躯干血量上限
+    /// </summary>
     public float BodyMaxHealth
     {
         get => _bodyMaxHealth;
     }
-
+    /// <summary>
+    /// 玩家腿部血量上限
+    /// </summary>
     public float LegMaxHealth
     {
         get => _legMaxHealth;

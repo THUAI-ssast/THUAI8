@@ -1,12 +1,15 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// UIè¡Œä¸ºç±»ï¼Œç©å®¶æˆ˜æ–—UIå†…è§‚å¯Ÿå‘¨å›´æŒ‰é’®
+/// </summary>
 public class ViewAround : MonoBehaviour
 {
     private Button _button;
     private Button _backButton;
     private GameObject _battleUI;
-    private Image _battleUIImage; // ÓÃÀ´¿ØÖÆÃæ°åµÄÍ¸Ã÷¶È
+    private Image _battleUIImage; // ç”¨æ¥æ§åˆ¶é¢æ¿çš„é€æ˜åº¦
     GameObject _roundUI;
     GameObject _playerInfoUI;
 
@@ -15,36 +18,36 @@ public class ViewAround : MonoBehaviour
     {
         _button = GetComponent<Button>();
         _backButton = transform.parent.Find("BackButton").GetComponent<Button>();
-        _battleUI = transform.parent.gameObject; // ¼ÙÉè _battleUI ÊÇÕâ¸ö UI Ãæ°å
-        _battleUIImage = _battleUI.GetComponent<Image>(); // »ñÈ¡Ãæ°åµÄ Image ×é¼ş
+        _battleUI = transform.parent.gameObject; // å‡è®¾ _battleUI æ˜¯è¿™ä¸ª UI é¢æ¿
+        _battleUIImage = _battleUI.GetComponent<Image>(); // è·å–é¢æ¿çš„ Image ç»„ä»¶
 
-        _backButton.gameObject.SetActive(false); // ³õÊ¼Ê± _backButton ²»¿É¼û
+        _backButton.gameObject.SetActive(false); // åˆå§‹æ—¶ _backButton ä¸å¯è§
         _button.onClick.AddListener(onClickCheckButton);
         _playerInfoUI = GameObject.Find("Canvas").transform.Find("PlayerInfoPanel").gameObject;
         _roundUI = GameObject.Find("Canvas").transform.Find("Round").gameObject;
     }
 
-    // °´Å¥µã»÷ºóÒş²ØÆäËûUI²¢ÏÔÊ¾ _backButton£¬ÉèÖÃÃæ°åÎªÍ¸Ã÷
+    // æŒ‰é’®ç‚¹å‡»åéšè—å…¶ä»–UIå¹¶æ˜¾ç¤º _backButtonï¼Œè®¾ç½®é¢æ¿ä¸ºé€æ˜
     private void onClickCheckButton()
     {
-        // ±éÀú _battleUI ÖĞµÄËùÓĞ×ÓÎïÌå
+        // éå† _battleUI ä¸­çš„æ‰€æœ‰å­ç‰©ä½“
         foreach (Transform child in _battleUI.transform)
         {
-            if (child != _backButton.transform) // ÅÅ³ı _backButton
+            if (child != _backButton.transform) // æ’é™¤ _backButton
             {
-                child.gameObject.SetActive(false); // Òş²ØÆäËû UI ÔªËØ
+                child.gameObject.SetActive(false); // éšè—å…¶ä»– UI å…ƒç´ 
             }
         }
 
-        _backButton.gameObject.SetActive(true); // ÏÔÊ¾ _backButton
-        _playerInfoUI.SetActive(false); // Òş²ØÍæ¼ÒĞÅÏ¢Ãæ°å
-        _roundUI.SetActive(false); // Òş²Ø»ØºÏĞÅÏ¢Ãæ°å
+        _backButton.gameObject.SetActive(true); // æ˜¾ç¤º _backButton
+        _playerInfoUI.SetActive(false); // éšè—ç©å®¶ä¿¡æ¯é¢æ¿
+        _roundUI.SetActive(false); // éšè—å›åˆä¿¡æ¯é¢æ¿
 
-        // ÉèÖÃ _battleUI Ãæ°åµÄÍ¸Ã÷¶È
+        // è®¾ç½® _battleUI é¢æ¿çš„é€æ˜åº¦
         if (_battleUIImage != null)
         {
             Color tempColor = _battleUIImage.color;
-            tempColor.a = 0f; // ÉèÖÃÍ¸Ã÷¶ÈÎª 0 (ÍêÈ«Í¸Ã÷)£¬Ô­±¾Îª100
+            tempColor.a = 0f; // è®¾ç½®é€æ˜åº¦ä¸º 0 (å®Œå…¨é€æ˜)ï¼ŒåŸæœ¬ä¸º100
             _battleUIImage.color = tempColor;
         }
     }

@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,10 +8,15 @@ using System;
 using UnityEngine.UIElements;
 using Pathfinding;
 
+/// <summary>
+/// å•ä¾‹Managerï¼ŒUIè¡Œä¸ºç±»ï¼Œæ§åˆ¶æ¸¸æˆå¼€å±€æ¸¸æˆå‡ºç”Ÿç‚¹é€‰æ‹©
+/// </summary>
 public class BornUIManager : NetworkBehaviour
 {
     public static BornUIManager Instance;
-
+    /// <summary>
+    /// é€‰æ‹©å‡ºç”Ÿç‚¹çš„æ—¶é—´é™åˆ¶
+    /// </summary>
     public float delayTime;
 
     private Vector3Int _bornPos;
@@ -95,17 +100,17 @@ public class BornUIManager : NetworkBehaviour
         float cellWidth = bigMapRect.rect.width / Columns;
         float cellHeight = bigMapRect.rect.height / Rows;
 
-        // ³õÊ¼»¯Íø¸ñÎªnull
+        // åˆå§‹åŒ–ç½‘æ ¼ä¸ºnull
         _gridCells = new List<GameObject>(new GameObject[Rows * Columns]);
 
         for (int i = 0; i < Rows; i++)
         {
             for (int j = 0; j < Columns; j++)
             {
-                // ÅĞ¶ÏÊÇ·ñÊÇº£ÑóÇøÓò
+                // åˆ¤æ–­æ˜¯å¦æ˜¯æµ·æ´‹åŒºåŸŸ
                 if (i == 0 || i == Rows - 1 || j < 2 || j >= Columns - 2)
                 {
-                    // º£ÑóÇøÓò¶ÔÓ¦µÄ¸ñ×ÓÉèÖÃÎªnull
+                    // æµ·æ´‹åŒºåŸŸå¯¹åº”çš„æ ¼å­è®¾ç½®ä¸ºnull
                     _gridCells[i * Columns + j] = null;
                     continue;
                 }
@@ -113,14 +118,14 @@ public class BornUIManager : NetworkBehaviour
                 GameObject gridCell = Instantiate(GridCellPrefab, _bigMapPanel.transform);
                 RectTransform cellRect = gridCell.GetComponent<RectTransform>();
 
-                // ¼ÆËãĞ¡·½¸ñµÄÎ»ÖÃ
+                // è®¡ç®—å°æ–¹æ ¼çš„ä½ç½®
                 float xPos = j * cellWidth - bigMapRect.rect.width / 2 + cellWidth / 2;
                 float yPos = i * cellHeight - bigMapRect.rect.height / 2 + cellHeight / 2;
 
                 cellRect.localPosition = new Vector2(xPos, yPos);
-                cellRect.sizeDelta = new Vector2(cellWidth, cellHeight); // ÉèÖÃĞ¡·½¸ñµÄ´óĞ¡
+                cellRect.sizeDelta = new Vector2(cellWidth, cellHeight); // è®¾ç½®å°æ–¹æ ¼çš„å¤§å°
 
-                // ±£´æ¸ñ×Ó
+                // ä¿å­˜æ ¼å­
                 _gridCells[i * Columns + j] = gridCell;
             }
         }
@@ -131,14 +136,14 @@ public class BornUIManager : NetworkBehaviour
     {
         Vector2 localPos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _bigMapPanel.GetComponent<RectTransform>(), // ×ª»»Ä¿±êRectTransform
-            Input.mousePosition, // Êó±êµÄÆÁÄ»Î»ÖÃ
-            null, // ÉãÏñ»ú£¬´« null Ä¬ÈÏÊ¹ÓÃµ±Ç°ÉãÏñ»ú
-            out localPos); // Êä³öµ½±¾µØ×ø±ê
+            _bigMapPanel.GetComponent<RectTransform>(), // è½¬æ¢ç›®æ ‡RectTransform
+            Input.mousePosition, // é¼ æ ‡çš„å±å¹•ä½ç½®
+            null, // æ‘„åƒæœºï¼Œä¼  null é»˜è®¤ä½¿ç”¨å½“å‰æ‘„åƒæœº
+            out localPos); // è¾“å‡ºåˆ°æœ¬åœ°åæ ‡
 
         RectTransform bigMapRect = _bigMapPanel.GetComponent<RectTransform>();
 
-        // ¼ÆËãµã»÷µÄÁĞºÍĞĞ
+        // è®¡ç®—ç‚¹å‡»çš„åˆ—å’Œè¡Œ
         float cellWidth = bigMapRect.rect.width / Columns;
         float cellHeight = bigMapRect.rect.height / Rows;
 
@@ -166,7 +171,7 @@ public class BornUIManager : NetworkBehaviour
                 break;
         }
 
-        // Êä³ö¼ÆËãµÄ tilePos
+        // è¾“å‡ºè®¡ç®—çš„ tilePos
         Debug.Log($"Tile position for clicked cell center: {_bornPos}");
 
         if (newIndex >= 0 && newIndex < _gridCells.Count)

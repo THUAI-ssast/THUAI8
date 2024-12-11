@@ -6,17 +6,17 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// ÓÃÓÚÏÔÊ¾ºÍ¸üĞÂÍæ¼ÒÔÚBattleSceneÖĞµÄÑªÌõ
+/// UIç±»ï¼Œç”¨äºæ˜¾ç¤ºå’Œæ›´æ–°ç©å®¶åœ¨BattleSceneä¸­çš„è¡€æ¡
 /// </summary>
 public class HealthGUI : MonoBehaviour
 {
     /// <summary>
-    /// ¶ÔÓ¦µÄÍæ¼ÒTransform
+    /// å¯¹åº”çš„ç©å®¶Transform
     /// </summary>
     public Transform TargetPlayer;
 
     /// <summary>
-    /// Ïà¶ÔÓÚÍæ¼ÒÎ»ÖÃµÄÆ«ÒÆÁ¿£¬ÓÃÓÚµ÷ÕûÍæ¼ÒÑªÌõµÄÏÔÊ¾Î»ÖÃ
+    /// ç›¸å¯¹äºç©å®¶ä½ç½®çš„åç§»é‡ï¼Œç”¨äºè°ƒæ•´ç©å®¶è¡€æ¡çš„æ˜¾ç¤ºä½ç½®
     /// </summary>
     public Vector3 Offset;
 
@@ -29,10 +29,10 @@ public class HealthGUI : MonoBehaviour
 
 
     /// <summary>
-    /// ¸üĞÂÍæ¼ÒÑªÌõµÄ³¤¶È£¬µ±Íæ¼ÒÑªÁ¿¸ü¸ÄÊ±»á×Ô¶¯µ÷ÓÃ
+    /// æ›´æ–°ç©å®¶è¡€æ¡çš„é•¿åº¦ï¼Œå½“ç©å®¶è¡€é‡æ›´æ”¹æ—¶ä¼šè‡ªåŠ¨è°ƒç”¨
     /// </summary>
-    /// <param name="totalHealth"></param>
-    /// <param name="newHealth"></param>
+    /// <param name="totalHealth">è¡€é‡ä¸Šé™</param>
+    /// <param name="newHealth">å½“å‰è¡€é‡</param>
     public void UpdateHealthGUILength(float totalHealth, float newHealth)
     {
         gameObject.GetComponent<UnityEngine.UI.Image>().fillAmount = newHealth/totalHealth;

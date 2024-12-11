@@ -1,8 +1,11 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// UIè¡Œä¸º/æ•°æ®ç±»ï¼Œç®¡ç†æˆ˜æ–—UIå†…çš„æ•Œäººæ˜¾ç¤ºï¼Œä»¥åŠå¯¹åº”çš„æ”»å‡»è§¦å‘
+/// </summary>
 public class HealthPanelEnemy : MonoBehaviour
 {
     public static HealthPanelEnemy Instance;
@@ -51,7 +54,7 @@ public class HealthPanelEnemy : MonoBehaviour
             PlayerHealth enemyPlayerHealth = EnemyPlayer.GetComponent<PlayerHealth>();
             string enemyName = enemyPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Head, UIManager.Instance.FollowImage);
-            string message = $"µ±Ç°»ØºÏ£ºÄãÏûºÄ{costAP}APÊ¹ÓÃ{itemName}¹¥»÷ÁË{enemyName}µÄÍ·²¿£¬Ôì³ÉÁË{damage}HPÉËº¦¡£";
+            string message = $"å½“å‰å›åˆï¼šä½ æ¶ˆè€—{costAP}APä½¿ç”¨{itemName}æ”»å‡»äº†{enemyName}çš„å¤´éƒ¨ï¼Œé€ æˆäº†{damage}HPä¼¤å®³ã€‚";
             UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
 
@@ -71,7 +74,7 @@ public class HealthPanelEnemy : MonoBehaviour
             PlayerHealth enemyPlayerHealth = EnemyPlayer.GetComponent<PlayerHealth>();
             string enemyName = enemyPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.MainBody, UIManager.Instance.FollowImage);
-            string message = $"µ±Ç°»ØºÏ£ºÄãÏûºÄ{costAP}APÊ¹ÓÃ{itemName}¹¥»÷ÁË{enemyName}µÄÇû¸É£¬Ôì³ÉÁË{damage}HPÉËº¦¡£";
+            string message = $"å½“å‰å›åˆï¼šä½ æ¶ˆè€—{costAP}APä½¿ç”¨{itemName}æ”»å‡»äº†{enemyName}çš„èº¯å¹²ï¼Œé€ æˆäº†{damage}HPä¼¤å®³ã€‚";
             UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
 
@@ -91,7 +94,7 @@ public class HealthPanelEnemy : MonoBehaviour
             PlayerHealth enemyPlayerHealth = EnemyPlayer.GetComponent<PlayerHealth>();
             string enemyName = enemyPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Legs, UIManager.Instance.FollowImage);
-            string message = $"µ±Ç°»ØºÏ£ºÄãÏûºÄ{costAP}APÊ¹ÓÃ{itemName}¹¥»÷ÁË{enemyName}µÄÍÈ²¿£¬Ôì³ÉÁË{damage}HPÉËº¦¡£";
+            string message = $"å½“å‰å›åˆï¼šä½ æ¶ˆè€—{costAP}APä½¿ç”¨{itemName}æ”»å‡»äº†{enemyName}çš„è…¿éƒ¨ï¼Œé€ æˆäº†{damage}HPä¼¤å®³ã€‚";
             UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
 
@@ -102,17 +105,17 @@ public class HealthPanelEnemy : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸üĞÂ AP ÌõµÄ³¤¶ÈºÍÏÔÊ¾µÄÊıÖµ
+    /// æ›´æ–° AP æ¡çš„é•¿åº¦å’Œæ˜¾ç¤ºçš„æ•°å€¼
     /// </summary>
-    /// <param name="currentAP">µ±Ç° AP Öµ</param>
-    /// <param name="maxAP">×î´ó AP Öµ</param>
+    /// <param name="currentAP">å½“å‰ AP å€¼</param>
+    /// <param name="maxAP">æœ€å¤§ AP å€¼</param>
     public void UpdateActionPoint(float currentAP, float maxAP)
     {
-        // ¸üĞÂ AP Ìõ³¤¶È
+        // æ›´æ–° AP æ¡é•¿åº¦
         RectTransform apBarRect = _apBar.GetComponent<RectTransform>();
         _apBar.GetComponent<UnityEngine.UI.Image>().fillAmount = currentAP / maxAP;
 
-        // ¸üĞÂ AP ÌõÎÄ±¾
+        // æ›´æ–° AP æ¡æ–‡æœ¬
         Transform valueText = _apBar.transform.Find("Value");
         if (valueText != null)
         {

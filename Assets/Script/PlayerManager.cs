@@ -1,32 +1,35 @@
-using Mirror;
+ï»¿using Mirror;
 using UnityEngine;
 
+/// <summary>
+/// å•ä¾‹Managerï¼Œå¤„ç†ç©å®¶çš„ç”Ÿæˆäº‹ä»¶
+/// </summary>
 public class PlayerManager : NetworkBehaviour
 {
-    // Ö±½ÓÊ¹ÓÃ Player Ô¤ÖÆ¼ş
-    public GameObject playerPrefab; // ÓÃÓÚÉèÖÃµÄ Player Ô¤ÖÆÌå
-    public Vector2 spawnAreaMin; // Ëæ»úÉú³ÉµÄ×îĞ¡Î»ÖÃ
-    public Vector2 spawnAreaMax; // Ëæ»úÉú³ÉµÄ×î´óÎ»ÖÃ
+    // ç›´æ¥ä½¿ç”¨ Player é¢„åˆ¶ä»¶
+    public GameObject playerPrefab; // ç”¨äºè®¾ç½®çš„ Player é¢„åˆ¶ä½“
+    public Vector2 spawnAreaMin; // éšæœºç”Ÿæˆçš„æœ€å°ä½ç½®
+    public Vector2 spawnAreaMax; // éšæœºç”Ÿæˆçš„æœ€å¤§ä½ç½®
 
     public override void OnStartServer()
     {
-        // Ö»Éú³ÉÒ»¸öÍæ¼Ò
+        // åªç”Ÿæˆä¸€ä¸ªç©å®¶
         SpawnPlayer();
     }
 
     [Server]
     private void SpawnPlayer()
     {
-        // Éú³ÉËæ»úÎ»ÖÃ
+        // ç”Ÿæˆéšæœºä½ç½®
         Vector3 randomPosition = new Vector3(
             Random.Range(spawnAreaMin.x, spawnAreaMax.x),
             Random.Range(spawnAreaMin.y, spawnAreaMax.y),
             0);
 
-        // ÊµÀı»¯Íæ¼ÒÔ¤ÖÆÌå
+        // å®ä¾‹åŒ–ç©å®¶é¢„åˆ¶ä½“
         GameObject player = Instantiate(playerPrefab, randomPosition, Quaternion.identity);
 
-        // Îª¸ÃÍæ¼Ò·ÖÅäÍøÂçÉí·İ
+        // ä¸ºè¯¥ç©å®¶åˆ†é…ç½‘ç»œèº«ä»½
         NetworkServer.Spawn(player);
     }
 }

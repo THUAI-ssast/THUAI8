@@ -6,28 +6,21 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ÓÃÓÚÏÔÊ¾Íæ¼ÒÔÚBattleSceneÖĞµÄÃû×Ö 
+/// UIç±»ï¼Œç”¨äºæ˜¾ç¤ºç©å®¶åœ¨BattleSceneä¸­çš„åå­— 
 /// </summary>
 public class NameGUI : NetworkBehaviour
 {
     /// <summary>
-    /// ¶ÔÓ¦µÄÍæ¼ÒTransform
+    /// å¯¹åº”çš„ç©å®¶Transform
     /// </summary>
     public Transform TargetPlayer;
 
     /// <summary>
-    /// Ïà¶ÔÓÚÍæ¼ÒÎ»ÖÃµÄÆ«ÒÆÁ¿£¬ÓÃÓÚµ÷ÕûÍæ¼ÒÃû×ÖµÄÏÔÊ¾Î»ÖÃ
+    /// ç›¸å¯¹äºç©å®¶ä½ç½®çš„åç§»é‡ï¼Œç”¨äºè°ƒæ•´ç©å®¶åå­—çš„æ˜¾ç¤ºä½ç½®
     /// </summary>
     public Vector3 Offset;
 
 
-    // Start is called before the first frame update 
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update() 
     {
         gameObject.GetComponent<TMP_Text>().text = TargetPlayer.gameObject.GetComponent<PlayerHealth>().Name;

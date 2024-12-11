@@ -1,9 +1,12 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
 
+/// <summary>
+/// 摄像机控制类，查找LocalPlayer并将其绑定为跟随目标
+/// </summary>
 [RequireComponent(typeof(CinemachineVirtualCamera))]
 public class CameraController : MonoBehaviour
 {

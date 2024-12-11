@@ -1,4 +1,4 @@
-using Mirror;
+ï»¿using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +8,9 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
+/// <summary>
+/// ç‰©å“è¡Œä¸ºç±»ï¼Œç®¡ç†ä¸–ç•Œåœ°å›¾ä¸Šçš„èµ„æºç‚¹ï¼Œä»¥åŠå¯¹åº”çš„ç©å®¶äº¤äº’
+/// </summary>
 public class ResourcePointController : NetworkBehaviour
 {
     [SerializeField] private SerializableDictionary.Scripts.SerializableDictionary<ItemData, float> _serializedProbilityDictionary;
@@ -24,7 +27,7 @@ public class ResourcePointController : NetworkBehaviour
     public List<Item> ItemList { get => _itemList; }
 
     /// <summary>
-    /// ´æ´¢µØÍ¼ÉÏËùÓĞ×ÊÔ´µãµÄ×Öµä£ºkeyÊÇtilePosition£¬valueÊÇ×ÊÔ´µã
+    /// å­˜å‚¨åœ°å›¾ä¸Šæ‰€æœ‰èµ„æºç‚¹çš„å­—å…¸ï¼škeyæ˜¯tilePositionï¼Œvalueæ˜¯èµ„æºç‚¹
     /// </summary>
     public static Dictionary<Vector3Int, Transform> ResourcePointDictionary = new Dictionary<Vector3Int, Transform>();
     
@@ -44,7 +47,7 @@ public class ResourcePointController : NetworkBehaviour
                 StartCoroutine(RandomInitItems());
             }
         }
-        // ×ÊÔ´µãÉú³ÉÊ±´æ´¢µ½×ÖµäÖĞ
+        // èµ„æºç‚¹ç”Ÿæˆæ—¶å­˜å‚¨åˆ°å­—å…¸ä¸­
         ResourcePointDictionary.Add(_furnitureTilemap.WorldToCell(transform.position), transform);
     }
 
@@ -100,7 +103,7 @@ public class ResourcePointController : NetworkBehaviour
             }
         }
     }
-
+    
     public IEnumerator AssignInitItems(List<Item> items)
     {
         yield return new WaitForSeconds(1);
@@ -145,7 +148,7 @@ public class ResourcePointController : NetworkBehaviour
     }
 
     /// <summary>
-    /// ·şÎñÆ÷µ÷ÓÃ£¬ÏòÍ¬²½ÎïÆ·ÁĞ±íÖĞÌí¼ÓÎïÆ·
+    /// æœåŠ¡å™¨è°ƒç”¨ï¼Œå‘åŒæ­¥ç‰©å“åˆ—è¡¨ä¸­æ·»åŠ ç‰©å“
     /// </summary>
     /// <param name="item"></param>
     public void AddItemToResourcePoint(Item item)
@@ -157,7 +160,7 @@ public class ResourcePointController : NetworkBehaviour
         }
     }
     /// <summary>
-    /// ·şÎñÆ÷µ÷ÓÃ£¬É¾³ıÍ¬²½ÎïÆ·ÁĞ±íÖĞµÄÎïÆ·
+    /// æœåŠ¡å™¨è°ƒç”¨ï¼Œåˆ é™¤åŒæ­¥ç‰©å“åˆ—è¡¨ä¸­çš„ç‰©å“
     /// </summary>
     /// <param name="item"></param>
     [ClientRpc]
