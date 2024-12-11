@@ -1,4 +1,6 @@
-﻿using Mirror;
+﻿using System;
+using System.Collections;
+using Mirror;
 using UnityEngine;
 
 /// <summary>
@@ -6,30 +8,54 @@ using UnityEngine;
 /// </summary>
 public class PlayerManager : NetworkBehaviour
 {
-    // 直接使用 Player 预制件
-    public GameObject playerPrefab; // 用于设置的 Player 预制体
-    public Vector2 spawnAreaMin; // 随机生成的最小位置
-    public Vector2 spawnAreaMax; // 随机生成的最大位置
-
-    public override void OnStartServer()
+    static public PlayerManager Instance;
+    void Awake()
     {
-        // 只生成一个玩家
-        SpawnPlayer();
+        if (Instance)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
     }
-
-    [Server]
-    private void SpawnPlayer()
+    int _connectingPlayerCount;
+    int _totalPlayerCount;
+    public int AlivePlayerCount => _alivePlayerCount;
+    [SyncVar(hook = nameof(UpdateNumUI))] int _alivePlayerCount;
+    int _tmpDeadPlayerCount;
+    void Start()
     {
-        // 生成随机位置
-        Vector3 randomPosition = new Vector3(
-            Random.Range(spawnAreaMin.x, spawnAreaMax.x),
-            Random.Range(spawnAreaMin.y, spawnAreaMax.y),
-            0);
-
-        // 实例化玩家预制体
-        GameObject player = Instantiate(playerPrefab, randomPosition, Quaternion.identity);
-
-        // 为该玩家分配网络身份
-        NetworkServer.Spawn(player);
+        if(isServer)
+        {
+            _connectingPlayerCount = 0;
+            _alivePlayerCount = 0;
+            _tmpDeadPlayerCount = 0;
+            StartCoroutine(UpdatePlayerCount());
+        }
+    }
+    IEnumerator UpdatePlayerCount()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            _connectingPlayerCount = NetworkServer.connections.Count;
+            _totalPlayerCount = Math.Max(_connectingPlayerCount, _totalPlayerCount);
+            _alivePlayerCount = _connectingPlayerCount - _tmpDeadPlayerCount;
+        }
+    }
+    void UpdateNumUI(int oldAlivePlayer, int newAlivePlayer)
+    {
+        Debug.Log("hook: UpdateNumUI");
+        UIManager.Instance.UpdateAlivePlayersNumUI(newAlivePlayer);
+    }
+    public void DeployPlayerDie()
+    {
+        _tmpDeadPlayerCount++;
+    }
+    public void DeployDeadPlayerLogout()
+    {
+        _tmpDeadPlayerCount--;
     }
 }

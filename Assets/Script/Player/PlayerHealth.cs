@@ -1,14 +1,11 @@
 using System;
 using Mirror;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.XR;
 using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// 玩家数据类，保存了玩家的名字、血量上限和当前血量，以及处理血量变化逻辑的方法
@@ -544,8 +541,35 @@ public class PlayerHealth : NetworkBehaviour
         if (_headHealth <= 0 || _bodyHealth <= 0)
         {
             NetworkIdentity networkIdentity = GetComponent<NetworkIdentity>();
+            PlayerManager.Instance.DeployPlayerDie();
             TargetCreateRP();
-            TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient);
+            TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient, 
+                            gameObject.GetComponent<PlayerLog>().LogList.Last(),  
+                            gameObject.GetComponent<PlayerLog>().EliminationCount);
+            RpcPlayerDie(gameObject.GetComponent<PlayerLog>().LogList.Last(), gameObject);
+        }
+    }
+    [ClientRpc]
+    void RpcPlayerDie(LogInfo logInfo, GameObject deadPlayer)
+    {
+        deadPlayer.transform.Find("SpriteDisplay").gameObject.SetActive(false);
+        deadPlayer.transform.Find("Canvas").gameObject.SetActive(false);
+        switch (logInfo.Type)
+        {
+            case LogInfo.DamageType.fight:
+                string pattern = @"被(?<localName>.+?)用";
+                Match match = Regex.Match(logInfo.Message, pattern);
+                string enemyName = match.Groups["localName"].Value;
+                UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, Name ,enemyName);
+                // UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, Name ,enemyName);
+                // UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, Name ,enemyName);
+                break;
+            case LogInfo.DamageType.poison:
+                UIManager.Instance.AddKillLog(LogInfo.DamageType.poison, Name);
+                break;
+            case LogInfo.DamageType.other:
+                UIManager.Instance.AddKillLog(LogInfo.DamageType.other, null);
+                break;
         }
     }
 
@@ -604,11 +628,19 @@ public class PlayerHealth : NetworkBehaviour
     }
     
     [TargetRpc]
-    public void TargetPlayerDie(NetworkConnection conn)
+    public void TargetPlayerDie(NetworkConnection conn, LogInfo logInfo, int eliminationCount)
     {
         if(gameObject.GetComponent<PlayerFight>().IsFighting)
         {
             gameObject.GetComponent<PlayerFight>().CmdDead();
         }
+        GameObject playerDeadUI = GameObject.Find("Canvas").transform.Find("PlayerDead").gameObject;
+        playerDeadUI.transform.Find("RankInfo").Find("Rank").GetChild(1).GetComponent<TMP_Text>().text = 
+            PlayerManager.Instance.AlivePlayerCount.ToString();
+        playerDeadUI.transform.Find("RankInfo").Find("Elimination").GetChild(1).GetComponent<TMP_Text>().text = 
+            eliminationCount.ToString();
+        playerDeadUI.transform.Find("DeadInfo").GetComponent<TMP_Text>().text = 
+            logInfo.Message;
+        playerDeadUI.SetActive(true);
     }
 }

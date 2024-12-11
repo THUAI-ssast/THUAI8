@@ -92,7 +92,7 @@ public class BackpackManager : MonoBehaviour
         BattleLegsHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Legs");
 
         RefreshSlots();
-        //StartCoroutine(initItems_debug());
+        StartCoroutine(initItems_debug());
     }
 
     private IEnumerator initItems_debug()
@@ -100,20 +100,30 @@ public class BackpackManager : MonoBehaviour
         yield return new WaitForSeconds(1);
         if (GameObject.FindWithTag("LocalPlayer") != null)
         {
-            CreateItem("ScriptableObject/Items/木板");
-            CreateItem("ScriptableObject/Items/锤石");
-            CreateItem("ScriptableObject/Items/Weapons/球棒");
-            CreateItem("ScriptableObject/Items/金属破片");
-            CreateItem("ScriptableObject/Items/石头");
-            CreateItem("ScriptableObject/Items/刀片");
-            CreateItem("ScriptableObject/Items/攀岩绳");
-            CreateItem("ScriptableObject/Items/Armor/摩托头盔");
-            CreateItem("ScriptableObject/Items/Armor/防刺服");
-            CreateItem("ScriptableObject/Items/Weapons/小刀");
+            // CreateItem("ScriptableObject/Items/木板");
+            // CreateItem("ScriptableObject/Items/锤石");
+            // CreateItem("ScriptableObject/Items/Weapons/球棒");
+            // CreateItem("ScriptableObject/Items/金属破片");
+            // CreateItem("ScriptableObject/Items/石头");
+            // CreateItem("ScriptableObject/Items/刀片");
+            // CreateItem("ScriptableObject/Items/攀岩绳");
+            // CreateItem("ScriptableObject/Items/Armor/摩托头盔");
+            // CreateItem("ScriptableObject/Items/Armor/防刺服");
+            // CreateItem("ScriptableObject/Items/Weapons/小刀");
             CreateItem("ScriptableObject/Items/Weapons/佩剑");
-            CreateItem("ScriptableObject/Items/Medicines/医用酒精");
-            CreateItem("ScriptableObject/Items/Medicines/医用绷带");
-            CreateItem("ScriptableObject/Items/Medicines/止痛药");
+            // CreateItem("ScriptableObject/Items/Weapons/小刀");
+            // CreateItem("ScriptableObject/Items/Weapons/佩剑");
+            // CreateItem("ScriptableObject/Items/Weapons/小刀");
+            // CreateItem("ScriptableObject/Items/Weapons/佩剑");
+            // CreateItem("ScriptableObject/Items/Weapons/小刀");
+            // CreateItem("ScriptableObject/Items/Weapons/佩剑");
+            // CreateItem("ScriptableObject/Items/Weapons/小刀");
+            // CreateItem("ScriptableObject/Items/Weapons/佩剑");
+            // CreateItem("ScriptableObject/Items/Weapons/小刀");
+            // CreateItem("ScriptableObject/Items/Weapons/佩剑");
+            // CreateItem("ScriptableObject/Items/Medicines/医用酒精");
+            // CreateItem("ScriptableObject/Items/Medicines/医用绷带");
+            // CreateItem("ScriptableObject/Items/Medicines/止痛药");
         }
         else
         {
