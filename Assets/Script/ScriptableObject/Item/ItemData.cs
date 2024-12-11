@@ -5,7 +5,7 @@ using UnityEngine;
 /// </summary>
 [CreateAssetMenu(menuName = "ItemSystem/Item/ItemData")]
 
-[Serializable]
+[System.Serializable]
 public class ItemData : ScriptableObject
 {
     /// <summary>

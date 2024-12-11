@@ -586,12 +586,15 @@ public class PlayerHealth : NetworkBehaviour
                 itemlist.Add(item);
             }
         }
-        CmdCreateRP(itemlist);
+
+        List<GameObject> itemObjList = new List<GameObject>();
+        itemlist.ForEach(i=>itemObjList.Add(i.gameObject));
+        CmdCreateRP(itemObjList);
     }
 
 
     [Command]
-    public void CmdCreateRP(List<Item> itemlist)
+    public void CmdCreateRP(List<GameObject> itemList)
     {
         Vector3Int tempPosition = _furnitureTilemap.WorldToCell(transform.position);
         Vector3 cellPosition = _furnitureTilemap.GetCellCenterWorld(tempPosition);
@@ -599,15 +602,15 @@ public class PlayerHealth : NetworkBehaviour
         instance.transform.position = cellPosition;
         instance.transform.SetParent(_furnitureTilemap.transform);
         ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
-        List<Item> emptyitemlist = new List<Item>();
-        resourcePointController.InitializeWithCustomItems(emptyitemlist);
+        List<Item> emptyItemList = new List<Item>();
+        resourcePointController.InitializeWithCustomItems(emptyItemList);
 
-        foreach (var item in itemlist)
+        foreach (var item in itemList)
         {
-            resourcePointController.AddItemToResourcePoint(item);
+            resourcePointController.AddItemToResourcePoint(item.GetComponent<Item>());
         }
         NetworkServer.Spawn(instance);
-        RpcSyncInstance(instance, cellPosition, itemlist);
+        RpcSyncInstance(instance, cellPosition, itemList);
     }
 
 
@@ -615,15 +618,15 @@ public class PlayerHealth : NetworkBehaviour
     /// 在客户端将实例设置为 Tilemap 的子对象，并更新位置
     /// </summary>
     [ClientRpc]
-    private void RpcSyncInstance(GameObject instance, Vector3 cellPosition, List<Item> itemlist)
+    private void RpcSyncInstance(GameObject instance, Vector3 cellPosition, List<GameObject> itemList)
     {
         ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
         instance.transform.position = cellPosition;
         instance.transform.SetParent(_furnitureTilemap.transform);
 
-        foreach (var item in itemlist)
+        foreach (var item in itemList)
         {
-            resourcePointController.AddItemToResourcePoint(item);
+            resourcePointController.AddItemToResourcePoint(item.GetComponent<Item>());
         }
     }
     

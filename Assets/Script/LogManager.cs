@@ -6,12 +6,12 @@ using Mirror;
 /// <summary>
 /// 单例Manager，管理战斗日志显示
 /// </summary>
-public class BattleLogManager : NetworkBehaviour
+public class LogManager : NetworkBehaviour
 {
     /// <summary>
     /// 类的单例
     /// </summary>
-    public static BattleLogManager Instance;
+    public static LogManager Instance;
 
     [SerializeField] GameObject logTextPrefab;
     [SerializeField] GameObject _logPanelContent;
