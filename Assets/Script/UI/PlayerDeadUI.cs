@@ -10,7 +10,6 @@ public class PlayerDeadUI : MonoBehaviour
 {
     public void OnButtonClick()
     {
-        GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerLog>().Logout();
         RoomManager.Instance.StopClient();
         SceneManager.LoadScene("StartScene");
         gameObject.transform.parent.gameObject.SetActive(false);

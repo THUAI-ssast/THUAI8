@@ -30,11 +30,6 @@ public class PlayerLog : NetworkBehaviour
     {
         _eliminationCount++;
     }
-    [Command]
-    public void Logout()
-    {
-        PlayerManager.Instance.DeployDeadPlayerLogout();
-    }
 }
 
 public class LogInfo

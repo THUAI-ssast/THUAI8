@@ -331,7 +331,7 @@ public class UIManager : MonoBehaviour
             transparent -= 1;
             yield return null;
         }
-        Destroy(gameObject);
+        Destroy(log);
     }
     public void UpdateAlivePlayersNumUI(int alivePlayerNum)
     {

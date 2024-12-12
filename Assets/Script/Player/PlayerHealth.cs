@@ -18,6 +18,12 @@ public class PlayerHealth : NetworkBehaviour
     private Tilemap _furnitureTilemap;
 
     /// <summary>
+    /// 玩家是否存活
+    /// </summary>
+    public bool IsAlive => _isAlive;
+    bool _isAlive;
+
+    /// <summary>
     /// 玩家的名字
     /// </summary>
     [SyncVar] private string _name;
@@ -259,6 +265,7 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(_legHealth, _legMaxHealth, BodyPart.Leg);
         }
 
+        _isAlive = true;
         _furnitureTilemap = GridMoveController.Instance.FurnitureTilemap;
     }
 
@@ -540,7 +547,7 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (_headHealth <= 0 || _bodyHealth <= 0)
         {
-            NetworkIdentity networkIdentity = GetComponent<NetworkIdentity>();
+            _isAlive = false;
             PlayerManager.Instance.DeployPlayerDie();
             TargetCreateRP();
             TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient, 
@@ -560,9 +567,7 @@ public class PlayerHealth : NetworkBehaviour
                 string pattern = @"被(?<localName>.+?)用";
                 Match match = Regex.Match(logInfo.Message, pattern);
                 string enemyName = match.Groups["localName"].Value;
-                UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, Name ,enemyName);
-                // UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, Name ,enemyName);
-                // UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, Name ,enemyName);
+                UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, Name, enemyName);
                 break;
             case LogInfo.DamageType.poison:
                 UIManager.Instance.AddKillLog(LogInfo.DamageType.poison, Name);

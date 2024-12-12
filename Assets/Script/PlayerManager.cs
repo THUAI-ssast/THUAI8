@@ -23,39 +23,49 @@ public class PlayerManager : NetworkBehaviour
     int _connectingPlayerCount;
     int _totalPlayerCount;
     public int AlivePlayerCount => _alivePlayerCount;
-    [SyncVar(hook = nameof(UpdateNumUI))] int _alivePlayerCount;
-    int _tmpDeadPlayerCount;
+    [SyncVar(hook = nameof(RpcUpdateNumUI))] int _alivePlayerCount;
     void Start()
     {
         if(isServer)
         {
             _connectingPlayerCount = 0;
             _alivePlayerCount = 0;
-            _tmpDeadPlayerCount = 0;
-            StartCoroutine(UpdatePlayerCount());
+            StartCoroutine(DeployUpdatePlayerCount());
         }
     }
-    IEnumerator UpdatePlayerCount()
+    IEnumerator DeployUpdatePlayerCount()
     {
         while (true)
         {
             yield return new WaitForSeconds(1);
-            _connectingPlayerCount = NetworkServer.connections.Count;
+            if(NetworkServer.connections.Count != _connectingPlayerCount)
+            {
+                DeployUpdateAlivePlayer();   
+                _connectingPlayerCount = NetworkServer.connections.Count;
+            }
             _totalPlayerCount = Math.Max(_connectingPlayerCount, _totalPlayerCount);
-            _alivePlayerCount = _connectingPlayerCount - _tmpDeadPlayerCount;
         }
     }
-    void UpdateNumUI(int oldAlivePlayer, int newAlivePlayer)
+    void DeployUpdateAlivePlayer()
     {
-        Debug.Log("hook: UpdateNumUI");
+        int alivePlayer = 0;
+        foreach (var connection in NetworkServer.connections)
+        {
+            int connectionId = connection.Key;
+            PlayerHealth health = connection.Value.identity.GetComponent<PlayerHealth>();
+            if(health.IsAlive == true)
+            {
+                alivePlayer++;
+            }
+        }
+        _alivePlayerCount = alivePlayer;
+    }
+    void RpcUpdateNumUI(int oldAlivePlayer, int newAlivePlayer)
+    {
         UIManager.Instance.UpdateAlivePlayersNumUI(newAlivePlayer);
     }
     public void DeployPlayerDie()
     {
-        _tmpDeadPlayerCount++;
-    }
-    public void DeployDeadPlayerLogout()
-    {
-        _tmpDeadPlayerCount--;
+        DeployUpdateAlivePlayer();
     }
 }

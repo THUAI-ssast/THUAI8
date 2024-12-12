@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -56,8 +56,8 @@ public class HealthPanelEnemy : MonoBehaviour
             string enemyName = enemyPlayerHealth.Name;
             string localName = localPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Head, UIManager.Instance.FollowImage);
-            string message = $"��ǰ�غϣ�{localName}����{costAP}APʹ��{itemName}������{enemyName}��ͷ���������{damage}HP�˺���";
-            string enemyDeadMsg = $"��{localName}��{itemName}������ͷ����";
+            string message = $"{localName}消耗{costAP}AP使用{itemName}攻击了{enemyName}的头部，造成了{damage}HP伤害。";
+            string enemyDeadMsg = $"被{localName}用{itemName}攻击了头部…";
             _localPlayer.GetComponent<PlayerLog>().CmdAddLog(_enemyPlayer, enemyDeadMsg, LogInfo.DamageType.fight);
             UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
@@ -80,8 +80,8 @@ public class HealthPanelEnemy : MonoBehaviour
             string enemyName = enemyPlayerHealth.Name;
             string localName = localPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.MainBody, UIManager.Instance.FollowImage);
-            string message = $"��ǰ�غϣ�{localName}����{costAP}APʹ��{itemName}������{enemyName}�����ɣ������{damage}HP�˺���";
-            string enemyDeadMsg = $"��{localName}��{itemName}���������ɡ�";
+            string message = $"{localName}消耗{costAP}AP使用{itemName}攻击了{enemyName}的躯干，造成了{damage}HP伤害。";
+            string enemyDeadMsg = $"被{localName}用{itemName}攻击了躯干…";
             _localPlayer.GetComponent<PlayerLog>().CmdAddLog(_enemyPlayer, enemyDeadMsg, LogInfo.DamageType.fight);
             UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
@@ -104,8 +104,8 @@ public class HealthPanelEnemy : MonoBehaviour
             string enemyName = enemyPlayerHealth.Name;
             string localName = localPlayerHealth.Name;
             float damage = enemyPlayerHealth.GetWeaponDamage(PlayerHealth.BodyPosition.Legs, UIManager.Instance.FollowImage);
-            string message = $"��ǰ�غϣ�{localName}����{costAP}APʹ��{itemName}������{enemyName}���Ȳ��������{damage}HP�˺���";
-            string enemyDeadMsg = $"��{localName}��{itemName}�������Ȳ���";
+            string message = $"{localName}消耗{costAP}AP使用{itemName}攻击了{enemyName}的腿部，造成了{damage}HP伤害。";
+            string enemyDeadMsg = $"被{localName}用{itemName}攻击了腿部…";
             _localPlayer.GetComponent<PlayerLog>().CmdAddLog(_enemyPlayer, enemyDeadMsg, LogInfo.DamageType.fight);
             UIManager.Instance.DestroyCurrentFollowImage();
             _localPlayer.GetComponent<PlayerFight>().CmdAttackHappened(message, costAP);
