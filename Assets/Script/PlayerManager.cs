@@ -1,4 +1,6 @@
-﻿using Mirror;
+﻿using System;
+using System.Collections;
+using Mirror;
 using UnityEngine;
 
 /// <summary>
@@ -6,30 +8,64 @@ using UnityEngine;
 /// </summary>
 public class PlayerManager : NetworkBehaviour
 {
-    // 直接使用 Player 预制件
-    public GameObject playerPrefab; // 用于设置的 Player 预制体
-    public Vector2 spawnAreaMin; // 随机生成的最小位置
-    public Vector2 spawnAreaMax; // 随机生成的最大位置
-
-    public override void OnStartServer()
+    static public PlayerManager Instance;
+    void Awake()
     {
-        // 只生成一个玩家
-        SpawnPlayer();
+        if (Instance)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
     }
-
-    [Server]
-    private void SpawnPlayer()
+    int _connectingPlayerCount;
+    int _totalPlayerCount;
+    public int AlivePlayerCount => _alivePlayerCount;
+    [SyncVar(hook = nameof(RpcUpdateNumUI))] int _alivePlayerCount;
+    void Start()
     {
-        // 生成随机位置
-        Vector3 randomPosition = new Vector3(
-            Random.Range(spawnAreaMin.x, spawnAreaMax.x),
-            Random.Range(spawnAreaMin.y, spawnAreaMax.y),
-            0);
-
-        // 实例化玩家预制体
-        GameObject player = Instantiate(playerPrefab, randomPosition, Quaternion.identity);
-
-        // 为该玩家分配网络身份
-        NetworkServer.Spawn(player);
+        if(isServer)
+        {
+            _connectingPlayerCount = 0;
+            _alivePlayerCount = 0;
+            StartCoroutine(DeployUpdatePlayerCount());
+        }
+    }
+    IEnumerator DeployUpdatePlayerCount()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            if(NetworkServer.connections.Count != _connectingPlayerCount)
+            {
+                DeployUpdateAlivePlayer();   
+                _connectingPlayerCount = NetworkServer.connections.Count;
+            }
+            _totalPlayerCount = Math.Max(_connectingPlayerCount, _totalPlayerCount);
+        }
+    }
+    void DeployUpdateAlivePlayer()
+    {
+        int alivePlayer = 0;
+        foreach (var connection in NetworkServer.connections)
+        {
+            int connectionId = connection.Key;
+            PlayerHealth health = connection.Value.identity.GetComponent<PlayerHealth>();
+            if(health.IsAlive == true)
+            {
+                alivePlayer++;
+            }
+        }
+        _alivePlayerCount = alivePlayer;
+    }
+    void RpcUpdateNumUI(int oldAlivePlayer, int newAlivePlayer)
+    {
+        UIManager.Instance.UpdateAlivePlayersNumUI(newAlivePlayer);
+    }
+    public void DeployPlayerDie()
+    {
+        DeployUpdateAlivePlayer();
     }
 }
