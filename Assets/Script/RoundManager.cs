@@ -117,7 +117,7 @@ public class RoundManager : NetworkBehaviour
     /// <returns></returns>
     IEnumerator RoundTimer()
     {
-        if (SceneManager.GetActiveScene().name == "BattleScene")
+        if (SceneManager.GetActiveScene().name == "BattleScene" || true)
         {
             float shortTimer = BornUIManager.Instance.delayTime; // 15秒倒计时
             while (shortTimer > 0)
