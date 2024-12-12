@@ -1,32 +1,57 @@
-ï»¿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using kcp2k;
 using Mirror;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-/// <summary>
-/// ç½‘ç»œç±»ï¼Œå¼€å¯æ—¶è‡ªåŠ¨è¿æ¥è‡³äº‘æœåŠ¡å™¨
-/// </summary>
 public class AddService : MonoBehaviour
 {
-    /// <summary>
-    /// æ˜¯å¦ä»¥æœåŠ¡å™¨æ¨¡å¼å¯åŠ¨
-    /// </summary>
-    public bool AppIsServer = false;
-    private NetworkManager networkManager;
+    public static AddService Instance; 
+
+    public enum AppBuildMode
+    {
+        AppIsMatchServer,
+        AppIsGameServer,
+        AppIsClient,
+        AppIsHost
+    }
+
+    public AppBuildMode appBuildMode;
+
+    public static string ServerNetworkAddress = "150.158.44.119";
+    public static ushort MatchServerPort = 8000;
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
     void Start()
     {
-        networkManager = GetComponent<RoomManager>();
-        networkManager.networkAddress = "150.158.44.119";
-        GetComponent<KcpTransport>().port = 8003;
-        if (AppIsServer == true)
+        switch (appBuildMode)
         {
-            networkManager.StartServer();
-        }
-        else
-        {
-            networkManager.StartClient();
-        }
+            case AppBuildMode.AppIsMatchServer:
+                
+                break;
+            case AppBuildMode.AppIsGameServer:
+                SceneManager.LoadScene("RoomStartScene");
+                break;
+            case AppBuildMode.AppIsClient:
 
+                break;
+            case AppBuildMode.AppIsHost:
+                // Ö±½Ó½øÈëÓÎÏ··¿¼äÓÃÓÚµ÷ÊÔ
+                SceneManager.LoadScene("RoomStartScene");
+                break;
+            default:
+                break;
+        }
     }
 }

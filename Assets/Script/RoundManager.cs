@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
@@ -116,14 +117,17 @@ public class RoundManager : NetworkBehaviour
     /// <returns></returns>
     IEnumerator RoundTimer()
     {
-        float shortTimer = BornUIManager.Instance.delayTime; // 15秒倒计时
-        while (shortTimer > 0)
+        if (SceneManager.GetActiveScene().name == "BattleScene")
         {
-            shortTimer -= Time.deltaTime;
-            UpdateTimerText(shortTimer); // 更新显示的短时间计时
-            yield return null;
+            float shortTimer = BornUIManager.Instance.delayTime; // 15秒倒计时
+            while (shortTimer > 0)
+            {
+                shortTimer -= Time.deltaTime;
+                UpdateTimerText(shortTimer); // 更新显示的短时间计时
+                yield return null;
+            }
         }
-
+        
         StartRound();
         yield return new WaitForSeconds(2);
         while (true)
