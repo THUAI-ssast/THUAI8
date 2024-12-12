@@ -17,9 +17,9 @@ public class PlayerLog : NetworkBehaviour
         _eliminationCount = 0;   
     }
     [Command]
-    public void CmdAddLog(GameObject enemyPlayer ,string message, LogInfo.DamageType damageType)
+    public void CmdAddLog(GameObject player ,string message, LogInfo.DamageType damageType)
     {
-        enemyPlayer.GetComponent<PlayerLog>().DeployAddLog(message, damageType);
+        player.GetComponent<PlayerLog>().DeployAddLog(message, damageType);
     }
     public void DeployAddLog(string message, LogInfo.DamageType damageType)
     {

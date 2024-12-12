@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics;
 using Mirror;
+using Mirror.Examples.Chat;
+using TMPro;
 using UnityEngine;
 
 /// <summary>
@@ -49,6 +52,7 @@ public class PlayerManager : NetworkBehaviour
     void DeployUpdateAlivePlayer()
     {
         int alivePlayer = 0;
+        NetworkConnectionToClient lastPlayer = null;
         foreach (var connection in NetworkServer.connections)
         {
             int connectionId = connection.Key;
@@ -56,10 +60,33 @@ public class PlayerManager : NetworkBehaviour
             if(health.IsAlive == true)
             {
                 alivePlayer++;
+                lastPlayer = connection.Value;
             }
         }
         _alivePlayerCount = alivePlayer;
+        // 胜利判断
+        if (alivePlayer == 1)
+        {
+            TargetVictoryUI(lastPlayer, lastPlayer.identity.GetComponent<PlayerLog>().EliminationCount);
+        }
     }
+
+    [TargetRpc]
+    void TargetVictoryUI(NetworkConnection conn, int eliminationCount)
+    {
+        StartCoroutine(VictoryUIDisplay(eliminationCount));
+    }
+
+    IEnumerator VictoryUIDisplay(int eliminationCount)
+    {
+        yield return new WaitForSeconds(2);
+        GameObject playerVictoryUI = UIManager.Instance.MainCanvas.transform.Find("PlayerVictory").gameObject;
+        playerVictoryUI.transform.Find("RankInfo").Find("Rank").GetChild(1).GetComponent<TMP_Text>().text = "1";
+        playerVictoryUI.transform.Find("RankInfo").Find("Elimination").GetChild(1).GetComponent<TMP_Text>().text =
+            eliminationCount.ToString();
+        playerVictoryUI.SetActive(true);
+    }
+
     void RpcUpdateNumUI(int oldAlivePlayer, int newAlivePlayer)
     {
         UIManager.Instance.UpdateAlivePlayersNumUI(newAlivePlayer);

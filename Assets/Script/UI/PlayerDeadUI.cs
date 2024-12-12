@@ -10,8 +10,8 @@ public class PlayerDeadUI : MonoBehaviour
 {
     public void OnButtonClick()
     {
+        NetworkManagerController.Instance.IsEnterRoom = false;
         RoomManager.Instance.StopClient();
-        SceneManager.LoadScene("StartScene");
         gameObject.transform.parent.gameObject.SetActive(false);
     }
 }

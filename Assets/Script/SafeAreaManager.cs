@@ -21,8 +21,7 @@ public class SafeAreaManager : NetworkBehaviour
     /// key：世界回合计数；value：安全区的边长（安全区始终是正方形）。
     /// 到了key指定的世界回合，安全区的边长就更新为对应的value
     /// </summary>
-    [Mirror.ReadOnly]
-    private Dictionary<int, int> _safeAreaChangePlan = new Dictionary<int, int>
+    private readonly Dictionary<int, int> _safeAreaChangePlan = new Dictionary<int, int>
     {
         {1,168},
         {3,110},
@@ -48,12 +47,12 @@ public class SafeAreaManager : NetworkBehaviour
     /// <summary>
     /// 下一次安全区的边长
     /// </summary>
-    [SyncVar] private int _nextSafeAreaLength = 168;
+    [SyncVar] private int _nextSafeAreaLength;
 
     /// <summary>
     /// 下一次安全区的左下角坐标，初始化时需要设置为全图的左下角
     /// </summary>
-    [SyncVar(hook = nameof(DisplaySafeArea))] private Vector2Int _nextSafeAreaOrigin = new(-84,-84);
+    [SyncVar(hook = nameof(DisplaySafeArea))] private Vector2Int _nextSafeAreaOrigin;
 
     /// <summary>
     /// 用于显示安全区，覆盖全图
@@ -68,6 +67,8 @@ public class SafeAreaManager : NetworkBehaviour
     /// </summary>
     private Transform _safeAreaOutline;
 
+    private readonly int _firstRoundSafeAreaLength = 168;
+    private readonly Vector2Int _firstRoundSafeAreaOrigin = new Vector2Int(-84, -84);
 
     private void Awake()
     {
@@ -110,8 +111,11 @@ public class SafeAreaManager : NetworkBehaviour
                 Debug.Log("SafeArea has error");
                 return;
             }
+            bool isFirstRound = currentRoundCount == 1;
+            _nextSafeAreaLength = isFirstRound ? _firstRoundSafeAreaLength : _nextSafeAreaLength;
+            _nextSafeAreaOrigin = isFirstRound ? _firstRoundSafeAreaOrigin : _nextSafeAreaOrigin;
             // 确定新边长
-            _safeAreaLength = _nextSafeAreaLength;
+            _safeAreaLength =  _nextSafeAreaLength;
             // 确定左下角的新坐标
             _safeAreaOrigin = _nextSafeAreaOrigin;
             
@@ -141,7 +145,9 @@ public class SafeAreaManager : NetworkBehaviour
         {
             return;
         }
-        PlayerHealth localPlayerHealth = GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerHealth>();
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
+        localPlayer.GetComponent<PlayerLog>().CmdAddLog(localPlayer, "你迷失了前进的方向…", LogInfo.DamageType.poison);
+        PlayerHealth localPlayerHealth = localPlayer.GetComponent<PlayerHealth>();
         localPlayerHealth.ChangeHealth((int)RandomSelectBodyPosition(), -decreaseActionPoint);
     }
 
@@ -151,7 +157,9 @@ public class SafeAreaManager : NetworkBehaviour
         {
             return;
         }
-        PlayerHealth localPlayerHealth = GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerHealth>();
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
+        localPlayer.GetComponent<PlayerLog>().CmdAddLog(localPlayer, "你迷失了前进的方向…", LogInfo.DamageType.poison);
+        PlayerHealth localPlayerHealth = localPlayer.GetComponent<PlayerHealth>();
         for (int i = 0; i < roundCount; i++)
         {
             localPlayerHealth.ChangeHealth((int)RandomSelectBodyPosition(), -1);
@@ -163,6 +171,13 @@ public class SafeAreaManager : NetworkBehaviour
     /// </summary>
     private void DisplaySafeArea(Vector2Int oldOrigin, Vector2Int newOrigin)
     {
+        Debug.Log($"{_safeAreaLength},{_safeAreaOrigin},{_nextSafeAreaLength},{_nextSafeAreaOrigin}");
+        if (_safeAreaLength == 0)
+        {
+            _safeAreaMask.gameObject.SetActive(false);
+            _safeAreaOutline.gameObject.SetActive(false);
+            return;
+        }
         // 绘制安全区，确定position为正方形的中心坐标，scale等于边长
         float halfLength = _safeAreaLength / 2.0f;
         _safeAreaMask.position = new Vector3(_safeAreaOrigin.x, _safeAreaOrigin.y) + new Vector3(halfLength, halfLength);
@@ -196,5 +211,13 @@ public class SafeAreaManager : NetworkBehaviour
         // 随机选择一个枚举值
         var randomBody = (PlayerHealth.BodyPosition)bodyPositions.GetValue(UnityEngine.Random.Range(0, bodyPositions.Length));
         return randomBody;
+    }
+
+    public void DeleteSafeAreaOnServer()
+    {
+        _safeAreaLength = 0;
+        _safeAreaOrigin = new Vector2Int(0, 0);
+        _nextSafeAreaLength = 0;
+        _nextSafeAreaOrigin = new Vector2Int(0, 0);
     }
 }

@@ -2,8 +2,10 @@ using kcp2k;
 using Mirror;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 public class NetworkManagerController : MonoBehaviour
 {
@@ -23,6 +25,7 @@ public class NetworkManagerController : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
     }
 
@@ -76,16 +79,22 @@ public class NetworkManagerController : MonoBehaviour
                             Debug.Log("Delete RoomManager");
                             Destroy(GameObject.Find("RoomManager"));
                         }
-                        else
-                        {
-                            Debug.Log("No Delete RoomManager");
-                        }
                         SceneManager.LoadScene("StartScene");
                     }
                 }
                 else if(AddService.Instance.appBuildMode == AddService.AppBuildMode.AppIsGameServer)
                 {
                     CreateRoomOnGameServer();
+                    StartCoroutine(destroyRoomEnumerator());
+                }
+                else if (AddService.Instance.appBuildMode == AddService.AppBuildMode.AppIsLocalServer)
+                {
+                    RoomManager.Instance.StartServer();
+                    StartCoroutine(destroyRoomEnumerator());
+                }
+                else if (AddService.Instance.appBuildMode == AddService.AppBuildMode.AppIsLocalClient)
+                {
+                    RoomManager.Instance.StartClient();
                 }
                 break;
             case "RoomScene":
@@ -103,6 +112,11 @@ public class NetworkManagerController : MonoBehaviour
                     }
                     else
                     {
+                        if (GameObject.Find("RoomManager"))
+                        {
+                            Debug.Log("Delete RoomManager");
+                            Destroy(GameObject.Find("RoomManager"));
+                        }
                         SceneManager.LoadScene("StartScene");
                     }
                 }
@@ -148,7 +162,20 @@ public class NetworkManagerController : MonoBehaviour
     public IEnumerator EnterTutorial()
     {
         yield return new WaitForSeconds(0.1f);
-        Debug.Log("EnterTutorial func");
         TutorialMenu.Instance.StartTutorial();
+    }
+
+    IEnumerator destroyRoomEnumerator()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(10f);
+            if (NetworkServer.connections.Count == 0)
+            {
+                Process currentProcess = Process.GetCurrentProcess();
+                // 结束当前进程
+                currentProcess.Kill();
+            }
+        }
     }
 }

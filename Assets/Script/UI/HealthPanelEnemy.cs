@@ -1,10 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// UI��Ϊ/�����࣬����ս��UI�ڵĵ�����ʾ���Լ���Ӧ�Ĺ�������
+/// UI行为/数据类，管理战斗UI内的敌人显示，以及对应的攻击触发
 /// </summary>
 public class HealthPanelEnemy : MonoBehaviour
 {
@@ -117,21 +117,21 @@ public class HealthPanelEnemy : MonoBehaviour
     }
 
     /// <summary>
-    /// ���� AP ���ĳ��Ⱥ���ʾ����ֵ
+    /// 更新 AP 条的长度和显示的数值
     /// </summary>
-    /// <param name="currentAP">��ǰ AP ֵ</param>
-    /// <param name="maxAP">��� AP ֵ</param>
+    /// <param name="currentAP">当前 AP 值 ֵ</param>
+    /// <param name="maxAP">最大 AP 值ֵ</param>
     public void UpdateActionPoint(float currentAP, float maxAP)
     {
-        // ���� AP ������
+        // AP条显示
         RectTransform apBarRect = _apBar.GetComponent<RectTransform>();
         _apBar.GetComponent<UnityEngine.UI.Image>().fillAmount = currentAP / maxAP;
 
-        // ���� AP ���ı�
+        // AP文字显示
         Transform valueText = _apBar.transform.Find("Value");
         if (valueText != null)
         {
-            valueText.GetComponent<TextMeshProUGUI>().text = currentAP.ToString() + "\n /\n20";
+            valueText.GetComponent<TextMeshProUGUI>().text = currentAP.ToString("0.0") + "\n /\n20";
         }
     }
     public void SetEnemy(GameObject enemyPlayer)

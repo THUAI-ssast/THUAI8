@@ -117,7 +117,7 @@ public class RoundManager : NetworkBehaviour
     /// <returns></returns>
     IEnumerator RoundTimer()
     {
-        if (SceneManager.GetActiveScene().name == "BattleScene" || true)
+        if (SceneManager.GetActiveScene().name == "BattleScene")
         {
             float shortTimer = BornUIManager.Instance.delayTime; // 15秒倒计时
             while (shortTimer > 0)
@@ -132,7 +132,7 @@ public class RoundManager : NetworkBehaviour
         yield return new WaitForSeconds(2);
         while (true)
         {
-            _playerCount = NetworkServer.connections.Count;
+            _playerCount = PlayerManager.Instance.AlivePlayerCount;
             if (_readyPlayer.Count == _playerCount)
             {
                 EndRoundOnServer();

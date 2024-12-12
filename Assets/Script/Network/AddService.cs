@@ -6,16 +6,31 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+/// <summary>
+/// 单例，用于游戏的Build配置
+/// </summary>
 public class AddService : MonoBehaviour
 {
-    public static AddService Instance; 
+    public static AddService Instance;
 
+    /// <summary>
+    /// Build模式枚举类。
+    /// <para>AppIsMatchServer：服务器上的匹配Server；</para>
+    /// <para>AppIsMatchServer：服务器上的房间游戏Server；</para>
+    /// <para>AppIsClient：与服务器交互的Client；</para>
+    /// <para>ApplsHost：本地Host；</para>
+    /// <para>AppIsLocalServer：本地Server；</para>
+    /// <para>AppIsLocalClient：本地Client。</para>
+    /// </summary>
     public enum AppBuildMode
     {
         AppIsMatchServer,
         AppIsGameServer,
         AppIsClient,
-        AppIsHost
+        AppIsHost,
+        AppIsLocalServer,
+        AppIsLocalClient
     }
 
     public AppBuildMode appBuildMode;
@@ -48,6 +63,12 @@ public class AddService : MonoBehaviour
                 break;
             case AppBuildMode.AppIsHost:
                 // 直接进入游戏房间用于调试
+                SceneManager.LoadScene("RoomStartScene");
+                break;
+            case AppBuildMode.AppIsLocalServer:
+                SceneManager.LoadScene("RoomStartScene");
+                break;
+            case AppBuildMode.AppIsLocalClient:
                 SceneManager.LoadScene("RoomStartScene");
                 break;
             default:

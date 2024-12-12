@@ -21,7 +21,7 @@ public class PlayerHealth : NetworkBehaviour
     /// 玩家是否存活
     /// </summary>
     public bool IsAlive => _isAlive;
-    bool _isAlive;
+    [SyncVar] bool _isAlive;
 
     /// <summary>
     /// 玩家的名字
@@ -548,12 +548,12 @@ public class PlayerHealth : NetworkBehaviour
         if (_headHealth <= 0 || _bodyHealth <= 0)
         {
             _isAlive = false;
-            PlayerManager.Instance.DeployPlayerDie();
             TargetCreateRP();
             TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient, 
                             gameObject.GetComponent<PlayerLog>().LogList.Last(),  
                             gameObject.GetComponent<PlayerLog>().EliminationCount);
             RpcPlayerDie(gameObject.GetComponent<PlayerLog>().LogList.Last(), gameObject);
+            PlayerManager.Instance.DeployPlayerDie();
         }
     }
     [ClientRpc]
@@ -561,16 +561,17 @@ public class PlayerHealth : NetworkBehaviour
     {
         deadPlayer.transform.Find("SpriteDisplay").gameObject.SetActive(false);
         deadPlayer.transform.Find("Canvas").gameObject.SetActive(false);
+        string deadPlayerName = deadPlayer.GetComponent<PlayerHealth>().Name;
         switch (logInfo.Type)
         {
             case LogInfo.DamageType.fight:
                 string pattern = @"被(?<localName>.+?)用";
                 Match match = Regex.Match(logInfo.Message, pattern);
                 string enemyName = match.Groups["localName"].Value;
-                UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, Name, enemyName);
+                UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, deadPlayerName, enemyName);
                 break;
             case LogInfo.DamageType.poison:
-                UIManager.Instance.AddKillLog(LogInfo.DamageType.poison, Name);
+                UIManager.Instance.AddKillLog(LogInfo.DamageType.poison, deadPlayerName);
                 break;
             case LogInfo.DamageType.other:
                 UIManager.Instance.AddKillLog(LogInfo.DamageType.other, null);
@@ -650,5 +651,14 @@ public class PlayerHealth : NetworkBehaviour
         playerDeadUI.transform.Find("DeadInfo").GetComponent<TMP_Text>().text = 
             logInfo.Message;
         playerDeadUI.SetActive(true);
+    }
+
+    /// <summary>
+    /// 删除安全区并更新
+    /// </summary>
+    [Command]
+    public void CmdDeleteSafeArea()
+    {
+        SafeAreaManager.Instance.DeleteSafeAreaOnServer();
     }
 }
