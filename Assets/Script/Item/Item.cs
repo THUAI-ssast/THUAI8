@@ -1,8 +1,6 @@
 using System;
 using Mirror;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 using static PlayerHealth;
 
 /// <summary>

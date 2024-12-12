@@ -19,7 +19,7 @@ MonoBehaviour:
   ItemValue: 0
   Durability: 4
   AttakAPCost: 0.4
-  BasicDamage: 1
+  BasicDamage: 3
   BodyDamageDictionary:
     _pairs:
     - _key: 0
