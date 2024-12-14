@@ -77,7 +77,7 @@ public class MapUIManager : MonoBehaviour
         float nextLength = nextSafeAreaLength * _lengthPerTile;
         Vector2 nextOrigin = TilePosToImagePos(nextSafeAreaOrigin);
 
-        if(RoundManager.Instance.RoundCount > 1)
+        if (RoundManager.Instance && RoundManager.Instance.RoundCount > 1)
         {
             _currentMask.GetComponent<RectTransform>().localPosition = currentOrigin + new Vector2(currentLength, currentLength) / 2;
             _currentMask.GetComponent<RectTransform>().localScale = new Vector2(currentLength, currentLength);

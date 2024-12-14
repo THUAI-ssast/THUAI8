@@ -1,5 +1,3 @@
-
-using Mirror;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -242,6 +240,7 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
             if (Input.GetMouseButtonDown(1))
             {
                 DestroyFollowImage();
+                UIManager.Instance.FollowImage = null;
             }
         }
     }

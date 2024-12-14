@@ -1,10 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
-using JetBrains.Annotations;
 using TMPro;
-using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,17 +31,12 @@ public class UIManager : MonoBehaviour
         private set => _battlePanel = value;
     }
 
-    public Item FollowImage
-    {
-        get => _followImage;
-        set => _followImage = value;
-    }
+    public Item FollowImage;
 
     public SlotMenuTrigger CurrentSlotMenuTrigger { get; set; } // here
 
     [SerializeField] private GameObject _bagPanel;
     [SerializeField] private GameObject _battlePanel;
-    [SerializeField] private Item _followImage;
     private GameObject _craftPanel;
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
@@ -301,5 +293,48 @@ public class UIManager : MonoBehaviour
         hoverStatusPanel.SetActive(false);
         _hoverStatusPanelList.Remove(hoverStatusPanel);
         Destroy(hoverStatusPanel);
+    }
+
+    public void AddKillLog(LogInfo.DamageType damageType, string victimName, string killerName = null)
+    {
+        GameObject KillLogPanel = MainCanvas.transform.Find("KillLogPanel").gameObject;
+        GameObject newKillLog = Instantiate(Resources.Load<GameObject>("UI/KillLog"), KillLogPanel.transform);
+        switch(damageType)
+        {
+            case LogInfo.DamageType.fight:
+                newKillLog.transform.GetChild(0).GetComponent<TMP_Text>().text = killerName;
+                newKillLog.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/Sprite/KillLog/Murder");
+                newKillLog.transform.GetChild(2).GetComponent<TMP_Text>().text = victimName;
+                break;
+            case LogInfo.DamageType.poison:
+                newKillLog.transform.GetChild(0).GetComponent<TMP_Text>().text = victimName;
+                newKillLog.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/Sprite/KillLog/Death");
+                newKillLog.transform.GetChild(2).gameObject.SetActive(false);
+                break;
+            case LogInfo.DamageType.other:
+                break;
+        }
+        newKillLog.transform.SetAsFirstSibling();
+        StartCoroutine(DestroyAfterSeconds(2, newKillLog));
+    }
+    
+    IEnumerator DestroyAfterSeconds(int seconds, GameObject log)
+    {
+        yield return new WaitForSeconds(seconds);
+        byte transparent = 255;
+        Color32 color = log.transform.GetChild(0).GetComponent<TMP_Text>().color;
+        while(transparent > 0)
+        {
+            log.transform.GetChild(0).GetComponent<TMP_Text>().color = new Color32(color.r, color.g, color.b, transparent);
+            log.transform.GetChild(1).GetComponent<Image>().color = new Color32(color.r, color.g, color.b, transparent);
+            log.transform.GetChild(2).GetComponent<TMP_Text>().color = new Color32(color.r, color.g, color.b, transparent);
+            transparent -= 1;
+            yield return null;
+        }
+        Destroy(log);
+    }
+    public void UpdateAlivePlayersNumUI(int alivePlayerNum)
+    {
+        MainCanvas.transform.Find("AlivePlayersNum").GetChild(1).GetComponent<TMP_Text>().text = alivePlayerNum.ToString();
     }
 }

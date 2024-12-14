@@ -68,8 +68,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 387f580385e2a6642a409f5f5d4f43bc, type: 2}
-  m_sharedMaterial: {fileID: -122742541679575602, guid: 387f580385e2a6642a409f5f5d4f43bc, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: dc305d2493ef42747a4c611605e0ca81, type: 2}
+  m_sharedMaterial: {fileID: -122742541679575602, guid: dc305d2493ef42747a4c611605e0ca81, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -445,6 +445,7 @@ GameObject:
   - component: {fileID: 5631205497098370975}
   - component: {fileID: 1185039093791707258}
   - component: {fileID: 9034928871300990328}
+  - component: {fileID: 7539951699323777751}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -488,6 +489,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  _isMoving: 0
 --- !u!120 &6154002801919467951
 LineRenderer:
   serializedVersion: 2
@@ -963,6 +965,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf42ad75c342454459ccb9aa8c4a0193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+--- !u!114 &7539951699323777751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4470334930336716649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49fce0b766deb484699a1b88dad0c122, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncDirection: 0

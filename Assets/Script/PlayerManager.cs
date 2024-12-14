@@ -1,4 +1,9 @@
-﻿using Mirror;
+﻿using System;
+using System.Collections;
+using System.Diagnostics;
+using Mirror;
+using Mirror.Examples.Chat;
+using TMPro;
 using UnityEngine;
 
 /// <summary>
@@ -6,30 +11,88 @@ using UnityEngine;
 /// </summary>
 public class PlayerManager : NetworkBehaviour
 {
-    // 直接使用 Player 预制件
-    public GameObject playerPrefab; // 用于设置的 Player 预制体
-    public Vector2 spawnAreaMin; // 随机生成的最小位置
-    public Vector2 spawnAreaMax; // 随机生成的最大位置
-
-    public override void OnStartServer()
+    static public PlayerManager Instance;
+    void Awake()
     {
-        // 只生成一个玩家
-        SpawnPlayer();
+        if (Instance)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
+    int _connectingPlayerCount;
+    int _totalPlayerCount;
+    public int AlivePlayerCount => _alivePlayerCount;
+    [SyncVar(hook = nameof(RpcUpdateNumUI))] int _alivePlayerCount;
+    void Start()
+    {
+        if(isServer)
+        {
+            _connectingPlayerCount = 0;
+            _alivePlayerCount = 0;
+            StartCoroutine(DeployUpdatePlayerCount());
+        }
+    }
+    IEnumerator DeployUpdatePlayerCount()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            if(NetworkServer.connections.Count != _connectingPlayerCount)
+            {
+                DeployUpdateAlivePlayer();   
+                _connectingPlayerCount = NetworkServer.connections.Count;
+            }
+            _totalPlayerCount = Math.Max(_connectingPlayerCount, _totalPlayerCount);
+        }
+    }
+    void DeployUpdateAlivePlayer()
+    {
+        int alivePlayer = 0;
+        NetworkConnectionToClient lastPlayer = null;
+        foreach (var connection in NetworkServer.connections)
+        {
+            int connectionId = connection.Key;
+            PlayerHealth health = connection.Value.identity.GetComponent<PlayerHealth>();
+            if(health.IsAlive == true)
+            {
+                alivePlayer++;
+                lastPlayer = connection.Value;
+            }
+        }
+        _alivePlayerCount = alivePlayer;
+        // 胜利判断
+        if (alivePlayer == 1)
+        {
+            TargetVictoryUI(lastPlayer, lastPlayer.identity.GetComponent<PlayerLog>().EliminationCount);
+        }
     }
 
-    [Server]
-    private void SpawnPlayer()
+    [TargetRpc]
+    void TargetVictoryUI(NetworkConnection conn, int eliminationCount)
     {
-        // 生成随机位置
-        Vector3 randomPosition = new Vector3(
-            Random.Range(spawnAreaMin.x, spawnAreaMax.x),
-            Random.Range(spawnAreaMin.y, spawnAreaMax.y),
-            0);
+        StartCoroutine(VictoryUIDisplay(eliminationCount));
+    }
 
-        // 实例化玩家预制体
-        GameObject player = Instantiate(playerPrefab, randomPosition, Quaternion.identity);
+    IEnumerator VictoryUIDisplay(int eliminationCount)
+    {
+        yield return new WaitForSeconds(2);
+        GameObject playerVictoryUI = UIManager.Instance.MainCanvas.transform.Find("PlayerVictory").gameObject;
+        playerVictoryUI.transform.Find("RankInfo").Find("Rank").GetChild(1).GetComponent<TMP_Text>().text = "1";
+        playerVictoryUI.transform.Find("RankInfo").Find("Elimination").GetChild(1).GetComponent<TMP_Text>().text =
+            eliminationCount.ToString();
+        playerVictoryUI.SetActive(true);
+    }
 
-        // 为该玩家分配网络身份
-        NetworkServer.Spawn(player);
+    void RpcUpdateNumUI(int oldAlivePlayer, int newAlivePlayer)
+    {
+        UIManager.Instance.UpdateAlivePlayersNumUI(newAlivePlayer);
+    }
+    public void DeployPlayerDie()
+    {
+        DeployUpdateAlivePlayer();
     }
 }

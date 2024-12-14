@@ -79,7 +79,7 @@ public class PlayerActionPoint : NetworkBehaviour
     /// <returns>当前体力是否足以完成操作，true代表体力足够</returns>
     public bool CheckForEnoughActionPoint(float requiredActionPoint, bool isDisplayUI = true)
     {
-        bool isEnough = (_currentActionPoint - requiredActionPoint) >= 0;
+        bool isEnough = (_currentActionPoint - requiredActionPoint) >= -0.01f;
         if (!isEnough && isDisplayUI)
         {
             UIManager.Instance.DisplayHoverStatusPanel("你的体力不足！");
