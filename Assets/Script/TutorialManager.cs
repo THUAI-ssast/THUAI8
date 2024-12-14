@@ -182,6 +182,8 @@ public class TutorialManager : MonoBehaviour
         PlayerHealth playerHealth = _playerObject.GetComponent<PlayerHealth>();
         playerHealth.ChangeHealth((int)PlayerHealth.BodyPosition.MainBody, -5.5f);
         playerHealth.ChangeHealth((int)PlayerHealth.BodyPosition.Legs, -7.4f);
+        yield return new WaitForSeconds(0.2f);
+        GameObject.Find("SafeArea/WholeArea").SetActive(false);
     }
 
     private void Update()

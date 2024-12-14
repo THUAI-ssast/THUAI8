@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 /// <summary>
@@ -172,7 +173,7 @@ public class SafeAreaManager : NetworkBehaviour
     private void DisplaySafeArea(Vector2Int oldOrigin, Vector2Int newOrigin)
     {
         Debug.Log($"{_safeAreaLength},{_safeAreaOrigin},{_nextSafeAreaLength},{_nextSafeAreaOrigin}");
-        if (_safeAreaLength == 0)
+        if (_safeAreaLength == 0 && SceneManager.GetActiveScene().name!="TutorialScene")
         {
             _safeAreaMask.gameObject.SetActive(false);
             _safeAreaOutline.gameObject.SetActive(false);
