@@ -14,9 +14,25 @@ public class RoomManager : NetworkRoomManager
     /// </summary>
     public static RoomManager Instance;
 
+    public override void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            base.Awake();
+            Instance = this;
+        }
+
+    }
+
     // Start is called before the first frame update
     public override void Start()
     {
-        Instance = this;
+
     }
+
 }

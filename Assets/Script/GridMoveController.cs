@@ -18,6 +18,10 @@ public class GridMoveController : MonoBehaviour
     /// </summary>
     public PlayerMove Player;
     /// <summary>
+    /// 本机玩家是否存活
+    /// </summary>
+    private PlayerHealth _playerHealth;
+    /// <summary>
     /// 破碎的玻璃对应的Tile
     /// </summary>
     public Tile brokenGlassTile;
@@ -123,7 +127,7 @@ public class GridMoveController : MonoBehaviour
 
     private void Update()
     {
-        if (!UIManager.Instance.IsUIActivating && _isMovable && Player != null)
+        if (!UIManager.Instance.IsUIActivating && _isMovable && Player != null && _playerHealth.IsAlive)
             tryMove();
 
         // 鼠标右键点击门
@@ -154,6 +158,7 @@ public class GridMoveController : MonoBehaviour
         _pathSeeker = finderObj.GetComponent<Seeker>();
         UpdateGraph();
         _gridLine.position = position + new Vector3(0.5f, 0.5f);
+        _playerHealth = Player.GetComponent<PlayerHealth>();
     }
 
     /// <summary>

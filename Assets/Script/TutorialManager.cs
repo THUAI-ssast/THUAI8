@@ -170,6 +170,13 @@ public class TutorialManager : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
         }
 
+        PlayerMove playerMove = _playerObject.GetComponent<PlayerMove>();
+        Vector3 bornPos = Vector3.zero;
+        var tilePosition = GridMoveController.Instance.GroundTilemap.WorldToCell(bornPos);
+        playerMove.transform.position = bornPos + GridMoveController.Instance.GroundTilemap.cellSize * 0.5f;
+        bornPos = playerMove.transform.position;
+        playerMove.CmdSetPosition(bornPos, tilePosition, null);
+
         _playerActionPoint = _playerObject.GetComponent<PlayerActionPoint>();
 
         PlayerHealth playerHealth = _playerObject.GetComponent<PlayerHealth>();
@@ -210,5 +217,11 @@ public class TutorialManager : MonoBehaviour
         _tutorialImage1.sprite = state.Sprite1;
         _tutorialImage2.enabled = (state.Sprite2 != null);
         _tutorialImage2.sprite = state.Sprite2;
+    }
+
+    public void OnClickExitButton()
+    {
+        NetworkManagerController.Instance.IsEnterTutorial = false;
+        RoomManager.Instance.StopHost();
     }
 }

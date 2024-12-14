@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 /// <summary>
 /// 物品数据类，表示一类物品的数据，以ScriptableObject形式存储在Assets中

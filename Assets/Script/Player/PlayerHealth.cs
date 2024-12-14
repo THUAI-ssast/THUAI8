@@ -1,14 +1,11 @@
 using System;
 using Mirror;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.XR;
 using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 /// <summary>
 /// 玩家数据类，保存了玩家的名字、血量上限和当前血量，以及处理血量变化逻辑的方法
@@ -19,6 +16,12 @@ public class PlayerHealth : NetworkBehaviour
     /// 用于玩家死亡后创建资源点
     /// </summary>
     private Tilemap _furnitureTilemap;
+
+    /// <summary>
+    /// 玩家是否存活
+    /// </summary>
+    public bool IsAlive => _isAlive;
+    [SyncVar] bool _isAlive;
 
     /// <summary>
     /// 玩家的名字
@@ -262,6 +265,7 @@ public class PlayerHealth : NetworkBehaviour
             LocalPlayerInfoPanel.UpdateHealthPoint(_legHealth, _legMaxHealth, BodyPart.Leg);
         }
 
+        _isAlive = true;
         _furnitureTilemap = GridMoveController.Instance.FurnitureTilemap;
     }
 
@@ -543,9 +547,35 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (_headHealth <= 0 || _bodyHealth <= 0)
         {
-            NetworkIdentity networkIdentity = GetComponent<NetworkIdentity>();
+            _isAlive = false;
             TargetCreateRP();
-            TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient);
+            TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient, 
+                            gameObject.GetComponent<PlayerLog>().LogList.Last(),  
+                            gameObject.GetComponent<PlayerLog>().EliminationCount);
+            RpcPlayerDie(gameObject.GetComponent<PlayerLog>().LogList.Last(), gameObject);
+            PlayerManager.Instance.DeployPlayerDie();
+        }
+    }
+    [ClientRpc]
+    void RpcPlayerDie(LogInfo logInfo, GameObject deadPlayer)
+    {
+        deadPlayer.transform.Find("SpriteDisplay").gameObject.SetActive(false);
+        deadPlayer.transform.Find("Canvas").gameObject.SetActive(false);
+        string deadPlayerName = deadPlayer.GetComponent<PlayerHealth>().Name;
+        switch (logInfo.Type)
+        {
+            case LogInfo.DamageType.fight:
+                string pattern = @"被(?<localName>.+?)用";
+                Match match = Regex.Match(logInfo.Message, pattern);
+                string enemyName = match.Groups["localName"].Value;
+                UIManager.Instance.AddKillLog(LogInfo.DamageType.fight, deadPlayerName, enemyName);
+                break;
+            case LogInfo.DamageType.poison:
+                UIManager.Instance.AddKillLog(LogInfo.DamageType.poison, deadPlayerName);
+                break;
+            case LogInfo.DamageType.other:
+                UIManager.Instance.AddKillLog(LogInfo.DamageType.other, null);
+                break;
         }
     }
 
@@ -562,12 +592,15 @@ public class PlayerHealth : NetworkBehaviour
                 itemlist.Add(item);
             }
         }
-        CmdCreateRP(itemlist);
+
+        List<GameObject> itemObjList = new List<GameObject>();
+        itemlist.ForEach(i=>itemObjList.Add(i.gameObject));
+        CmdCreateRP(itemObjList);
     }
 
 
     [Command]
-    public void CmdCreateRP(List<Item> itemlist)
+    public void CmdCreateRP(List<GameObject> itemList)
     {
         Vector3Int tempPosition = _furnitureTilemap.WorldToCell(transform.position);
         Vector3 cellPosition = _furnitureTilemap.GetCellCenterWorld(tempPosition);
@@ -575,15 +608,15 @@ public class PlayerHealth : NetworkBehaviour
         instance.transform.position = cellPosition;
         instance.transform.SetParent(_furnitureTilemap.transform);
         ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
-        List<Item> emptyitemlist = new List<Item>();
-        resourcePointController.InitializeWithCustomItems(emptyitemlist);
+        List<Item> emptyItemList = new List<Item>();
+        resourcePointController.InitializeWithCustomItems(emptyItemList);
 
-        foreach (var item in itemlist)
+        foreach (var item in itemList)
         {
-            resourcePointController.AddItemToResourcePoint(item);
+            resourcePointController.AddItemToResourcePoint(item.GetComponent<Item>());
         }
         NetworkServer.Spawn(instance);
-        RpcSyncInstance(instance, cellPosition, itemlist);
+        RpcSyncInstance(instance, cellPosition, itemList);
     }
 
 
@@ -591,24 +624,41 @@ public class PlayerHealth : NetworkBehaviour
     /// 在客户端将实例设置为 Tilemap 的子对象，并更新位置
     /// </summary>
     [ClientRpc]
-    private void RpcSyncInstance(GameObject instance, Vector3 cellPosition, List<Item> itemlist)
+    private void RpcSyncInstance(GameObject instance, Vector3 cellPosition, List<GameObject> itemList)
     {
         ResourcePointController resourcePointController = instance.GetComponent<ResourcePointController>();
         instance.transform.position = cellPosition;
         instance.transform.SetParent(_furnitureTilemap.transform);
 
-        foreach (var item in itemlist)
+        foreach (var item in itemList)
         {
-            resourcePointController.AddItemToResourcePoint(item);
+            resourcePointController.AddItemToResourcePoint(item.GetComponent<Item>());
         }
     }
     
     [TargetRpc]
-    public void TargetPlayerDie(NetworkConnection conn)
+    public void TargetPlayerDie(NetworkConnection conn, LogInfo logInfo, int eliminationCount)
     {
         if(gameObject.GetComponent<PlayerFight>().IsFighting)
         {
             gameObject.GetComponent<PlayerFight>().CmdDead();
         }
+        GameObject playerDeadUI = GameObject.Find("Canvas").transform.Find("PlayerDead").gameObject;
+        playerDeadUI.transform.Find("RankInfo").Find("Rank").GetChild(1).GetComponent<TMP_Text>().text = 
+            PlayerManager.Instance.AlivePlayerCount.ToString();
+        playerDeadUI.transform.Find("RankInfo").Find("Elimination").GetChild(1).GetComponent<TMP_Text>().text = 
+            eliminationCount.ToString();
+        playerDeadUI.transform.Find("DeadInfo").GetComponent<TMP_Text>().text = 
+            logInfo.Message;
+        playerDeadUI.SetActive(true);
+    }
+
+    /// <summary>
+    /// 删除安全区并更新
+    /// </summary>
+    [Command]
+    public void CmdDeleteSafeArea()
+    {
+        SafeAreaManager.Instance.DeleteSafeAreaOnServer();
     }
 }

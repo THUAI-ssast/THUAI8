@@ -182,6 +182,7 @@ public class ResourcePointController : NetworkBehaviour
             {
                 var image = slots.GetChild(i).GetChild(0).GetComponent<Image>();
                 image.enabled = true;
+                Debug.Log(_itemList[i] == null);
                 image.sprite = _itemList[i].ItemData.ItemIcon;
                 slots.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
                 if (_itemList[i].MaxDurability != -1)

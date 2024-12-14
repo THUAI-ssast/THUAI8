@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,59 +9,27 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Mirror.Examples.TopDownShooter;
 using Unity.VisualScripting;
-using System;
 
-/// <summary>
-/// 单例Manager，管理开始菜单界面的行为
-/// </summary>
 public class MainMenu : MonoBehaviour
 {
     public static MainMenu Instance;
-    private NetPlayer _player;
-
-    // 定义一个事件，当 Player 被赋值时触发
-    public event Action<NetPlayer> OnPlayerAssigned;
-    public NetPlayer Player
-    {
-        get => _player;
-        set
-        {
-            // 只有当值发生变化时才触发事件
-            if (_player != value)
-            {
-                _player = value;
-                OnPlayerAssigned?.Invoke(_player); // 触发事件
-                OnPlayerAssigned = null;
-            }
-        }
-    }
+    public NetPlayer Player;
     [SerializeField] private  GameObject loadingPanel;
     [SerializeField] private  TextMeshProUGUI matchingText;
     [SerializeField] private TextMeshProUGUI playerNameText;
-    private RoomManager _roomManager;
-    private int playerCount 
-    { 
-        get 
-        {   
-            int count = 0;
-            foreach (NetworkRoomPlayer player in RoomManager.Instance.roomSlots)
-            {
-                if(player.readyToBegin)
-                {
-                    count++;
-                }
-            }
-            return count;
-        } 
-    }
-    private int playerCountLimit { get => RoomManager.Instance.maxConnections; }
+    [SerializeField] public TextMeshProUGUI roomIDText;
+    private int playerCount => RoomInfoManager.Instance.ReadyPlayerNumber;
+    private int playerCountLimit { get => RoomInfoManager.Instance.PlayerNumberLimit; }
     private Coroutine matchingCoroutine; 
 
     public void Start()
     {
         Instance = this;
-        _roomManager = GameObject.Find("RoomManager").GetComponent<RoomManager>();
         loadingPanel.SetActive(false);
+        if(roomIDText != null)
+        {
+            roomIDText.text = $"�����: {NetworkManagerController.Instance.RoomPort - AddService.MatchServerPort}";
+        }
     }
 
     public void ExitGame()
@@ -83,8 +51,7 @@ public class MainMenu : MonoBehaviour
  
     }
     public void StartGame()
-    {
-        _roomManager.GameplayScene = "BattleScene";
+    {   
         loadingPanel.SetActive(true);
         if (Player != null)
         {
@@ -95,10 +62,7 @@ public class MainMenu : MonoBehaviour
 
     public void StartTutorial()
     {
-        _roomManager.GameplayScene = "TutorialScene";
-        //TODO:改端口号
-        _roomManager.StartHost();
-        OnPlayerAssigned += player => { player.StartMatching(playerNameText.text);};
+        StartGame();
     }
 
     IEnumerator StartMatching()
@@ -110,4 +74,9 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    public void QuitRoom()
+    {
+        NetworkManagerController.Instance.IsEnterRoom = false;
+        RoomManager.Instance.StopClient();
+    }
 }
