@@ -8,7 +8,7 @@ using TMPro;
 /// </summary>
 public class CheckButton : MonoBehaviour
 {
-    private string newText = "Resources Checkable";
+    private string _newText = "已搜刮";
     private Button button;
     private TextMeshProUGUI buttonText;
 
@@ -43,7 +43,7 @@ public class CheckButton : MonoBehaviour
 
     private IEnumerator ChangeTextAndDisable()
     {
-        buttonText.text = newText;
+        buttonText.text = _newText;
         button.interactable = false;
         _searchIcon.gameObject.SetActive(true);
         AudioManager.Instance.CameraSource.PlayOneShot(_checkAudioClip);
