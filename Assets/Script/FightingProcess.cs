@@ -22,7 +22,7 @@ public class FightingProcess : NetworkBehaviour
     /// <summary>
     /// 回合持续时间。
     /// </summary>
-    private float _roundDuration;
+    [SerializeField]private float _roundDuration = 20f;
     public float RoundDuration => _roundDuration;
 
     /// <summary>
@@ -129,7 +129,6 @@ public class FightingProcess : NetworkBehaviour
         _escapePlayer = null;
         _deadPlayer = null;
         _roundCount = 1;
-        _roundDuration = 20f;
         _roundAPLimit = 1;
         _roundAPRemaining = _roundAPLimit;
         _finishRound = false;
@@ -385,9 +384,7 @@ public class FightingProcess : NetworkBehaviour
         DeployAddLog($"{_attacker.GetComponent<PlayerHealth>().Name}的回合结束");
 
         // 切换进攻方防守方
-        GameObject temp = _attacker;
-        _attacker = _defender;
-        _defender = temp;
+        (_attacker, _defender) = (_defender, _attacker);
     }
 
     /// <summary>
@@ -453,7 +450,7 @@ public class FightingProcess : NetworkBehaviour
     IEnumerator SetRoundUI(string childName)
     {
         _roundUI.transform.Find(childName).gameObject.SetActive(true);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         _roundUI.transform.Find(childName).gameObject.SetActive(false);
     }
 

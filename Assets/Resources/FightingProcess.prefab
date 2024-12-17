@@ -48,6 +48,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  _roundDuration: 30
 --- !u!114 &4302749482846545302
 MonoBehaviour:
   m_ObjectHideFlags: 0
