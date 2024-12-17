@@ -229,6 +229,11 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void ReverseBagPanel()
+    {
+        ReversePanel(_bagPanel);
+    }
+
     // public void ReverseBattlePanel()
     // {
     //     reverseUIActive(_battlePanel);
