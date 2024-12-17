@@ -135,15 +135,7 @@ public class PlayerActionPoint : NetworkBehaviour
     /// <param name="increase">变动值，正数为增加AP，负数为减少AP</param>
     private void DeployChangeActionPoint(float increase)
     {
-        float tempActionPoint = _currentActionPoint + increase;
-        if (tempActionPoint > MaxActionPoint)
-        {
-            _currentActionPoint = MaxActionPoint;
-        }
-        else if (tempActionPoint >= 0)
-        {
-            _currentActionPoint = tempActionPoint;
-        }
+        _currentActionPoint = Mathf.Clamp(_currentActionPoint + increase, 0, MaxActionPoint);
     }
 
 

@@ -266,7 +266,7 @@ public class GridMoveController : MonoBehaviour
                 }
 
                 float requiredActionPoint = ComputeRequiredActionPoint(p);
-                if (!GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().CheckForEnoughActionPoint(requiredActionPoint))
+                if (!GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().DecreaseActionPoint(requiredActionPoint))
                 {
                     Debug.Log("ActionPoint is not enough.");
                     return; // 如果当前体力值不够，直接返回
@@ -290,7 +290,7 @@ public class GridMoveController : MonoBehaviour
                 StartCoroutine(setMoveCD(duration));
 
                 //移动消耗体力
-                GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().DecreaseActionPoint(requiredActionPoint);
+                
             }
         }
     }

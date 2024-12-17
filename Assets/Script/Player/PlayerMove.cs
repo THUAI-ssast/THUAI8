@@ -107,7 +107,7 @@ public class PlayerMove : NetworkBehaviour
         float angle = (endMoveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, endMoveVector);
         setRotateAnimation(firstAngle,angle,duration);
 
-        transform.DOPath(path, duration);
+        transform.DOPath(path, duration).SetEase(Ease.Linear);
         SetTilePos(tilePosition);
         //_tilePosition = tilePosition; // 更新同步位置
         return;
