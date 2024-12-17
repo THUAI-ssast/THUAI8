@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemName: "\u91D1\u5C5E\u7834\u7247"
   ItemIcon: {fileID: 21300000, guid: fad3be36b9624d54b868948a792b69d7, type: 3}
-  ItemDesc: "\u4E0D\u77E5\u540D\u91D1\u5C5E\u7684\u788E\u7247\uFF0C\u8FB9\u89D2\u5341\u5206\u950B\u5229"
+  _itemDesc: "\u4E0D\u77E5\u540D\u91D1\u5C5E\u7684\u788E\u7247\uFF0C\u8FB9\u89D2\u5341\u5206\u950B\u5229"
   ItemType: 0
   ItemValue: 0

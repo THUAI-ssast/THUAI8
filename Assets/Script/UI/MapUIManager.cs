@@ -16,6 +16,8 @@ public class MapUIManager : MonoBehaviour
     private GameObject _playerPositionImage;
     private GameObject _currentMask;
     private GameObject _nextSafeArea;
+    
+    public GameObject BigMapPanel => _bigMapPanel;
 
     private readonly Vector2 _playerPositionImageBias = new(0.65f, -5);
 

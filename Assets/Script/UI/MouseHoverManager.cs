@@ -30,10 +30,7 @@ public class MouseHoverManager : MonoBehaviour
     /// 鼠标悬停显示的UI
     /// </summary>
     private GameObject _mouseHoverPanel;
-    /// <summary>
-    /// 悬停显示UI相对于鼠标位置的偏置
-    /// </summary>
-    private Vector3 _panelBias;
+
     /// <summary>
     /// 悬停显示UI下的文本UI
     /// </summary>
@@ -86,7 +83,6 @@ public class MouseHoverManager : MonoBehaviour
 
         // 初始化悬停显示UI相关的对象
         _mouseHoverPanel = UIManager.Instance.MainCanvas.transform.Find("MouseHoverPanel").gameObject;
-        _panelBias = new Vector3(120,-60);
         _panelText = _mouseHoverPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
     }
 
@@ -142,7 +138,7 @@ public class MouseHoverManager : MonoBehaviour
             if (targetCellPos == _lastCellPosition) // 如果鼠标位置所在的tile与上次检测时相同，则直接使展示的内容跟随鼠标位置移动，而不再继续后续判断
             {
                 yield return new WaitForSeconds(0.05f); // 跟随鼠标的间隔为0.05s
-                _mouseHoverPanel.GetComponent<RectTransform>().position = Input.mousePosition + _panelBias;
+                _mouseHoverPanel.transform.position = Input.mousePosition;
                 continue;
             }
 
@@ -221,7 +217,7 @@ public class MouseHoverManager : MonoBehaviour
             _panelText.text = descriptionText;
             if (isTileOccupied && descriptionText != "")
             {
-                _mouseHoverPanel.GetComponent<RectTransform>().position = Input.mousePosition + _panelBias;
+                _mouseHoverPanel.transform.position = Input.mousePosition;
                 _mouseHoverPanel.SetActive(true);
             }
         }

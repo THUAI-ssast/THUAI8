@@ -156,14 +156,7 @@ public class UIManager : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.M)||Input.GetKeyDown(KeyCode.Tab))
         {
-            if(MapUIManager.Instance.IsDisplayBigMap)
-            {
-                MapUIManager.Instance.DisplaySmallMap();
-            }
-            else
-            {
-                MapUIManager.Instance.DisplayBigMap();
-            }
+            reverseMapPanel();
         }
 
         // if (Input.GetKeyDown(KeyCode.B))
@@ -175,7 +168,14 @@ public class UIManager : MonoBehaviour
         {
             if (_activeUIList.Count > 0)
             {
-                reverseUIActive(_activeUIList[^1]);
+                if (_activeUIList[^1] == MapUIManager.Instance.BigMapPanel && MapUIManager.Instance.IsDisplayBigMap)
+                {
+                    MapUIManager.Instance.DisplaySmallMap();
+                }
+                else
+                {
+                    reverseUIActive(_activeUIList[^1]);
+                }
             }
         }
     }
@@ -185,6 +185,11 @@ public class UIManager : MonoBehaviour
         if (ui.activeSelf)
         {
             ui.SetActive(false);
+            foreach (var activeUI in _activeUIList.FindAll(x=>x.transform.parent == ui.transform))
+            {
+                activeUI.SetActive(false);
+                _activeUIList.Remove(activeUI);
+            }
             _activeUIList.Remove(ui);
         }
         else
@@ -232,6 +237,18 @@ public class UIManager : MonoBehaviour
     public void ReverseBagPanel()
     {
         ReversePanel(_bagPanel);
+    }
+
+    private void reverseMapPanel()
+    {
+        if (MapUIManager.Instance.IsDisplayBigMap)
+        {
+            MapUIManager.Instance.DisplaySmallMap();
+        }
+        else
+        {
+            MapUIManager.Instance.DisplayBigMap();
+        }
     }
 
     // public void ReverseBattlePanel()

@@ -89,6 +89,7 @@ GameObject:
   - component: {fileID: 3642528029091016442}
   - component: {fileID: 5080838172717945116}
   - component: {fileID: 238042744213544984}
+  - component: {fileID: 7583664458185718310}
   m_Layer: 5
   m_Name: CraftWayUI
   m_TagString: Untagged
@@ -237,6 +238,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7583664458185718310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5390999899366484196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b666ff8989a7ae544adc8affa8a95d14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5425326216608054086
 GameObject:
   m_ObjectHideFlags: 0

@@ -20,14 +20,9 @@ public class SlotHoverUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private Coroutine _followMouseCoroutine = null;
 
     /// <summary>
-    /// UI相对鼠标位置的偏移
+    /// 槽中对应的Item类物品的信息
     /// </summary>
-    private Vector3 _panelBias;
-
-    /// <summary>
-    /// 槽中对应的Item类物品
-    /// </summary>
-    private Item _item;
+    private string _itemDesc;
 
 
     private void Start()
@@ -50,12 +45,13 @@ public class SlotHoverUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        _item = GetSlotItem();
-        if (_item == null)
+        _itemDesc = GetSlotItemDesc();
+        if (_itemDesc == null)
+        {
             return;
+        }
         // 更新鼠标悬停UI的文本内容，并启动协程不断使UI跟随鼠标
-        _mouseHoverPanel.GetComponentInChildren<TextMeshProUGUI>().text = _item.ItemData.ItemDesc;
-        _panelBias = (new Vector2(40,30) + _mouseHoverPanel.GetComponent<RectTransform>().rect.size * new Vector2(1.2f,1.2f)) * new Vector2(1,-1);
+        _mouseHoverPanel.GetComponentInChildren<TextMeshProUGUI>().text = _itemDesc;
         _followMouseCoroutine = StartCoroutine(FollowMousePosition());
         _mouseHoverPanel.SetActive(true);
     }
@@ -77,7 +73,7 @@ public class SlotHoverUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         while(true)
         {
-            _mouseHoverPanel.transform.position = Input.mousePosition + _panelBias;
+            _mouseHoverPanel.transform.position = Input.mousePosition;
             yield return new WaitForSeconds(0.05f);
         }
     }
@@ -102,5 +98,22 @@ public class SlotHoverUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             item =  GetComponent<RPSlot>().GetItem();
         }
         return item;
+    }
+
+    private string GetSlotItemDesc()
+    {
+        string itemDesc = null;
+        
+        Item item = GetSlotItem();
+        if (item != null)
+        {
+            itemDesc = item.ItemData.ItemDesc;
+        }
+        else if (GetComponent<CraftWayUI>() != null)
+        {
+            itemDesc = "产物：" + GetComponent<CraftWayUI>().CraftWayData.ProductItem.ItemDesc;
+        }
+
+        return itemDesc;
     }
 }

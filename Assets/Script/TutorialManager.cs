@@ -196,6 +196,7 @@ public class TutorialManager : MonoBehaviour
             }
             else
             {
+                NetworkManagerController.Instance.IsEnterTutorial = false;
                 RoomManager.Instance.StopHost();
             }
         }
