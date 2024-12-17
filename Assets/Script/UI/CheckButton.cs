@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+
 /// <summary>
 /// UI行为类，在资源点UI内的搜刮按钮
 /// </summary>
@@ -22,11 +23,11 @@ public class CheckButton : MonoBehaviour
     void Start()
     {
         ResourcePoint = transform.parent.parent.parent.gameObject;
-        if (_checkAudioClip==null)
+        if (_checkAudioClip == null)
         {
             _checkAudioClip = Resources.Load<AudioClip>("Sound/Action/翻找物品金属");
         }
-        
+
         button = GetComponent<Button>();
         buttonText = GetComponentInChildren<TextMeshProUGUI>();
         buttonText.text = $"消耗 {ResourcePoint.GetComponent<ResourcePointController>().RequiredActionPoint} AP搜刮";
@@ -43,14 +44,17 @@ public class CheckButton : MonoBehaviour
 
     private IEnumerator ChangeTextAndDisable()
     {
-        buttonText.text = _newText;
-        button.interactable = false;
-        _searchIcon.gameObject.SetActive(true);
-        AudioManager.Instance.CameraSource.PlayOneShot(_checkAudioClip);
-        yield return new WaitForSeconds(1.3f);
-        AudioManager.Instance.CameraSource.Stop();
-        _searchIcon.gameObject.SetActive(false);
-        _slots.SetActive(true);
-        GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>().DecreaseActionPoint(ResourcePoint.GetComponent<ResourcePointController>().RequiredActionPoint);
+        if (GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerActionPoint>()
+            .DecreaseActionPoint(ResourcePoint.GetComponent<ResourcePointController>().RequiredActionPoint))
+        {
+            buttonText.text = _newText;
+            button.interactable = false;
+            _searchIcon.gameObject.SetActive(true);
+            AudioManager.Instance.CameraSource.PlayOneShot(_checkAudioClip);
+            yield return new WaitForSeconds(1.3f);
+            AudioManager.Instance.CameraSource.Stop();
+            _searchIcon.gameObject.SetActive(false);
+            _slots.SetActive(true);
+        }
     }
 }
