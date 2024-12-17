@@ -187,10 +187,10 @@ public class BackpackManager : MonoBehaviour
     /// 使用背包中的物品
     /// </summary>
     /// <param name="item">要使用的物品</param>
-    /// <param name="healhead">是否要治疗头部</param>
-    /// <param name="healbody">是否要治疗躯干</param>
+    /// <param name="healHead">是否要治疗头部</param>
+    /// <param name="healBody">是否要治疗躯干</param>
     /// <param name="heallegs">是否要治疗腿部</param>
-    public void UseItem(Item item, bool isGlobalHeal = true, bool healhead = true, bool healbody = true, bool heallegs = true)
+    public void UseItem(Item item, bool isGlobalHeal = true, bool healHead = true, bool healBody = true, bool heallegs = true)
     {
         GameObject player = GameObject.FindWithTag("LocalPlayer");
         var playerInteraction = player.GetComponent<PlayerItemInteraction>();
@@ -198,11 +198,6 @@ public class BackpackManager : MonoBehaviour
         {
             player.GetComponent<PlayerHealth>().EquipArmor(armorData.EquipBodyPosition, item);
             _itemList.Remove(item);
-        }
-        else if (item.ItemData is WeaponItemData weaponData)
-        {
-            var target = GameObject.FindWithTag("Player");
-            player.GetComponent<PlayerHealth>().CmdAttack(player,target,(int)PlayerHealth.BodyPosition.MainBody,item.gameObject); // 攻击方，被攻击方，攻击部位，使用武器
         }
         else if (item.ItemData is MedicineItemData medicineData)
         {
@@ -215,9 +210,9 @@ public class BackpackManager : MonoBehaviour
             }
             else
             {
-                if (healhead)
+                if (healHead)
                     player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, false); // 治疗者，治疗部位，使用物品
-                else if (healbody)
+                else if (healBody)
                     player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, false);
                 else if (heallegs)
                     player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, false);

@@ -153,10 +153,20 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
                     tmpText.text = $"装备\n({PlayerHealth.BodyToChinese[armorData.EquipBodyPosition]})";
                     tmpText.fontSize = 11;
                 }
+
+                if (_slotItem.ItemData is not ArmorItemData&& _slotItem.ItemData is not MedicineItemData)
+                {
+                    _layout.GetChild(0).gameObject.SetActive(false);
+                    _operationMenu.transform.localScale *= 0.7f;
+                }
                 _layout.GetChild(0).GetComponent<Button>().onClick.AddListener(() => 
                 {
                     Destroy(_operationMenu);
-                    if (_slotItem.ItemData is MedicineItemData medicineData)
+                    if (_slotItem.ItemData is ArmorItemData)
+                    {
+                        BackpackManager.Instance.UseItem(_slotItem);
+                    }
+                    else if (_slotItem.ItemData is MedicineItemData medicineData)
                     {
                         string medicinename = _slotItem.ItemData.ItemName;
                         if (medicinename == "止痛药" || medicinename == "肾上腺素")
@@ -200,10 +210,6 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
                                 Destroy(_bodyPositionMenu);
                             });
                         }
-                    }
-                    else
-                    {
-                        BackpackManager.Instance.UseItem(_slotItem);
                     }
                 });
                 _layout.GetChild(1).GetComponent<Button>().onClick.AddListener(() => 
