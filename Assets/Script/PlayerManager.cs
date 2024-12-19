@@ -67,8 +67,17 @@ public class PlayerManager : NetworkBehaviour
         // 胜利判断
         if (alivePlayer == 1)
         {
-            TargetVictoryUI(lastPlayer, lastPlayer.identity.GetComponent<PlayerLog>().EliminationCount);
+            StartCoroutine(DeployVictory(lastPlayer));
         }
+    }
+
+    IEnumerator DeployVictory(NetworkConnectionToClient lastPlayer)
+    {
+        while(lastPlayer.identity.GetComponent<PlayerLog>().CheckFlag == false)
+        {
+            yield return null;
+        }
+        TargetVictoryUI(lastPlayer, lastPlayer.identity.GetComponent<PlayerLog>().EliminationCount);
     }
 
     [TargetRpc]

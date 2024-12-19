@@ -256,7 +256,7 @@ public class GridMoveController : MonoBehaviour
             //成功找到路径
             if (p.vectorPath[^1] == targetWorldPosition && _isMovable)
             {
-                float duration = (p.vectorPath.Count - 1) * 0.6f; // 假设移动速度为每格0.6秒
+                float duration = (p.vectorPath.Count - 1) * 0.5f; // 假设移动速度为每格0.6秒
                 var pathArray = p.vectorPath.ToArray();
 
                 if (CheckForDoorBlock(pathArray))
