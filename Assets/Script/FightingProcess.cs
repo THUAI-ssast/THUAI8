@@ -185,14 +185,14 @@ public class FightingProcess : NetworkBehaviour
             {
                 _timer = 0;
                 EndRoundOnServer();
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(1);
                 if(_fightingInterrupted && 
                     _defender.GetComponent<NetworkIdentity>().netId == _interruptedPlayerNetId)
                 {
                     break;
                 }
                 StartRoundOnServer();
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(1);
             }
             yield return null;
         }

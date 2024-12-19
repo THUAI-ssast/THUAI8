@@ -523,6 +523,10 @@ public class PlayerHealth : NetworkBehaviour
     }
     private void DeployChangeHealth(int bodyPosition, float healthChange)
     {
+        if(!_isAlive || PlayerManager.Instance.IfVictory)
+        {
+            return;
+        }
         BodyPosition pos = (BodyPosition)bodyPosition;
         switch (pos)
         {

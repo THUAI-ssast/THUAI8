@@ -71,7 +71,7 @@ public class BornUIManager : NetworkBehaviour
 
     void Update()
     {
-        if (_bigMapPanel.activeSelf && Input.GetMouseButtonDown(0))
+        if (_mapPanel.activeSelf && Input.GetMouseButtonDown(0))
         {
             HandleClick();
         }
@@ -83,7 +83,7 @@ public class BornUIManager : NetworkBehaviour
         _playerMove = GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerMove>();
         if (_bigMapPanel != null)
         {
-            _bigMapPanel.SetActive(false);
+            _mapPanel.SetActive(false);
             _blockerPanel.SetActive(false);
             UIManager.Instance.ActiveUIList.Remove(_bigMapPanel);
 

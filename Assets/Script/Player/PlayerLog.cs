@@ -25,7 +25,7 @@ public class PlayerLog : NetworkBehaviour
     }
     public void DeployAddLog(string message, LogInfo.DamageType damageType)
     {
-        _logList.Add(new LogInfo(message, LogInfo.DamageType.fight));
+        _logList.Add(new LogInfo(message, damageType));
     }
     
     public void DeployAddEliminationCount()

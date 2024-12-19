@@ -149,12 +149,13 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E) && !_isOnBattle)
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
+        if (Input.GetKeyDown(KeyCode.E) && !_isOnBattle && localPlayer.GetComponent<PlayerHealth>().IsAlive)
         {
             ReversePanel(_bagPanel);
         }
         
-        if (Input.GetKeyDown(KeyCode.M)||Input.GetKeyDown(KeyCode.Tab))
+        if ((Input.GetKeyDown(KeyCode.M)||Input.GetKeyDown(KeyCode.Tab)) && localPlayer.GetComponent<PlayerHealth>().IsAlive)
         {
             reverseMapPanel();
         }

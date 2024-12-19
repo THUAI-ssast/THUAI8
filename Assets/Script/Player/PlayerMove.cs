@@ -167,7 +167,7 @@ public class PlayerMove : NetworkBehaviour
     public IEnumerator drawPathLine(Vector3 target, float duration)
     {
         // 如果正在移动，不更改
-        while(_pathLineRenderer.enabled)
+        if(_pathLineRenderer.enabled)
             yield break;
         _pathLineRenderer.SetPositions(new[] { transform.position, target });
         _pathLineRenderer.enabled = true;

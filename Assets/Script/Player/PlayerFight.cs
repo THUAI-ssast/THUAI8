@@ -35,7 +35,7 @@ public class PlayerFight : NetworkBehaviour
     /// </summary>
     GameObject _selectedUI;
     /// <summary>
-    /// 存储开始战斗后的敌人，战斗结束后为null。在战斗的客户端和服务端有存储，无同步。
+    /// 存储战斗时的敌人，战斗结束后为上一次战斗的敌人。在战斗的客户端和服务端有存储，无同步。
     /// </summary>
     GameObject _enemy;
     public GameObject Enemy => _enemy;
@@ -112,9 +112,21 @@ public class PlayerFight : NetworkBehaviour
     /// <returns></returns>
     bool UIState()
     {
-        return _battleUI.activeSelf || _waitingForFightUI.activeSelf;
+        if(_battleUI.activeSelf || _waitingForFightUI.activeSelf)
+        {
+            return true;
+        }
+        // if(UIManager.Instance.MainCanvas.transform.Find("PlayerVictory").gameObject.activeSelf)
+        // {
+        //     return true;
+        // }
+        if(UIManager.Instance.MainCanvas.transform.Find("PlayerDead").gameObject.activeSelf)
+        {
+            return true;
+        }
+        return false;
     }
-
+ 
     /// <summary>
     /// 碰撞检测。当该玩家物体进入LocalPlayer的攻击范围时（攻击范围是一个触发器），设置_inAttackRange为true。
     /// </summary>
