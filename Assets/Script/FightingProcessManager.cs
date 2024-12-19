@@ -39,8 +39,8 @@ public class FightingProcessManager : NetworkBehaviour
         {
             GameObject process = Instantiate(_fightingProcess);
             process.transform.SetParent(gameObject.transform);
-            attacker.GetComponent<PlayerFight>().DeploySetFightingProcess(process.GetComponent<NetworkIdentity>());
-            defender.GetComponent<PlayerFight>().DeploySetFightingProcess(process.GetComponent<NetworkIdentity>());
+            attacker.GetComponent<PlayerFight>().DeploySet(process.GetComponent<NetworkIdentity>(), defender.GetComponent<NetworkIdentity>());
+            defender.GetComponent<PlayerFight>().DeploySet(process.GetComponent<NetworkIdentity>(), attacker.GetComponent<NetworkIdentity>());
             NetworkConnection attacker_conn = attacker.GetComponent<NetworkIdentity>().connectionToClient;
             NetworkConnection defender_conn = defender.GetComponent<NetworkIdentity>().connectionToClient;
             NetworkServer.Spawn(process, attacker_conn);

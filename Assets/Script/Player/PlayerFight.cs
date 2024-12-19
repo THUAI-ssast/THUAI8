@@ -34,6 +34,11 @@ public class PlayerFight : NetworkBehaviour
     /// 定位玩家被选中ui。
     /// </summary>
     GameObject _selectedUI;
+    /// <summary>
+    /// 存储开始战斗后的敌人，战斗结束后为null。在战斗的客户端和服务端有存储，无同步。
+    /// </summary>
+    GameObject _enemy;
+    public GameObject Enemy => _enemy;
 
     /// <summary>
     /// 存储开始战斗后生成的战斗流程GameObject，在战斗的客户端和服务端有存储，无同步。
@@ -310,9 +315,11 @@ public class PlayerFight : NetworkBehaviour
     /// 指向战斗流程GameObject。在服务端执行。
     /// </summary>
     /// <param name="processID">战斗流程NetworkIdentity</param>
-    public void DeploySetFightingProcess(NetworkIdentity processID)
+    /// <param name="enemyPlayerID">对面玩家NetworkIdentity</param>
+    public void DeploySet(NetworkIdentity processID, NetworkIdentity enemyPlayerID)
     {
         _fightingProcess = processID.gameObject;
+        _enemy = enemyPlayerID.gameObject;
     }
 
     /// <summary>
@@ -339,6 +346,7 @@ public class PlayerFight : NetworkBehaviour
     {
         CmdSetIsFighting();
         _fightingProcess = FightingProcessManager.Instance.transform.GetChild(0).gameObject;
+        _enemy = enemyPlayer;
         HealthPanelEnemy.Instance.SetEnemy(enemyPlayer);
         GridMoveController.Instance.ToggleMovementState(false);
         _battleUI.SetActive(true);

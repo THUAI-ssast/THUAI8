@@ -92,7 +92,7 @@ public class BackpackManager : MonoBehaviour
         BattleLegsHealthEnemyPanel = _battlePanel.transform.Find("HealthPanel_enemy/Legs");
 
         RefreshSlots();
-        //StartCoroutine(initItems_debug());
+        StartCoroutine(initItems_debug());
     }
 
     private IEnumerator initItems_debug()
@@ -112,9 +112,9 @@ public class BackpackManager : MonoBehaviour
             // CreateItem("ScriptableObject/Items/Weapons/小刀");
             CreateItem("ScriptableObject/Items/Weapons/佩剑");
             // CreateItem("ScriptableObject/Items/Weapons/小刀");
-            // CreateItem("ScriptableObject/Items/Weapons/佩剑");
+            CreateItem("ScriptableObject/Items/Weapons/佩剑");
             // CreateItem("ScriptableObject/Items/Weapons/小刀");
-            // CreateItem("ScriptableObject/Items/Weapons/佩剑");
+            CreateItem("ScriptableObject/Items/Weapons/佩剑");
             // CreateItem("ScriptableObject/Items/Weapons/小刀");
             // CreateItem("ScriptableObject/Items/Weapons/佩剑");
             // CreateItem("ScriptableObject/Items/Weapons/小刀");

@@ -11,10 +11,12 @@ public class PlayerLog : NetworkBehaviour
     List<LogInfo> _logList = new List<LogInfo>();
     public int EliminationCount => _eliminationCount;
     int _eliminationCount;
+    public bool CheckFlag;
     
     void Start()
     {
-        _eliminationCount = 0;   
+        CheckFlag = true;
+        _eliminationCount = 0;
     }
     [Command]
     public void CmdAddLog(GameObject player ,string message, LogInfo.DamageType damageType)
@@ -29,6 +31,7 @@ public class PlayerLog : NetworkBehaviour
     public void DeployAddEliminationCount()
     {
         _eliminationCount++;
+        CheckFlag = true;
     }
 }
 

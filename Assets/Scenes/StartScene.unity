@@ -2971,7 +2971,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7463792255d088e4f8b657377d5ea2db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  appBuildMode: 2
+  appBuildMode: 4
 --- !u!4 &1896339088
 Transform:
   m_ObjectHideFlags: 0

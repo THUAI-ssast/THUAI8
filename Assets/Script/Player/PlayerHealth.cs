@@ -547,12 +547,23 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (_headHealth <= 0 || _bodyHealth <= 0)
         {
+            if(gameObject.GetComponent<PlayerLog>().LogList.Last().Type == LogInfo.DamageType.fight)
+            {
+                gameObject.GetComponent<PlayerFight>().Enemy.GetComponent<PlayerLog>().CheckFlag = false;
+            }
             _isAlive = false;
             TargetCreateRP();
             TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient, 
                             gameObject.GetComponent<PlayerLog>().LogList.Last(),  
                             gameObject.GetComponent<PlayerLog>().EliminationCount);
             RpcPlayerDie(gameObject.GetComponent<PlayerLog>().LogList.Last(), gameObject);
+            if(gameObject.GetComponent<PlayerLog>().LogList.Last().Type == LogInfo.DamageType.fight)
+            {   
+                while(!gameObject.GetComponent<PlayerLog>().CheckFlag)
+                {
+                    continue;
+                }
+            }
             PlayerManager.Instance.DeployPlayerDie();
         }
     }
