@@ -62,6 +62,8 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (_armorEquipments.TryGetValue(position, out var armorItem))
         {
+            if (armorItem.CurrentDurability <= 0)
+                return null;
             return armorItem;
         }
 

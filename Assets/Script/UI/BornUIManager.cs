@@ -147,6 +147,13 @@ public class BornUIManager : NetworkBehaviour
         float cellWidth = bigMapRect.rect.width / Columns;
         float cellHeight = bigMapRect.rect.height / Rows;
 
+        // 点击地图外区域不进行处理
+        if (localPos.x < -bigMapRect.rect.width / 2 || localPos.x > bigMapRect.rect.width / 2 ||
+        localPos.y < -bigMapRect.rect.height / 2 || localPos.y > bigMapRect.rect.height / 2)
+        {
+            return;
+        }
+
         int clickedColumn = Mathf.FloorToInt((localPos.x + bigMapRect.rect.width / 2) / cellWidth);
         int clickedRow = Mathf.FloorToInt((localPos.y + bigMapRect.rect.height / 2) / cellHeight);
 
