@@ -31,6 +31,10 @@ public class StartScenePlayer : NetworkBehaviour
             StartMenuManager.Instance.WarningDisplay("房间创建失败");
             return;
         }
+        if (port == 0)
+        {
+            StartMenuManager.Instance.WarningDisplay("该房间不存在");
+        }
 
         NetworkManagerController.Instance.RoomPort = port;
         GameObject.Find("MatchNetworkManager").GetComponent<NetworkManager>().StopClient();
@@ -42,6 +46,11 @@ public class StartScenePlayer : NetworkBehaviour
     public void CmdJoinRoom(int roomID)
     {
         int port = roomID + AddService.MatchServerPort;
+        if (MatchMaker.Instance.CheckPort(port)) // 如果端口未被占用，则无法加入房间，以port=0为标识
+        {
+            port = 0;
+        }
+
         TargetInformPort(port);
     }
 }
