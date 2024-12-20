@@ -71,6 +71,11 @@ public class MouseHoverManager : MonoBehaviour
     /// </summary>
     private bool _isShowUIBefore;
 
+    /// <summary>
+    /// 战斗界面UI
+    /// </summary>
+    private GameObject _battlePanel;
+
 
     private void Start()
     {
@@ -84,6 +89,9 @@ public class MouseHoverManager : MonoBehaviour
         // 初始化悬停显示UI相关的对象
         _mouseHoverPanel = UIManager.Instance.MainCanvas.transform.Find("MouseHoverPanel").gameObject;
         _panelText = _mouseHoverPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+
+        // 战斗界面UI
+        _battlePanel = UIManager.Instance.MainCanvas.transform.Find("BattlePanel").gameObject;
     }
 
     private void OnDestroy()
@@ -96,6 +104,11 @@ public class MouseHoverManager : MonoBehaviour
 
     private void Update()
     {
+        if (_battlePanel.activeSelf)
+        {
+            return;
+        }
+
         if (UIManager.Instance.GetActiveUINumber == 0)  // 当存在其他阻塞式UI时，禁止鼠标悬停功能（例如背包UI、资源点UI、战斗界面UI等）
         {   
             if (Input.GetKeyDown(KeyCode.C) && !_isSwitchCD)    // 键盘按C切换是否启用鼠标悬停功能的状态
