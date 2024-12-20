@@ -166,9 +166,6 @@ public class PlayerMove : NetworkBehaviour
     /// <param name="duration">显示持续时间</param>
     public IEnumerator drawPathLine(Vector3 target, float duration)
     {
-        // 如果正在移动，不更改
-        if(_pathLineRenderer.enabled)
-            yield break;
         _pathLineRenderer.SetPositions(new[] { transform.position, target });
         _pathLineRenderer.enabled = true;
         yield return new WaitForSeconds(duration);
@@ -183,6 +180,9 @@ public class PlayerMove : NetworkBehaviour
     /// <param name="duration">显示持续时间</param>
     public IEnumerator drawPathLine(Vector3[] path, float duration)
     {
+        // 如果正在移动，不更改
+        if(_pathLineRenderer.enabled)
+            yield break;
         _pathLineRenderer.positionCount = path.Length;
         _pathLineRenderer.SetPositions(path);
         _pathLineRenderer.enabled = true;

@@ -223,6 +223,10 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
 
     void Update()
     {
+        if(Input.GetAxis("Mouse ScrollWheel") < 0f && _existingOperationMenu != null)
+        {
+            Destroy(_existingOperationMenu);
+        }
         // 如果存在跟随图片，更新它的位置
         if (_followImage != null)
         {

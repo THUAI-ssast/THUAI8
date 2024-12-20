@@ -284,6 +284,7 @@ public class GridMoveController : MonoBehaviour
                     CheckForAdjacentDoor(cellPosition_1);
                 }
 
+                StartCoroutine(Player.drawPathLine(pathArray, duration)); // 绘制路径
                 // 调用网络同步方法,改变位置并生成对应动画
                 Player.CmdSetPosition(targetWorldPosition, _targetCellPosition, pathArray);
                 StartCoroutine(setMoveCD(duration));

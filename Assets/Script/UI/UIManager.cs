@@ -41,9 +41,7 @@ public class UIManager : MonoBehaviour
     private Transform _craftContent;
     private GameObject _craftWayUIPrefab;
     private GameObject _bigMapPanel;
-
-    private bool _isOnBattle = false;
-
+    private GameObject _mapPanel;
     private Button _backButton;
     private Image _battleUIImage;
 
@@ -101,11 +99,11 @@ public class UIManager : MonoBehaviour
         _bagPanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
             {
-                setUIActive(_bagPanel, false);
-                setUIActive(_craftPanel, false);
+                SetUIActive(_bagPanel, false);
+                SetUIActive(_craftPanel, false);
             });
         _bagPanel.transform.Find("CraftButton").GetComponent<Button>().onClick
-            .AddListener(() => setUIActive(_craftPanel, true));
+            .AddListener(() => SetUIActive(_craftPanel, true));
 
         _battlePanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
@@ -140,24 +138,26 @@ public class UIManager : MonoBehaviour
             });
 
         _craftPanel.transform.Find("BackButton").GetComponent<Button>().onClick
-            .AddListener(() => reverseUIActive(_craftPanel));
+            .AddListener(() => ReverseUIActive(_craftPanel));
         _craftPanel.transform.Find("ApplyButton").GetComponent<Button>().onClick
             .AddListener(() => BackpackManager.Instance.DeployCraft(CraftWayUI.SelectedCraftWay));
 
         _bigMapPanel = MainCanvas.transform.Find("MapPanel/SmallMapMask/BigMapImage").gameObject;
+        _mapPanel = MainCanvas.transform.Find("MapPanel").gameObject;
     }
 
     void Update()
     {
         GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
-        if (Input.GetKeyDown(KeyCode.E) && !_isOnBattle && localPlayer.GetComponent<PlayerHealth>().IsAlive)
+        if (Input.GetKeyDown(KeyCode.E) && !_battlePanel.activeSelf && localPlayer.GetComponent<PlayerHealth>().IsAlive)
         {
             ReversePanel(_bagPanel);
+            SimpleReverseUIActive(_mapPanel);
         }
         
-        if ((Input.GetKeyDown(KeyCode.M)||Input.GetKeyDown(KeyCode.Tab)) && localPlayer.GetComponent<PlayerHealth>().IsAlive)
+        if ((Input.GetKeyDown(KeyCode.M)||Input.GetKeyDown(KeyCode.Tab)) && localPlayer.GetComponent<PlayerHealth>().IsAlive && _mapPanel.activeSelf)
         {
-            reverseMapPanel();
+            ReverseMapPanel();
         }
 
         // if (Input.GetKeyDown(KeyCode.B))
@@ -175,13 +175,21 @@ public class UIManager : MonoBehaviour
                 }
                 else
                 {
-                    reverseUIActive(_activeUIList[^1]);
-                }
+                    if(_activeUIList[^1] == _bagPanel)
+                    {
+                        SimpleReverseUIActive(_mapPanel);
+                    }
+                    ReverseUIActive(_activeUIList[^1]);
+                } 
             }
         }
     }
 
-    private void reverseUIActive(GameObject ui)
+    private void SimpleReverseUIActive(GameObject ui)
+    {
+        ui.SetActive(!ui.activeSelf);
+    }
+    private void ReverseUIActive(GameObject ui)
     {
         if (ui.activeSelf)
         {
@@ -215,16 +223,16 @@ public class UIManager : MonoBehaviour
     }
 
 
-    public void setUIActive(GameObject ui, bool active)
+    public void SetUIActive(GameObject ui, bool active)
     {
         if (ui.activeSelf == active)
             return;
-        reverseUIActive(ui);
+        ReverseUIActive(ui);
     }
 
     public void ReversePanel(GameObject panel)
     {
-        reverseUIActive(panel);
+        ReverseUIActive(panel);
         if (panel.activeSelf == false && ExistingOperationMenu != null)
         {
             Destroy(ExistingOperationMenu);
@@ -240,7 +248,7 @@ public class UIManager : MonoBehaviour
         ReversePanel(_bagPanel);
     }
 
-    private void reverseMapPanel()
+    private void ReverseMapPanel()
     {
         if (MapUIManager.Instance.IsDisplayBigMap)
         {

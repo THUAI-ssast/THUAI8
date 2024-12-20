@@ -149,7 +149,7 @@ public class SafeAreaManager : NetworkBehaviour
         GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
         localPlayer.GetComponent<PlayerLog>().CmdAddLog(localPlayer, "你迷失了前进的方向…", LogInfo.DamageType.poison);
         PlayerHealth localPlayerHealth = localPlayer.GetComponent<PlayerHealth>();
-        localPlayerHealth.ChangeHealth((int)RandomSelectBodyPosition(), -decreaseActionPoint * 5);
+        localPlayerHealth.ChangeHealth((int)RandomSelectBodyPosition(), -decreaseActionPoint);
     }
 
     public void DoSafeAreaDamageByRoundEnd(int roundCount)
@@ -163,7 +163,7 @@ public class SafeAreaManager : NetworkBehaviour
         PlayerHealth localPlayerHealth = localPlayer.GetComponent<PlayerHealth>();
         for (int i = 0; i < roundCount; i++)
         {
-            localPlayerHealth.ChangeHealth((int)RandomSelectBodyPosition(), -5); // -1
+            localPlayerHealth.ChangeHealth((int)RandomSelectBodyPosition(), -1);
         }
     }
 

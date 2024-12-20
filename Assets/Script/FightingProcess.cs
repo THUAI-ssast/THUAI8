@@ -82,6 +82,7 @@ public class FightingProcess : NetworkBehaviour
     /// 定位BattleUI。
     /// </summary>
     GameObject _battleUI;
+    GameObject _mapUI;
 
     /// <summary>
     /// 定位FinishRoundButton。
@@ -133,6 +134,7 @@ public class FightingProcess : NetworkBehaviour
         _roundAPRemaining = _roundAPLimit;
         _finishRound = false;
         _battleUI = GameObject.Find("Canvas").transform.Find("BattlePanel").gameObject; 
+        _mapUI = GameObject.Find("Canvas").transform.Find("MapPanel").gameObject;
         _roundUI = _battleUI.transform.Find("RoundUI").gameObject;
         _finishRoundButton = _battleUI.transform.Find("FinishRoundButton").gameObject;
         _escapeButton = _battleUI.transform.Find("EscapeButton").gameObject;
@@ -265,7 +267,7 @@ public class FightingProcess : NetworkBehaviour
         if(playerState == PlayerState.Attacker)
         {
             GridMoveController.Instance.ToggleMovementState(true);
-            _battleUI.SetActive(false);
+            CloseBattleUI();
             GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
         }
         if(playerState == PlayerState.Defender)
@@ -284,7 +286,7 @@ public class FightingProcess : NetworkBehaviour
     {
         if(isDead)
         {
-            _battleUI.SetActive(false);
+            CloseBattleUI();
             // GameObject.Find("Canvas").transform.Find("PlayerDead").gameObject.SetActive(true);
             GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
         }
@@ -306,7 +308,7 @@ public class FightingProcess : NetworkBehaviour
         yield return new WaitForSeconds(2);
         _roundUI.transform.Find("FightingInterrupted").gameObject.SetActive(false);
         GridMoveController.Instance.ToggleMovementState(true);
-        _battleUI.SetActive(false);
+        CloseBattleUI();
         GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
     }
 
@@ -320,7 +322,7 @@ public class FightingProcess : NetworkBehaviour
         yield return new WaitForSeconds(2);
         _roundUI.transform.Find("PlayerDead").gameObject.SetActive(false);
         GridMoveController.Instance.ToggleMovementState(true);
-        _battleUI.SetActive(false);
+        CloseBattleUI();
         GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
     }
 
@@ -334,7 +336,7 @@ public class FightingProcess : NetworkBehaviour
         yield return new WaitForSeconds(2);
         _roundUI.transform.Find("PlayerEscape").gameObject.SetActive(false);
         GridMoveController.Instance.ToggleMovementState(true);
-        _battleUI.SetActive(false);
+        CloseBattleUI();
         GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
     }
 
@@ -617,6 +619,11 @@ public class FightingProcess : NetworkBehaviour
         {
             BackpackManager.Instance.RefreshArmorBattleDisplay(enemyPlayerID.gameObject);
         }
+    }
+    void CloseBattleUI()
+    {
+        _battleUI.SetActive(false);
+        _mapUI.SetActive(true);
     }
 }
 // TODO: 玩家断联 打断过程战斗结束有时候会有奇怪bug

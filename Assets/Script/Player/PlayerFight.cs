@@ -24,6 +24,7 @@ public class PlayerFight : NetworkBehaviour
     /// 定位BattlePanel。
     /// </summary>
     GameObject _battleUI;
+    GameObject _mapUI;
 
     /// <summary>
     /// 定位攻击范围ui。
@@ -76,6 +77,7 @@ public class PlayerFight : NetworkBehaviour
         _selectedUI.SetActive(false);
         _battleUI = GameObject.Find("Canvas").transform.Find("BattlePanel").gameObject;
         _waitingForFightUI = GameObject.Find("Canvas").transform.Find("WaitingForFight").gameObject;
+        _mapUI = GameObject.Find("Canvas").transform.Find("MapPanel").gameObject;
     }
 
     /// <summary>
@@ -361,7 +363,7 @@ public class PlayerFight : NetworkBehaviour
         _enemy = enemyPlayer;
         HealthPanelEnemy.Instance.SetEnemy(enemyPlayer);
         GridMoveController.Instance.ToggleMovementState(false);
-        _battleUI.SetActive(true);
+        OpenBattleUI();
         BackpackManager.Instance.RefreshArmorBattleDisplay(enemyPlayer);
         RefreshPositionHealth(enemyPlayer);
         GameObject.FindGameObjectWithTag("LocalPlayer").GetComponent<PlayerFight>().SetAttackRangeFalse();
@@ -379,6 +381,12 @@ public class PlayerFight : NetworkBehaviour
             $"{enemyPlayer.GetComponent<PlayerHealth>().BodyHealth}/{enemyPlayer.GetComponent<PlayerHealth>().BodyMaxHealth}";
         _battleUI.transform.Find("HealthPanel_enemy/Legs").GetChild(0).GetComponent<TMP_Text>().text = 
             $"{enemyPlayer.GetComponent<PlayerHealth>().LegHealth}/{enemyPlayer.GetComponent<PlayerHealth>().LegMaxHealth}";
+    }
+
+    void OpenBattleUI()
+    {
+        _battleUI.SetActive(true);
+        _mapUI.SetActive(false);
     }
 
     /// <summary>
