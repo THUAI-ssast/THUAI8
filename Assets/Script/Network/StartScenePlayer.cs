@@ -45,7 +45,7 @@ public class StartScenePlayer : NetworkBehaviour
     [Command]
     public void CmdJoinRoom(int roomID)
     {
-        int port = roomID + AddService.MatchServerPort;
+        int port = roomID + AddService.Instance.MatchServerPort;
         if (MatchMaker.Instance.CheckPort(port)) // 如果端口未被占用，则无法加入房间，以port=0为标识
         {
             port = 0;

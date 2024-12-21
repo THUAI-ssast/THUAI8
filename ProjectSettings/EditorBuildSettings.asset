@@ -17,10 +17,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/BattleScene.unity
     guid: 5a71f04d14d783842a419657d9633c11
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/TutorialStartScene.unity
     guid: 26e3521ea5582204398cbc8fb19bcc6c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/TutorialScene.unity
     guid: 73c3757b6f845434fac3ff4b1ab279aa
   m_configObjects: {}

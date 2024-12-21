@@ -136,6 +136,7 @@ public class NetworkManagerController : MonoBehaviour
 
     public void CreateRoomOnGameServer()
     {
+        RoomManager.Instance.networkAddress = AddService.Instance.ServerNetworkAddress;
         var args = System.Environment.GetCommandLineArgs();
         int playerNumber;
         if (int.TryParse(args[1], out playerNumber))
@@ -146,9 +147,6 @@ public class NetworkManagerController : MonoBehaviour
         {
             Application.Quit();
         }
-
-        string serverNetworkAddress = args[2];
-        RoomManager.Instance.networkAddress = serverNetworkAddress;
         
         int port;
         if (int.TryParse(args[3], out port))

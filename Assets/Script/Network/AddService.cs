@@ -55,7 +55,7 @@ public class AddService : MonoBehaviour
         switch (appBuildMode)
         {
             case AppBuildMode.AppIsMatchServer:
-                GetNetworkSettings();
+                
                 break;
             case AppBuildMode.AppIsGameServer:
                 SceneManager.LoadScene("RoomStartScene");
