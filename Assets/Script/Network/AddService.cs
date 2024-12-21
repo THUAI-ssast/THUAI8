@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using kcp2k;
 using Mirror;
 using TMPro;
@@ -35,8 +37,8 @@ public class AddService : MonoBehaviour
 
     public AppBuildMode appBuildMode;
 
-    public static string ServerNetworkAddress = "150.158.44.119";
-    public static ushort MatchServerPort = 8000;
+    public string ServerNetworkAddress = "150.158.44.119";
+    public ushort MatchServerPort = 8000;
 
     private void Awake()
     {
@@ -53,7 +55,7 @@ public class AddService : MonoBehaviour
         switch (appBuildMode)
         {
             case AppBuildMode.AppIsMatchServer:
-                
+                GetNetworkSettings();
                 break;
             case AppBuildMode.AppIsGameServer:
                 SceneManager.LoadScene("RoomStartScene");
@@ -73,6 +75,29 @@ public class AddService : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    public void GetNetworkSettings()
+    {
+        var args = System.Environment.GetCommandLineArgs();
+        ServerNetworkAddress = args[1];
+        MatchServerPort = (ushort)int.Parse(args[2]);
+        MatchMaker.Instance.GameServerPath = args[3];
+
+        string GameServerPortRange = args[4];
+        string pattern = @"(\d+)-(\d+)";
+        Match match = Regex.Match(GameServerPortRange, pattern);
+        if (match.Success)
+        {
+            string firstNumber = match.Groups[1].Value;
+            string secondNumber = match.Groups[2].Value;
+            MatchMaker.Instance.MinPort = int.Parse(firstNumber);
+            MatchMaker.Instance.MaxPort = int.Parse(secondNumber);
+        }
+        else
+        {
+            Application.Quit();
         }
     }
 }

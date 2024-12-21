@@ -10,8 +10,9 @@ public class MatchMaker : MonoBehaviour
 {
     public static MatchMaker Instance;
 
-    [ReadOnly] public int MinPort = 8001;
-    [ReadOnly] public int MaxPort = 8050;
+    public string GameServerPath;
+    public int MinPort;
+    public int MaxPort;
     private List<int> _portsInUse = new List<int>();
 
     private void Start()
@@ -37,8 +38,8 @@ public class MatchMaker : MonoBehaviour
             if(!_portsInUse.Contains(port))
             {
                 ProcessStartInfo processStartInfo = new ProcessStartInfo();
-                processStartInfo.FileName = "/home/ubuntu/gameServer/UrbanOutlastServer.x86_64"; // 需要指定正确的程序路径名
-                processStartInfo.Arguments = $"{playerNumberInRoom} {port}";    //指定房间人数和端口号
+                processStartInfo.FileName = GameServerPath; // 需要指定正确的程序路径名
+                processStartInfo.Arguments = $"{playerNumberInRoom} {AddService.Instance.ServerNetworkAddress} {port}";    //指定房间人数和端口号
                 Process.Start(processStartInfo);
 
                 _portsInUse.Add(port);
