@@ -129,7 +129,7 @@ public class Item : NetworkBehaviour
         if(ItemLocation.Owner != ItemOwner.World) return false;
         if(UIManager.Instance.IsUIActivating == true) return false;
         GameObject player = GameObject.FindWithTag("LocalPlayer");
-        if (Vector3.Distance(gameObject.transform.position, player.transform.position) > _pickUpDistance) return false;
+        if (Vector2.Distance(gameObject.transform.position, player.transform.position) > _pickUpDistance) return false;
         return true;
     }
     /// <summary>
