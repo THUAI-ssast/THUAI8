@@ -34,6 +34,7 @@ public class StartScenePlayer : NetworkBehaviour
         if (port == 0)
         {
             StartMenuManager.Instance.WarningDisplay("该房间不存在");
+            return;
         }
 
         NetworkManagerController.Instance.RoomPort = port;
