@@ -386,6 +386,14 @@ public class PlayerFight : NetworkBehaviour
     void OpenBattleUI()
     {
         _battleUI.SetActive(true);
+        if (!HealthPanelEnemy.Instance.IfStart)
+        {
+            PlayerActionPoint playerAP = HealthPanelEnemy.Instance.LocalPlayer.GetComponent<PlayerActionPoint>();
+            float currentAP = playerAP.CurrentActionPoint;
+            float maxAP = playerAP.MaxActionPoint;
+            HealthPanelEnemy.Instance.UpdateActionPoint(currentAP, maxAP);
+        }
+
         _mapUI.SetActive(false);
     }
 

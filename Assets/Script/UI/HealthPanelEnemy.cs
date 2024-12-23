@@ -9,10 +9,17 @@ using UnityEngine;
 public class HealthPanelEnemy : MonoBehaviour
 {
     public static HealthPanelEnemy Instance;
+    public bool IfStart = true;
 
     private GameObject _localPlayer;
     private GameObject _enemyPlayer;
     private GameObject _apBar;
+
+    public GameObject LocalPlayer
+    {
+        get => _localPlayer;
+        private set => _localPlayer = value;
+    }
 
     public GameObject EnemyPlayer
     {
@@ -37,6 +44,7 @@ public class HealthPanelEnemy : MonoBehaviour
     void Start()
     {
         _localPlayer = GameObject.FindWithTag("LocalPlayer");
+        IfStart = false;
         // _enemyPlayer = GameObject.FindWithTag("Player");
         _apBar = transform.parent.Find("APPanel").GetChild(0).gameObject;
         float currentAP = _localPlayer.GetComponent<PlayerActionPoint>().CurrentActionPoint;
