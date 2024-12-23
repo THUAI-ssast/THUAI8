@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CostItems:
   - {fileID: 11400000, guid: c20005d58db72f14bb0be192c789233d, type: 2}
+  - {fileID: 11400000, guid: c20005d58db72f14bb0be192c789233d, type: 2}
   CatalystItems:
   - {fileID: 11400000, guid: f872786e11a1e4c4ca592593e4b30e39, type: 2}
   ProductItem: {fileID: 11400000, guid: f698925b71eddeb46ba8b5671bcc4be6, type: 2}
