@@ -458,6 +458,7 @@ public class GridMoveController : MonoBehaviour
     /// <returns>所需的体力值</returns>
     private float ComputeRequiredActionPoint(Path path)
     {
-        return 0.2f * (path.vectorPath.ToArray().Length - 1);
+        float perCost = Player.GetComponent<PlayerHealth>().LegHealth > 0 ? 0.2f : 0.3f;
+        return perCost * (path.vectorPath.ToArray().Length - 1);
     }
 }
