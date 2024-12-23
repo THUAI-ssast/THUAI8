@@ -101,6 +101,7 @@ public class UIManager : MonoBehaviour
             {
                 SetUIActive(_bagPanel, false);
                 SetUIActive(_craftPanel, false);
+                SimpleReverseUIActive(_mapPanel);
             });
         _bagPanel.transform.Find("CraftButton").GetComponent<Button>().onClick
             .AddListener(() => SetUIActive(_craftPanel, true));
@@ -246,6 +247,7 @@ public class UIManager : MonoBehaviour
     public void ReverseBagPanel()
     {
         ReversePanel(_bagPanel);
+        SimpleReverseUIActive(_mapPanel);
     }
 
     private void ReverseMapPanel()
