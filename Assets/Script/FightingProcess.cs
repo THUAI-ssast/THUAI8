@@ -133,6 +133,12 @@ public class FightingProcess : NetworkBehaviour
         _roundAPLimit = 1;
         _roundAPRemaining = _roundAPLimit;
         _finishRound = false;
+    }
+    /// <summary>
+    /// 在客户端执行，初始化战斗流程UI。
+    /// </summary>
+    public void Init()
+    {
         _battleUI = GameObject.Find("Canvas").transform.Find("BattlePanel").gameObject; 
         _mapUI = GameObject.Find("Canvas").transform.Find("MapPanel").gameObject;
         _roundUI = _battleUI.transform.Find("RoundUI").gameObject;

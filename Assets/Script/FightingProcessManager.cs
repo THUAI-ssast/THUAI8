@@ -45,20 +45,24 @@ public class FightingProcessManager : NetworkBehaviour
     {
         if(isServer)
         {
-            // foreach (var existedProcess in processToIconMapping)
-            // {
-            //     if(existedProcess.Key.GetComponent<FightingProcess>().GetAttackerId() == attacker.GetComponent<NetworkIdentity>().netId && 
-            //         existedProcess.Key.GetComponent<FightingProcess>().GetDefenderId() == defender.GetComponent<NetworkIdentity>().netId)
-            //     {
-            //         return ;
-            //     }
-            // }
+            foreach (var existedProcess in processToIconMapping)
+            {
+                if(existedProcess.Key.GetComponent<FightingProcess>().GetAttackerId() == attacker.GetComponent<NetworkIdentity>().netId ||
+                    existedProcess.Key.GetComponent<FightingProcess>().GetAttackerId() == defender.GetComponent<NetworkIdentity>().netId)
+                {
+                    return ;
+                }
+                if(existedProcess.Key.GetComponent<FightingProcess>().GetDefenderId() == attacker.GetComponent<NetworkIdentity>().netId ||
+                    existedProcess.Key.GetComponent<FightingProcess>().GetDefenderId() == defender.GetComponent<NetworkIdentity>().netId)
+                {
+                    return ;
+                }
+            }
             GameObject process = Instantiate(_fightingProcess);
             GameObject icon = Instantiate(_fightingIcon);
             processToIconMapping.Add(process, icon);
             process.transform.SetParent(gameObject.transform);
             icon.transform.SetParent(GameObject.Find("GridParent").transform.GetChild(0).Find("ItemTilemap").transform);
-            // Debug.LogError(attacker.transform.position + " " + defender.transform.position);
             icon.transform.position = (attacker.transform.position + defender.transform.position)/2;
             attacker.GetComponent<PlayerFight>().DeploySet(process.GetComponent<NetworkIdentity>(), defender.GetComponent<NetworkIdentity>());
             defender.GetComponent<PlayerFight>().DeploySet(process.GetComponent<NetworkIdentity>(), attacker.GetComponent<NetworkIdentity>());
@@ -70,7 +74,19 @@ public class FightingProcessManager : NetworkBehaviour
             TargetSetParent(attacker_conn, process.GetComponent<NetworkIdentity>());
             TargetSetParent(defender_conn, process.GetComponent<NetworkIdentity>());
             RpcSetParent(icon.GetComponent<NetworkIdentity>());
+            TargetProcessInit(attacker_conn, process);
+            TargetProcessInit(defender_conn, process);
         }
+    }
+    /// <summary>
+    /// 在战斗双方客户端初始化战斗流程UI
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="process"></param>
+    [TargetRpc]
+    void TargetProcessInit(NetworkConnection target, GameObject process)
+    {
+        process.GetComponent<FightingProcess>().Init();
     }
     /// <summary>
     /// 在战斗双方客户端设置战斗流程的父物体

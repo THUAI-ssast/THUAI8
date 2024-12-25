@@ -16,13 +16,18 @@ public class PlayerFight : NetworkBehaviour
     [SyncVar] public bool IsFighting;
 
     /// <summary>
-    /// 回合战斗状态，仅在服务端改变，不向客户端同步。
+    /// 回合战斗状态，在服务端改变，向所有客户端同步。
     /// </summary>
     [SyncVar] public FightingProcess.PlayerState FightingState;
     /// <summary>
     /// 从玩家ID所属逃跑。服务端改变，向所有客户端同步。
     /// </summary>
     [SyncVar] public uint EscapeFromPlayerID;
+
+    /// <summary>
+    /// 打断战斗时被攻击的玩家,服务端改变，向所有客户端同步。
+    /// </summary>
+    [SyncVar] public NetworkIdentity InterruptedPlayerID;
 
     /// <summary>
     /// 定位BattlePanel。
@@ -63,17 +68,12 @@ public class PlayerFight : NetworkBehaviour
     bool _inAttackRange;
 
     /// <summary>
-    /// 打断战斗时被攻击的玩家
-    /// </summary>
-    NetworkIdentity _interruptedPlayerID;
-
-    /// <summary>
     /// 初始化
     /// </summary>
     void Start()
     {
         EscapeFromPlayerID = 0;
-        _interruptedPlayerID = null;
+        InterruptedPlayerID = null;
         IsFighting = false;
         _attackRange = gameObject.transform.Find("AttackRange").gameObject;
         _attackRange.SetActive(false);
@@ -123,10 +123,6 @@ public class PlayerFight : NetworkBehaviour
         {
             return true;
         }
-        // if(UIManager.Instance.MainCanvas.transform.Find("PlayerVictory").gameObject.activeSelf)
-        // {
-        //     return true;
-        // }
         if(UIManager.Instance.MainCanvas.transform.Find("PlayerDead").gameObject.activeSelf)
         {
             return true;
@@ -173,8 +169,25 @@ public class PlayerFight : NetworkBehaviour
                 localPlayer.GetComponent<PlayerFight>().CmdInterruptFighting(gameObject.GetComponent<NetworkIdentity>());
                 return;
             }
+            if(InterruptedPlayerID != null)
+            {
+                // 取消打断，开始战斗
+                localPlayer.GetComponent<PlayerFight>().CmdCallCancelInterrupt(gameObject.GetComponent<NetworkIdentity>());
+                localPlayer.GetComponent<PlayerFight>().CmdStartFighting(localPlayer, gameObject);
+                return;
+            }
             localPlayer.GetComponent<PlayerFight>().CmdStartFighting(localPlayer, gameObject);
         }
+    }
+    [Command]
+    void CmdCallCancelInterrupt(NetworkIdentity targetID)
+    {
+        targetID.gameObject.GetComponent<PlayerFight>().TargetCallCancelInterrupt(targetID.connectionToClient);
+    }
+    [TargetRpc]
+    void TargetCallCancelInterrupt(NetworkConnection target)
+    {
+        CmdCancelInterrupt();
     }
     /// <summary>
     /// 打断战斗流程，调用被打断者的打断战斗流程。在打断者的服务端执行。
@@ -183,7 +196,7 @@ public class PlayerFight : NetworkBehaviour
     [Command]
     void CmdInterruptFighting(NetworkIdentity playerID)
     {
-        _interruptedPlayerID = playerID;
+        InterruptedPlayerID = playerID;
         playerID.gameObject.GetComponent<PlayerFight>().DeployInterruptFighting(gameObject.GetComponent<NetworkIdentity>());
     }
 
@@ -265,6 +278,7 @@ public class PlayerFight : NetworkBehaviour
         TargetUpdateInterruptUI(playerID.connectionToClient, 1, roundDuration, timer, attackerName);
         yield return new WaitForSeconds(3);
         TargetInterruptUI(playerID.connectionToClient, false);
+        playerID.gameObject.GetComponent<PlayerFight>().InterruptedPlayerID = null;
         playerID.GetComponent<PlayerFight>().TargetEnterStartFighting(playerID.connectionToClient, gameObject.GetComponent<NetworkIdentity>());
     }
 
@@ -467,7 +481,8 @@ public class PlayerFight : NetworkBehaviour
     public void CmdCancelInterrupt()
     {
         TargetInterruptUI(gameObject.GetComponent<NetworkIdentity>().connectionToClient, false);
-        _interruptedPlayerID.gameObject.GetComponent<PlayerFight>().DeployCancelInterrupt();
+        InterruptedPlayerID.gameObject.GetComponent<PlayerFight>().DeployCancelInterrupt();
+        InterruptedPlayerID = null;
     }
 
     /// <summary>
