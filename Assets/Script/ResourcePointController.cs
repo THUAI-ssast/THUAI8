@@ -216,4 +216,9 @@ public class ResourcePointController : NetworkBehaviour
         _useCustomInitItems = true;
         _customInitItems = customItems;
     }
+
+    public void OnClickExitResourcePoint()
+    {
+        ToggleResourcePointUI();
+    }
 }
