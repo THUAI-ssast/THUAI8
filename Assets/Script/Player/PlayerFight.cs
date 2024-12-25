@@ -483,6 +483,7 @@ public class PlayerFight : NetworkBehaviour
     public void CmdAttackHappened(string message, float costAP)
     {
         _fightingProcess.GetComponent<FightingProcess>().DeployAddLog(message);
+        _fightingProcess.GetComponent<FightingProcess>().DeployPlayAttackSound();
         _fightingProcess.GetComponent<FightingProcess>().DeployConsumeAP(costAP);
         _fightingProcess.GetComponent<FightingProcess>().DeployRefreshArmorDisplay();   
     }

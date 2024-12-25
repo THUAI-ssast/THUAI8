@@ -13,6 +13,8 @@ public class FightingProcessManager : NetworkBehaviour
     /// 单例模式
     /// </summary>
     public static FightingProcessManager Instance;
+
+    public AudioClip AttackAudioClip;
     /// <summary>
     /// 战斗流程的预制体
     /// </summary>
@@ -26,6 +28,7 @@ public class FightingProcessManager : NetworkBehaviour
         else
         {
             Instance = this;
+            AttackAudioClip = Resources.Load<AudioClip>("Sound/Action/Attack");
         }
     }
     /// <summary>

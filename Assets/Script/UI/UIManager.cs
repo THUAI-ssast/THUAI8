@@ -12,6 +12,8 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
+    public AudioClip ButtonAudioClip;
+
     public bool IsUIActivating => _activeUIList.Count > 0;
     public GameObject ExistingOperationMenu;
     public GameObject ExistingBodyPositionMenu;
@@ -104,7 +106,12 @@ public class UIManager : MonoBehaviour
                 SimpleReverseUIActive(_mapPanel);
             });
         _bagPanel.transform.Find("CraftButton").GetComponent<Button>().onClick
-            .AddListener(() => SetUIActive(_craftPanel, true));
+            .AddListener(() =>
+            {
+                SetUIActive(_craftPanel, true);
+                AudioManager.Instance.CameraSource.PlayOneShot(ButtonAudioClip);
+            });
+
 
         _battlePanel.transform.Find("BackButton").GetComponent<Button>().onClick
             .AddListener(() =>
@@ -114,18 +121,21 @@ public class UIManager : MonoBehaviour
                 // 遍历 _battleUI 中的所有子物体
                 foreach (Transform child in _battlePanel.transform)
                 {
-                    if(child.name == "InterruptedMessagePanel")
+                    if (child.name == "InterruptedMessagePanel")
                     {
-                        if(!FightingProcessManager.Instance.transform.GetChild(0).GetComponent<FightingProcess>().FightingInterrupted)
+                        if (!FightingProcessManager.Instance.transform.GetChild(0).GetComponent<FightingProcess>()
+                                .FightingInterrupted)
                         {
                             continue;
                         }
                     }
+
                     if (child != _backButton.transform) // 排除 _backButton
                     {
                         child.gameObject.SetActive(true); // 显示其他 UI 元素
                     }
                 }
+
                 _backButton.gameObject.SetActive(false);
                 GameObject.Find("Canvas").transform.Find("PlayerInfoPanel").gameObject.SetActive(true); // 显示玩家信息面板
                 GameObject.Find("Canvas").transform.Find("Round").gameObject.SetActive(true); // 显示回合信息面板
@@ -136,12 +146,22 @@ public class UIManager : MonoBehaviour
                     tempColor.a = 100f; // 设置透明度为 100 (完全透明)，原本为 0
                     _battleUIImage.color = tempColor;
                 }
+
+                AudioManager.Instance.CameraSource.PlayOneShot(ButtonAudioClip);
             });
 
         _craftPanel.transform.Find("BackButton").GetComponent<Button>().onClick
-            .AddListener(() => ReverseUIActive(_craftPanel));
+            .AddListener(() =>
+            {
+                ReverseUIActive(_craftPanel);
+                AudioManager.Instance.CameraSource.PlayOneShot(ButtonAudioClip);
+            });
         _craftPanel.transform.Find("ApplyButton").GetComponent<Button>().onClick
-            .AddListener(() => BackpackManager.Instance.DeployCraft(CraftWayUI.SelectedCraftWay));
+            .AddListener(() =>
+            {
+                BackpackManager.Instance.DeployCraft(CraftWayUI.SelectedCraftWay);
+                AudioManager.Instance.CameraSource.PlayOneShot(ButtonAudioClip);
+            });
 
         _bigMapPanel = MainCanvas.transform.Find("MapPanel/SmallMapMask/BigMapImage").gameObject;
         _mapPanel = MainCanvas.transform.Find("MapPanel").gameObject;
@@ -155,8 +175,9 @@ public class UIManager : MonoBehaviour
             ReversePanel(_bagPanel);
             SimpleReverseUIActive(_mapPanel);
         }
-        
-        if ((Input.GetKeyDown(KeyCode.M)||Input.GetKeyDown(KeyCode.Tab)) && localPlayer.GetComponent<PlayerHealth>().IsAlive && _mapPanel.activeSelf)
+
+        if ((Input.GetKeyDown(KeyCode.M) || Input.GetKeyDown(KeyCode.Tab)) &&
+            localPlayer.GetComponent<PlayerHealth>().IsAlive && _mapPanel.activeSelf)
         {
             ReverseMapPanel();
         }
@@ -176,12 +197,13 @@ public class UIManager : MonoBehaviour
                 }
                 else
                 {
-                    if(_activeUIList[^1] == _bagPanel)
+                    if (_activeUIList[^1] == _bagPanel)
                     {
                         SimpleReverseUIActive(_mapPanel);
                     }
+
                     ReverseUIActive(_activeUIList[^1]);
-                } 
+                }
             }
         }
     }
@@ -190,16 +212,18 @@ public class UIManager : MonoBehaviour
     {
         ui.SetActive(!ui.activeSelf);
     }
+
     private void ReverseUIActive(GameObject ui)
     {
         if (ui.activeSelf)
         {
             ui.SetActive(false);
-            foreach (var activeUI in _activeUIList.FindAll(x=>x.transform.parent == ui.transform))
+            foreach (var activeUI in _activeUIList.FindAll(x => x.transform.parent == ui.transform))
             {
                 activeUI.SetActive(false);
                 _activeUIList.Remove(activeUI);
             }
+
             _activeUIList.Remove(ui);
         }
         else
@@ -238,6 +262,7 @@ public class UIManager : MonoBehaviour
         {
             Destroy(ExistingOperationMenu);
         }
+
         if (_bagPanel.activeSelf == false && ExistingBodyPositionMenu != null)
         {
             Destroy(ExistingBodyPositionMenu);
@@ -305,7 +330,9 @@ public class UIManager : MonoBehaviour
         {
             panel.SetActive(false);
         }
-        GameObject hoverStatusPanel = Instantiate(Resources.Load<GameObject>("UI/HoverStatusPanel"), MainCanvas.transform, false);
+
+        GameObject hoverStatusPanel =
+            Instantiate(Resources.Load<GameObject>("UI/HoverStatusPanel"), MainCanvas.transform, false);
         hoverStatusPanel.GetComponentInChildren<TextMeshProUGUI>().text = text;
         _hoverStatusPanelList.Add(hoverStatusPanel);
         StartCoroutine(DisplayHoverStatusPanelCoroutine(hoverStatusPanel));
@@ -332,42 +359,50 @@ public class UIManager : MonoBehaviour
     {
         GameObject KillLogPanel = MainCanvas.transform.Find("KillLogPanel").gameObject;
         GameObject newKillLog = Instantiate(Resources.Load<GameObject>("UI/KillLog"), KillLogPanel.transform);
-        switch(damageType)
+        switch (damageType)
         {
             case LogInfo.DamageType.fight:
                 newKillLog.transform.GetChild(0).GetComponent<TMP_Text>().text = killerName;
-                newKillLog.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/Sprite/KillLog/Murder");
+                newKillLog.transform.GetChild(1).GetComponent<Image>().sprite =
+                    Resources.Load<Sprite>("UI/Sprite/KillLog/Murder");
                 newKillLog.transform.GetChild(2).GetComponent<TMP_Text>().text = victimName;
                 break;
             case LogInfo.DamageType.poison:
                 newKillLog.transform.GetChild(0).GetComponent<TMP_Text>().text = victimName;
-                newKillLog.transform.GetChild(1).GetComponent<Image>().sprite = Resources.Load<Sprite>("UI/Sprite/KillLog/Death");
+                newKillLog.transform.GetChild(1).GetComponent<Image>().sprite =
+                    Resources.Load<Sprite>("UI/Sprite/KillLog/Death");
                 newKillLog.transform.GetChild(2).gameObject.SetActive(false);
                 break;
             case LogInfo.DamageType.other:
                 break;
         }
+
         newKillLog.transform.SetAsFirstSibling();
         StartCoroutine(DestroyAfterSeconds(2, newKillLog));
     }
-    
+
     IEnumerator DestroyAfterSeconds(int seconds, GameObject log)
     {
         yield return new WaitForSeconds(seconds);
         byte transparent = 255;
         Color32 color = log.transform.GetChild(0).GetComponent<TMP_Text>().color;
-        while(transparent > 0)
+        while (transparent > 0)
         {
-            log.transform.GetChild(0).GetComponent<TMP_Text>().color = new Color32(color.r, color.g, color.b, transparent);
+            log.transform.GetChild(0).GetComponent<TMP_Text>().color =
+                new Color32(color.r, color.g, color.b, transparent);
             log.transform.GetChild(1).GetComponent<Image>().color = new Color32(color.r, color.g, color.b, transparent);
-            log.transform.GetChild(2).GetComponent<TMP_Text>().color = new Color32(color.r, color.g, color.b, transparent);
+            log.transform.GetChild(2).GetComponent<TMP_Text>().color =
+                new Color32(color.r, color.g, color.b, transparent);
             transparent -= 1;
             yield return null;
         }
+
         Destroy(log);
     }
+
     public void UpdateAlivePlayersNumUI(int alivePlayerNum)
     {
-        MainCanvas.transform.Find("AlivePlayersNum").GetChild(1).GetComponent<TMP_Text>().text = alivePlayerNum.ToString();
+        MainCanvas.transform.Find("AlivePlayersNum").GetChild(1).GetComponent<TMP_Text>().text =
+            alivePlayerNum.ToString();
     }
 }

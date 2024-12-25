@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using Mirror;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// 单例Manager，管理背包中的一切行为，包括对物品丢弃、使用、添加等。
@@ -16,8 +19,12 @@ public class BackpackManager : MonoBehaviour
     /// 定位背包UI
     /// </summary>
     [SerializeField] private GameObject _bagPanel;
+
     [SerializeField] private GameObject _battlePanel;
 
+    private AudioClip _useBandageAudioClip;
+    private AudioClip[] _equipArmorAudioClips;
+    private AudioClip _addItemAudioClip;
     public Transform HeadHealthPanel;
     public Transform LegsHealthPanel;
     public Transform BodyHealthPanel;
@@ -66,6 +73,9 @@ public class BackpackManager : MonoBehaviour
         else
         {
             Instance = this;
+            _addItemAudioClip = Resources.Load<AudioClip>("Sound/UI/pop");
+            _useBandageAudioClip = Resources.Load<AudioClip>("Sound/UI/Backpack/UseBandage");
+            _equipArmorAudioClips = Resources.LoadAll<AudioClip>("Sound/Items/Equipment");
         }
     }
 
@@ -162,6 +172,7 @@ public class BackpackManager : MonoBehaviour
     {
         // 从背包中添加物品
         _itemList.Add(item);
+        AudioManager.Instance.CameraSource.PlayOneShot(_addItemAudioClip);
         RefreshSlots();
     }
 
@@ -190,32 +201,42 @@ public class BackpackManager : MonoBehaviour
     /// <param name="healHead">是否要治疗头部</param>
     /// <param name="healBody">是否要治疗躯干</param>
     /// <param name="heallegs">是否要治疗腿部</param>
-    public void UseItem(Item item, bool isGlobalHeal = true, bool healHead = true, bool healBody = true, bool heallegs = true)
+    public void UseItem(Item item, bool isGlobalHeal = true, bool healHead = true, bool healBody = true,
+        bool heallegs = true)
     {
         GameObject player = GameObject.FindWithTag("LocalPlayer");
         var playerInteraction = player.GetComponent<PlayerItemInteraction>();
         if (item.ItemData is ArmorItemData armorData)
         {
+            AudioManager.Instance.CameraSource.PlayOneShot(
+                _equipArmorAudioClips[Random.Range(0, _equipArmorAudioClips.Length - 1)]);
             player.GetComponent<PlayerHealth>().EquipArmor(armorData.EquipBodyPosition, item);
             _itemList.Remove(item);
         }
         else if (item.ItemData is MedicineItemData medicineData)
         {
+            AudioManager.Instance.CameraSource.PlayOneShot(_useBandageAudioClip);
             if (isGlobalHeal)
             {
-                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, true);
-                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, true);
-                player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, true);
+                player.GetComponent<PlayerHealth>()
+                    .CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, true);
+                player.GetComponent<PlayerHealth>()
+                    .CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, true);
+                player.GetComponent<PlayerHealth>()
+                    .CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, true);
                 player.GetComponent<PlayerItemInteraction>().DecreaseDurability(item.gameObject);
             }
             else
             {
                 if (healHead)
-                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head, item.gameObject, false); // 治疗者，治疗部位，使用物品
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Head,
+                        item.gameObject, false); // 治疗者，治疗部位，使用物品
                 else if (healBody)
-                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody, item.gameObject, false);
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.MainBody,
+                        item.gameObject, false);
                 else if (heallegs)
-                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs, item.gameObject, false);
+                    player.GetComponent<PlayerHealth>().CmdHeal(player, (int)PlayerHealth.BodyPosition.Legs,
+                        item.gameObject, false);
             }
         }
 
@@ -254,7 +275,7 @@ public class BackpackManager : MonoBehaviour
         }
 
         // 移除无效物品
-        _itemList.RemoveAll(i => i == null||i.CurrentDurability==0);
+        _itemList.RemoveAll(i => i == null || i.CurrentDurability == 0);
 
         // 遍历更新槽位
         for (int i = 0; i < slotsTransform.childCount; i++)
@@ -264,7 +285,8 @@ public class BackpackManager : MonoBehaviour
                 // 设置槽位内容
                 slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().enabled = true;
                 slotsTransform.GetChild(i).GetChild(0).GetComponent<Image>().sprite = _itemList[i].ItemData.ItemIcon;
-                slotsTransform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = _itemList[i].ItemData.ItemName;
+                slotsTransform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text =
+                    _itemList[i].ItemData.ItemName;
 
                 if (_itemList[i].MaxDurability != -1)
                 {
@@ -298,7 +320,7 @@ public class BackpackManager : MonoBehaviour
 
     public void RefreshArmorDisplay()
     {
-        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");  
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
         if (localPlayer == null)
             return;
 
@@ -319,7 +341,7 @@ public class BackpackManager : MonoBehaviour
                     _armorSlots[position].UpdateDisplay();
                 }
             }
-        }   
+        }
     }
 
 
@@ -339,6 +361,7 @@ public class BackpackManager : MonoBehaviour
                 UpdateBattleArmorDisplay(position, playerArmor, false);
             }
         }
+
         GameObject enemy = enemyPlayer;
         if (enemy != null)
         {
@@ -391,7 +414,7 @@ public class BackpackManager : MonoBehaviour
                     break;
             }
         }
-        
+
         if (battleHealthPanel != null)
         {
             var battleArmorSlot = battleHealthPanel.Find("Equipment").GetComponent<ArmorSlot>();
@@ -484,6 +507,7 @@ public class BackpackManager : MonoBehaviour
         }
         else
             CreateItem("ScriptableObject/Items/" + craftWay.ProductItem.ItemName);
+
         _itemList = testItemList;
 
         CraftWayUI.UpdateSatisfiedAll();
