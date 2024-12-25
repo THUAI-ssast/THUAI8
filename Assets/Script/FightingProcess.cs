@@ -137,7 +137,7 @@ public class FightingProcess : NetworkBehaviour
     /// <summary>
     /// 在客户端执行，初始化战斗流程UI。
     /// </summary>
-    public void Init()
+    void Init()
     {
         _battleUI = GameObject.Find("Canvas").transform.Find("BattlePanel").gameObject; 
         _mapUI = GameObject.Find("Canvas").transform.Find("MapPanel").gameObject;
@@ -192,14 +192,13 @@ public class FightingProcess : NetworkBehaviour
             StartCoroutine(RoundTimer());
         }
     }
-
     /// <summary>
     /// 战斗主流程。
     /// </summary>
     /// <returns></returns>
     IEnumerator RoundTimer()
     {
-        StartRoundOnServer();
+        FirstStartRoundOnServer();
         yield return new WaitForSeconds(2);
         while (!IsFightOver())
         {
@@ -378,6 +377,43 @@ public class FightingProcess : NetworkBehaviour
         if(playerState == PlayerState.Defender)
         {
             _defenderCmdComfirmFightOver = true;
+        }
+    }
+    void FirstStartRoundOnServer()
+    {
+        _timer = _roundDuration;
+        _finishRound = false;
+        _roundAPRemaining = _roundAPLimit;
+
+        // 开始当前进攻方的回合
+        TargetFirstStartRound(_attacker.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Attacker);
+        TargetFirstStartRound(_defender.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Defender);
+        _roundCount++;
+        // 战斗日志输出
+        DeployAddLog($"{_attacker.GetComponent<PlayerHealth>().Name}的回合开始");
+    }
+    [TargetRpc]
+    void TargetFirstStartRound(NetworkConnection target, PlayerState playerState)
+    {
+        Init();
+        GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdSetFightingState(playerState);
+        GameObject currentRound = _battleUI.transform.Find("CurrentRoundPanel").GetChild(0).gameObject;
+        GameObject timer = _battleUI.transform.Find("CurrentRoundPanel").GetChild(1).gameObject;
+        timer.GetComponent<TMPro.TextMeshProUGUI>().text = $"{_roundDuration}s/{_roundDuration}s";
+        if(playerState == PlayerState.Attacker)
+        {
+            StartCoroutine(SetRoundUI("YourRoundStart"));
+            currentRound.GetComponent<TMPro.TextMeshProUGUI>().text = $"第{_roundCount}回合\n你的回合";
+            // 进攻方按钮变亮 可点
+            _finishRoundButton.GetComponent<Button>().interactable = true;
+            _escapeButton.GetComponent<Button>().interactable = true;
+            _battleUI.transform.Find("FinishRoundButton").GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = $"(0AP/{_roundAPLimit}AP)";
+        }
+        if(playerState == PlayerState.Defender)
+        {
+            StartCoroutine(SetRoundUI("EnemyRoundStart"));
+            currentRound.GetComponent<TMPro.TextMeshProUGUI>().text = $"第{_roundCount}回合\n对方回合";
+            _battleUI.transform.Find("FinishRoundButton").GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = $"(0AP/{_roundAPLimit}AP)";
         }
     }
 

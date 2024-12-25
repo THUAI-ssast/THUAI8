@@ -74,8 +74,8 @@ public class FightingProcessManager : NetworkBehaviour
             TargetSetParent(attacker_conn, process.GetComponent<NetworkIdentity>());
             TargetSetParent(defender_conn, process.GetComponent<NetworkIdentity>());
             RpcSetParent(icon.GetComponent<NetworkIdentity>());
-            TargetProcessInit(attacker_conn, process);
-            TargetProcessInit(defender_conn, process);
+            // TargetProcessInit(attacker_conn, process);
+            // TargetProcessInit(defender_conn, process);
         }
     }
     /// <summary>
@@ -83,11 +83,11 @@ public class FightingProcessManager : NetworkBehaviour
     /// </summary>
     /// <param name="target"></param>
     /// <param name="process"></param>
-    [TargetRpc]
-    void TargetProcessInit(NetworkConnection target, GameObject process)
-    {
-        process.GetComponent<FightingProcess>().Init();
-    }
+    // [TargetRpc]
+    // void TargetProcessInit(NetworkConnection target, GameObject process)
+    // {
+    //     process.GetComponent<FightingProcess>().Init();
+    // }
     /// <summary>
     /// 在战斗双方客户端设置战斗流程的父物体
     /// </summary>
