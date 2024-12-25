@@ -153,6 +153,25 @@ public class FightingProcess : NetworkBehaviour
     }
 
     /// <summary>
+    /// 获取进攻方名字。
+    /// </summary>
+    /// <returns></returns>
+    public uint GetAttackerId()
+    {
+        return _attacker.GetComponent<NetworkIdentity>().netId;
+    }
+
+    /// <summary>
+    /// 获取进攻方名字。
+    /// </summary>
+    /// <returns></returns>
+    public uint GetDefenderId()
+    {
+        return _defender.GetComponent<NetworkIdentity>().netId;
+    }
+
+
+    /// <summary>
     /// 开始战斗。
     /// </summary>
     /// <param name="attacker"></param>

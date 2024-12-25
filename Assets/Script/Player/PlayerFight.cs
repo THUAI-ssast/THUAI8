@@ -19,6 +19,10 @@ public class PlayerFight : NetworkBehaviour
     /// 回合战斗状态，仅在服务端改变，不向客户端同步。
     /// </summary>
     [SyncVar] public FightingProcess.PlayerState FightingState;
+    /// <summary>
+    /// 从玩家ID所属逃跑。服务端改变，向所有客户端同步。
+    /// </summary>
+    [SyncVar] public uint EscapeFromPlayerID;
 
     /// <summary>
     /// 定位BattlePanel。
@@ -68,6 +72,7 @@ public class PlayerFight : NetworkBehaviour
     /// </summary>
     void Start()
     {
+        EscapeFromPlayerID = 0;
         _interruptedPlayerID = null;
         IsFighting = false;
         _attackRange = gameObject.transform.Find("AttackRange").gameObject;
@@ -135,12 +140,12 @@ public class PlayerFight : NetworkBehaviour
     /// <param name="Other"></param>
     void OnTriggerEnter2D(Collider2D Other)
     {
-        if(gameObject.CompareTag("Player") && Other.gameObject.CompareTag("LocalPlayerAttackRange"))
+        if(gameObject.CompareTag("Player") && Other.gameObject.CompareTag("LocalPlayerAttackRange") &&
+            Other.gameObject.transform.parent.gameObject.GetComponent<PlayerFight>().EscapeFromPlayerID != gameObject.GetComponent<NetworkIdentity>().netId)
         {
             _inAttackRange = true;
         }
     }
-
     /// <summary>
     /// 碰撞检测。当该玩家物体离开LocalPlayer的攻击范围时（攻击范围是一个触发器），设置_inAttackRange为false。
     /// </summary>
@@ -345,6 +350,10 @@ public class PlayerFight : NetworkBehaviour
     public void CmdStartFighting(GameObject attacker, GameObject defender)
     {
         FightingProcessManager.Instance.CreateProcess(attacker, defender);
+        if(_fightingProcess == null)
+        {
+            return ;
+        }
         _fightingProcess.GetComponent<FightingProcess>().StartFighting(attacker, defender);
         TargetStartFighting(attacker.GetComponent<NetworkIdentity>().connectionToClient, defender);
         defender.GetComponent<PlayerFight>().TargetStartFighting(defender.GetComponent<NetworkIdentity>().connectionToClient, attacker);
@@ -412,8 +421,20 @@ public class PlayerFight : NetworkBehaviour
     [Command]
     public void CmdEscape()
     {
+        StartCoroutine(FightingCDAfterEscape());
         _fightingProcess.GetComponent<FightingProcess>().DeployPlayerEscape(gameObject);
         gameObject.GetComponent<PlayerActionPoint>().DecreaseActionPoint(2);
+    }
+
+    /// <summary>
+    /// 玩家逃跑后，5s内不能和同一玩家再次战斗。在服务端执行。
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator FightingCDAfterEscape()
+    {
+        EscapeFromPlayerID = _enemy.GetComponent<NetworkIdentity>().netId;
+        yield return new WaitForSeconds(5);
+        EscapeFromPlayerID = 0;
     }
 
     /// <summary>
