@@ -50,6 +50,21 @@ public class BackpackManager : MonoBehaviour
         private set => _itemList = value;
     }
 
+    /// <summary>
+    /// 背包最大容量
+    /// </summary>
+    public readonly int ItemSlotsLimit = 20;
+
+    /// <summary>
+    /// 背包中当前物品数
+    /// </summary>
+    public int ItemNumberInBag => _itemList.Count;
+
+    /// <summary>
+    /// 背包是否装满了物品，true则表示背包已满
+    /// </summary>
+    public bool IsBackpackFull => _itemList.Count >= ItemSlotsLimit;
+
     public Dictionary<PlayerHealth.BodyPosition, ArmorSlot> ArmorSlots
     {
         get => _armorSlots;

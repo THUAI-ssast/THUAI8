@@ -105,6 +105,11 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
                 GameObject player = GameObject.FindWithTag("LocalPlayer");
                 if (player == null)
                     return;
+                if (BackpackManager.Instance.IsBackpackFull)
+                {
+                    UIManager.Instance.DisplayHoverStatusPanel("你的背包已满!");
+                    return;
+                }
                 player.GetComponent<PlayerHealth>().UnEquipArmor(armorData.EquipBodyPosition);
                 Destroy(_menuObject);
             });
