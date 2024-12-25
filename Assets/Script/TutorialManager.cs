@@ -228,9 +228,20 @@ public class TutorialManager : MonoBehaviour
         _tutorialImage2.sprite = state.Sprite2;
     }
 
+    [SerializeField] private GameObject _warningPanel;
     public void OnClickExitButton()
+    {
+        UIManager.Instance.ReversePanel(_warningPanel);
+    }
+
+    public void EnsureExitTutorial()
     {
         NetworkManagerController.Instance.IsEnterTutorial = false;
         RoomManager.Instance.StopHost();
+    }
+
+    public void CancelExitTutorial()
+    {
+        UIManager.Instance.ReversePanel(_warningPanel);
     }
 }
