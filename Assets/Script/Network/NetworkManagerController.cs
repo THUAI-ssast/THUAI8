@@ -149,7 +149,7 @@ public class NetworkManagerController : MonoBehaviour
         }
         
         int port;
-        if (int.TryParse(args[3], out port))
+        if (int.TryParse(args[2], out port))
         {
             RoomManager.Instance.GetComponent<KcpTransport>().port = (ushort)port;
         }
