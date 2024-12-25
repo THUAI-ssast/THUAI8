@@ -99,10 +99,24 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     {
         // 左键生成 followImage
         if (eventData.button == PointerEventData.InputButton.Left && gameObject.transform.IsChildOf(_battlePanel.transform) 
-            && _slotItem != null && _slotItem.ItemData is WeaponItemData)
+            && _slotItem != null)
         {
-            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Attacker &&
-            GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().QueryRemainingAP() >= (_slotItem.ItemData as WeaponItemData).AttakAPCost)
+            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Defender)
+            {
+                UIManager.Instance.DisplayHoverStatusPanel("现在不是你的回合！");
+                return ;
+            }
+            if(_slotItem.ItemData is not WeaponItemData)
+            {
+                UIManager.Instance.DisplayHoverStatusPanel("战斗中只能使用武器！");
+                return ;
+            }
+            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().QueryRemainingAP() < (_slotItem.ItemData as WeaponItemData).AttakAPCost)
+            {
+                UIManager.Instance.DisplayHoverStatusPanel("战斗回合内体力不足！");
+                return ;
+            }
+            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Attacker)
             {
                 if (_followImage != null)
                 {
