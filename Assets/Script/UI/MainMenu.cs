@@ -28,7 +28,7 @@ public class MainMenu : MonoBehaviour
         loadingPanel.SetActive(false);
         if(roomIDText != null)
         {
-            roomIDText.text = $"房间号: {NetworkManagerController.Instance.RoomPort - AddService.MatchServerPort}";
+            roomIDText.text = $"房间号: {NetworkManagerController.Instance.RoomPort - AddService.Instance.MatchServerPort}";
         }
     }
 

@@ -46,7 +46,7 @@ public class PlayerItemInteraction : NetworkBehaviour
     [Command]
     public void CreateItem(string itemData_pth, ItemOwner owner, GameObject player)
     {
-        GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), Vector3.zero, Quaternion.identity);
+        GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), new Vector3(100, 100, 0), Quaternion.identity);
         NetworkServer.Spawn(instance);
         NetworkIdentity playerIdentity = player.GetComponent<NetworkIdentity>();
         instance.GetComponent<Item>().ItemData = Resources.Load<ItemData>(itemData_pth);
@@ -61,7 +61,7 @@ public class PlayerItemInteraction : NetworkBehaviour
     /// <param name="resourcePoint"></param>
     public void CreateItemForClient(string itemData_pth, ItemOwner owner, GameObject resourcePoint)
     {
-        GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), Vector3.zero, Quaternion.identity);
+        GameObject instance = Instantiate(Resources.Load<GameObject>("ScriptableObject/Items/General_Item"), new Vector3(100, 100, 0), Quaternion.identity);
         NetworkServer.Spawn(instance);
         instance.GetComponent<Item>().ItemData = Resources.Load<ItemData>(itemData_pth);
         RpcInitInstanceOnClients(instance, itemData_pth, owner, 0, resourcePoint);

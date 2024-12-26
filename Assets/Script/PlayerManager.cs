@@ -26,6 +26,7 @@ public class PlayerManager : NetworkBehaviour
     int _connectingPlayerCount;
     int _totalPlayerCount;
     public int AlivePlayerCount => _alivePlayerCount;
+    public bool IfVictory;
     [SyncVar(hook = nameof(RpcUpdateNumUI))] int _alivePlayerCount;
     void Start()
     {
@@ -33,6 +34,7 @@ public class PlayerManager : NetworkBehaviour
         {
             _connectingPlayerCount = 0;
             _alivePlayerCount = 0;
+            IfVictory = false;
             StartCoroutine(DeployUpdatePlayerCount());
         }
     }
@@ -67,8 +69,19 @@ public class PlayerManager : NetworkBehaviour
         // 胜利判断
         if (alivePlayer == 1)
         {
-            TargetVictoryUI(lastPlayer, lastPlayer.identity.GetComponent<PlayerLog>().EliminationCount);
+            StartCoroutine(DeployVictory(lastPlayer));
         }
+    }
+
+    IEnumerator DeployVictory(NetworkConnectionToClient lastPlayer)
+    {
+        while(lastPlayer.identity.GetComponent<PlayerLog>().CheckFlag == false)
+        {
+            yield return null;
+        }
+        TargetVictoryUI(lastPlayer, lastPlayer.identity.GetComponent<PlayerLog>().EliminationCount);
+        yield return new WaitForSeconds(3);
+        IfVictory = true;
     }
 
     [TargetRpc]
@@ -79,12 +92,16 @@ public class PlayerManager : NetworkBehaviour
 
     IEnumerator VictoryUIDisplay(int eliminationCount)
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(3);
+        // GridMoveController.Instance.ToggleMovementState(false);
         GameObject playerVictoryUI = UIManager.Instance.MainCanvas.transform.Find("PlayerVictory").gameObject;
         playerVictoryUI.transform.Find("RankInfo").Find("Rank").GetChild(1).GetComponent<TMP_Text>().text = "1";
         playerVictoryUI.transform.Find("RankInfo").Find("Elimination").GetChild(1).GetComponent<TMP_Text>().text =
             eliminationCount.ToString();
         playerVictoryUI.SetActive(true);
+        yield return new WaitForSeconds(10);
+        playerVictoryUI.SetActive(false);
+        UIManager.Instance.MainCanvas.transform.Find("Quit").gameObject.SetActive(true);
     }
 
     void RpcUpdateNumUI(int oldAlivePlayer, int newAlivePlayer)

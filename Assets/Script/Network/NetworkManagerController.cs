@@ -53,15 +53,15 @@ public class NetworkManagerController : MonoBehaviour
                     IsEnterTutorial = true;
 
                     NetworkManager matchNetworkManager = GameObject.Find("MatchNetworkManager").GetComponent<NetworkManager>();
-                    matchNetworkManager.networkAddress = AddService.ServerNetworkAddress;
-                    matchNetworkManager.GetComponent<KcpTransport>().port = AddService.MatchServerPort;
+                    matchNetworkManager.networkAddress = AddService.Instance.ServerNetworkAddress;
+                    matchNetworkManager.GetComponent<KcpTransport>().port = AddService.Instance.MatchServerPort;
                     matchNetworkManager.StartClient();
                 }
                 else if(AddService.Instance.appBuildMode == AddService.AppBuildMode.AppIsMatchServer)
                 {
                     NetworkManager matchNetworkManager = GameObject.Find("MatchNetworkManager").GetComponent<NetworkManager>();
-                    matchNetworkManager.networkAddress = AddService.ServerNetworkAddress;
-                    matchNetworkManager.GetComponent<KcpTransport>().port = AddService.MatchServerPort;
+                    matchNetworkManager.networkAddress = AddService.Instance.ServerNetworkAddress;
+                    matchNetworkManager.GetComponent<KcpTransport>().port = AddService.Instance.MatchServerPort;
                     matchNetworkManager.StartServer();
                 }
                 break;
@@ -129,14 +129,14 @@ public class NetworkManagerController : MonoBehaviour
     public IEnumerator EnterRoomOnClient()
     {
         yield return new WaitForSeconds(1f);
-        RoomManager.Instance.networkAddress = AddService.ServerNetworkAddress;
+        RoomManager.Instance.networkAddress = AddService.Instance.ServerNetworkAddress;
         RoomManager.Instance.GetComponent<KcpTransport>().port = (ushort)RoomPort;
         RoomManager.Instance.StartClient();
     }
 
     public void CreateRoomOnGameServer()
     {
-        RoomManager.Instance.networkAddress = AddService.ServerNetworkAddress;
+        RoomManager.Instance.networkAddress = AddService.Instance.ServerNetworkAddress;
         var args = System.Environment.GetCommandLineArgs();
         int playerNumber;
         if (int.TryParse(args[1], out playerNumber))
@@ -147,6 +147,7 @@ public class NetworkManagerController : MonoBehaviour
         {
             Application.Quit();
         }
+        
         int port;
         if (int.TryParse(args[2], out port))
         {

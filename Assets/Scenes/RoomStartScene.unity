@@ -1621,7 +1621,7 @@ MonoBehaviour:
   offlineSceneLoadDelay: 0
   transport: {fileID: 1536180147}
   networkAddress: localhost
-  maxConnections: 2
+  maxConnections: 8
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
@@ -1632,6 +1632,7 @@ MonoBehaviour:
   - {fileID: 3685720644459019547, guid: 70f5ab08b3ebfdf4e920191c2f1f29a9, type: 3}
   - {fileID: 3053860048405829172, guid: dfa34685de68be1428590ad03863476b, type: 3}
   - {fileID: 151556750962126745, guid: e0744ea6ae46a584794530e31097183b, type: 3}
+  - {fileID: 4890300830387758058, guid: 2a816c9c3a73b0b4184abd9b489c46fd, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -1705,7 +1706,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1536180145}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
   m_Name: 

@@ -82,6 +82,7 @@ public class FightingProcess : NetworkBehaviour
     /// 定位BattleUI。
     /// </summary>
     GameObject _battleUI;
+    GameObject _mapUI;
 
     /// <summary>
     /// 定位FinishRoundButton。
@@ -132,7 +133,14 @@ public class FightingProcess : NetworkBehaviour
         _roundAPLimit = 1;
         _roundAPRemaining = _roundAPLimit;
         _finishRound = false;
+    }
+    /// <summary>
+    /// 在客户端执行，初始化战斗流程UI。
+    /// </summary>
+    void Init()
+    {
         _battleUI = GameObject.Find("Canvas").transform.Find("BattlePanel").gameObject; 
+        _mapUI = GameObject.Find("Canvas").transform.Find("MapPanel").gameObject;
         _roundUI = _battleUI.transform.Find("RoundUI").gameObject;
         _finishRoundButton = _battleUI.transform.Find("FinishRoundButton").gameObject;
         _escapeButton = _battleUI.transform.Find("EscapeButton").gameObject;
@@ -151,6 +159,25 @@ public class FightingProcess : NetworkBehaviour
     }
 
     /// <summary>
+    /// 获取进攻方名字。
+    /// </summary>
+    /// <returns></returns>
+    public uint GetAttackerId()
+    {
+        return _attacker.GetComponent<NetworkIdentity>().netId;
+    }
+
+    /// <summary>
+    /// 获取进攻方名字。
+    /// </summary>
+    /// <returns></returns>
+    public uint GetDefenderId()
+    {
+        return _defender.GetComponent<NetworkIdentity>().netId;
+    }
+
+
+    /// <summary>
     /// 开始战斗。
     /// </summary>
     /// <param name="attacker"></param>
@@ -165,14 +192,13 @@ public class FightingProcess : NetworkBehaviour
             StartCoroutine(RoundTimer());
         }
     }
-
     /// <summary>
     /// 战斗主流程。
     /// </summary>
     /// <returns></returns>
     IEnumerator RoundTimer()
     {
-        StartRoundOnServer();
+        FirstStartRoundOnServer();
         yield return new WaitForSeconds(2);
         while (!IsFightOver())
         {
@@ -185,14 +211,14 @@ public class FightingProcess : NetworkBehaviour
             {
                 _timer = 0;
                 EndRoundOnServer();
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(1);
                 if(_fightingInterrupted && 
                     _defender.GetComponent<NetworkIdentity>().netId == _interruptedPlayerNetId)
                 {
                     break;
                 }
                 StartRoundOnServer();
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(1);
             }
             yield return null;
         }
@@ -265,7 +291,7 @@ public class FightingProcess : NetworkBehaviour
         if(playerState == PlayerState.Attacker)
         {
             GridMoveController.Instance.ToggleMovementState(true);
-            _battleUI.SetActive(false);
+            CloseBattleUI();
             GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
         }
         if(playerState == PlayerState.Defender)
@@ -284,7 +310,7 @@ public class FightingProcess : NetworkBehaviour
     {
         if(isDead)
         {
-            _battleUI.SetActive(false);
+            CloseBattleUI();
             // GameObject.Find("Canvas").transform.Find("PlayerDead").gameObject.SetActive(true);
             GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
         }
@@ -306,7 +332,7 @@ public class FightingProcess : NetworkBehaviour
         yield return new WaitForSeconds(2);
         _roundUI.transform.Find("FightingInterrupted").gameObject.SetActive(false);
         GridMoveController.Instance.ToggleMovementState(true);
-        _battleUI.SetActive(false);
+        CloseBattleUI();
         GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
     }
 
@@ -320,7 +346,7 @@ public class FightingProcess : NetworkBehaviour
         yield return new WaitForSeconds(2);
         _roundUI.transform.Find("PlayerDead").gameObject.SetActive(false);
         GridMoveController.Instance.ToggleMovementState(true);
-        _battleUI.SetActive(false);
+        CloseBattleUI();
         GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
     }
 
@@ -334,7 +360,7 @@ public class FightingProcess : NetworkBehaviour
         yield return new WaitForSeconds(2);
         _roundUI.transform.Find("PlayerEscape").gameObject.SetActive(false);
         GridMoveController.Instance.ToggleMovementState(true);
-        _battleUI.SetActive(false);
+        CloseBattleUI();
         GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdConfirmOver();
     }
 
@@ -351,6 +377,43 @@ public class FightingProcess : NetworkBehaviour
         if(playerState == PlayerState.Defender)
         {
             _defenderCmdComfirmFightOver = true;
+        }
+    }
+    void FirstStartRoundOnServer()
+    {
+        _timer = _roundDuration;
+        _finishRound = false;
+        _roundAPRemaining = _roundAPLimit;
+
+        // 开始当前进攻方的回合
+        TargetFirstStartRound(_attacker.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Attacker);
+        TargetFirstStartRound(_defender.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Defender);
+        _roundCount++;
+        // 战斗日志输出
+        DeployAddLog($"{_attacker.GetComponent<PlayerHealth>().Name}的回合开始");
+    }
+    [TargetRpc]
+    void TargetFirstStartRound(NetworkConnection target, PlayerState playerState)
+    {
+        Init();
+        GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().CmdSetFightingState(playerState);
+        GameObject currentRound = _battleUI.transform.Find("CurrentRoundPanel").GetChild(0).gameObject;
+        GameObject timer = _battleUI.transform.Find("CurrentRoundPanel").GetChild(1).gameObject;
+        timer.GetComponent<TMPro.TextMeshProUGUI>().text = $"{_roundDuration}s/{_roundDuration}s";
+        if(playerState == PlayerState.Attacker)
+        {
+            StartCoroutine(SetRoundUI("YourRoundStart"));
+            currentRound.GetComponent<TMPro.TextMeshProUGUI>().text = $"第{_roundCount}回合\n你的回合";
+            // 进攻方按钮变亮 可点
+            _finishRoundButton.GetComponent<Button>().interactable = true;
+            _escapeButton.GetComponent<Button>().interactable = true;
+            _battleUI.transform.Find("FinishRoundButton").GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = $"(0AP/{_roundAPLimit}AP)";
+        }
+        if(playerState == PlayerState.Defender)
+        {
+            StartCoroutine(SetRoundUI("EnemyRoundStart"));
+            currentRound.GetComponent<TMPro.TextMeshProUGUI>().text = $"第{_roundCount}回合\n对方回合";
+            _battleUI.transform.Find("FinishRoundButton").GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = $"(0AP/{_roundAPLimit}AP)";
         }
     }
 
@@ -560,6 +623,26 @@ public class FightingProcess : NetworkBehaviour
         _battleUI.transform.Find("InterruptedMessagePanel").gameObject.SetActive(state);
     }
 
+    public void DeployPlayAttackSound()
+    {
+        PlayAttackSound(_attacker.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Attacker);
+        PlayAttackSound(_defender.GetComponent<NetworkIdentity>().connectionToClient, PlayerState.Defender);
+    }
+
+    [TargetRpc]
+    void PlayAttackSound(NetworkConnection conn, PlayerState state)
+    {
+        AudioManager.Instance.CameraSource.PlayOneShot(FightingProcessManager.Instance.AttackAudioClip);
+        if (state == PlayerState.Attacker)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+
     /// <summary>
     /// 在服务端添加战斗日志。
     /// </summary>
@@ -617,6 +700,11 @@ public class FightingProcess : NetworkBehaviour
         {
             BackpackManager.Instance.RefreshArmorBattleDisplay(enemyPlayerID.gameObject);
         }
+    }
+    void CloseBattleUI()
+    {
+        _battleUI.SetActive(false);
+        _mapUI.SetActive(true);
     }
 }
 // TODO: 玩家断联 打断过程战斗结束有时候会有奇怪bug

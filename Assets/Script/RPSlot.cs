@@ -24,6 +24,11 @@ public class RPSlot : MonoBehaviour, IPointerClickHandler
     {
         if (eventData.button == PointerEventData.InputButton.Left && _slotItem != null)
         {
+            if(BackpackManager.Instance.IsBackpackFull)
+            {
+                UIManager.Instance.DisplayHoverStatusPanel("你的背包已满!");
+                return;
+            }
             BackpackManager.Instance.AddItem(_slotItem);
             //_rp.GetComponent<ResourcePointController>().RemoveItemFromResourcePoint(_slotItem);
             GameObject player = GameObject.FindWithTag("LocalPlayer");

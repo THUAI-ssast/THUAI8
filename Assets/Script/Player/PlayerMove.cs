@@ -68,7 +68,7 @@ public class PlayerMove : NetworkBehaviour
             return false;
         _isMoving = true;
         var position = transform.position;
-        float duration = (worldPosition - position).magnitude * 0.6f;
+        float duration = (worldPosition - position).magnitude * 0.5f;
         StartCoroutine(drawPathLine(worldPosition, duration));
         Vector3 moveVector = worldPosition - position;
         float angle = (moveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, moveVector);
@@ -99,7 +99,7 @@ public class PlayerMove : NetworkBehaviour
             return;
 
         _isMoving = true;
-        float duration = (path.Length - 1) * 0.6f;
+        float duration = (path.Length - 1) * 0.5f;
         StartCoroutine(drawPathLine(path, duration));
         Vector3 firstMoveVector = path[1] - path[0];
         float firstAngle = (firstMoveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, firstMoveVector);
@@ -107,7 +107,7 @@ public class PlayerMove : NetworkBehaviour
         float angle = (endMoveVector.y > 0 ? 1 : -1) * Vector3.Angle(Vector3.right, endMoveVector);
         setRotateAnimation(firstAngle,angle,duration);
 
-        transform.DOPath(path, duration).SetEase(Ease.Linear);
+        transform.DOPath(path, duration);
         SetTilePos(tilePosition);
         //_tilePosition = tilePosition; // 更新同步位置
         return;
@@ -180,6 +180,9 @@ public class PlayerMove : NetworkBehaviour
     /// <param name="duration">显示持续时间</param>
     public IEnumerator drawPathLine(Vector3[] path, float duration)
     {
+        // 如果正在移动，不更改
+        if(_pathLineRenderer.enabled)
+            yield break;
         _pathLineRenderer.positionCount = path.Length;
         _pathLineRenderer.SetPositions(path);
         _pathLineRenderer.enabled = true;

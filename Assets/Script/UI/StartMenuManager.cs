@@ -59,8 +59,8 @@ public class StartMenuManager : MonoBehaviour
         string roomIDText = _roomIDInput.GetComponent<TMP_InputField>().text;
         int roomID;
         if (int.TryParse(roomIDText, out roomID) 
-            && roomID >= MatchMaker.Instance.MinPort - AddService.MatchServerPort 
-            && roomID <= MatchMaker.Instance.MaxPort - AddService.MatchServerPort)
+            && roomID >= MatchMaker.Instance.MinPort - AddService.Instance.MatchServerPort 
+            && roomID <= MatchMaker.Instance.MaxPort - AddService.Instance.MatchServerPort)
         {
             if (StartScenePlayer.LocalStartScenePlayer == null)
             {

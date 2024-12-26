@@ -22,8 +22,8 @@ public class BornUIManager : NetworkBehaviour
     private Vector3Int _bornPos;
 
     private PlayerMove _playerMove;
-
     private GameObject _mapPanel;
+    private GameObject _bornMapPanel;
     private GameObject _bigMapPanel;
     private GameObject _blockerPanel;
     public GameObject GridCellPrefab;
@@ -58,9 +58,13 @@ public class BornUIManager : NetworkBehaviour
 
     void Start()
     {
-        _mapPanel = UIManager.Instance.MainCanvas.transform.Find("BornMapPanel").gameObject;
-        _bigMapPanel = _mapPanel.transform.Find("BigMapImage").gameObject;
+        _mapPanel = UIManager.Instance.MainCanvas.transform.Find("MapPanel").gameObject;
+        _bornMapPanel = UIManager.Instance.MainCanvas.transform.Find("BornMapPanel").gameObject;
+        _bigMapPanel = _bornMapPanel.transform.Find("BigMapImage").gameObject;
         _blockerPanel = UIManager.Instance.MainCanvas.transform.Find("BlockerPanel").gameObject;
+        _bornMapPanel.SetActive(true);
+        _blockerPanel.SetActive(true);
+        _mapPanel.SetActive(false);
 
         UIManager.Instance.ActiveUIList.Add(_bigMapPanel);
 
@@ -71,7 +75,7 @@ public class BornUIManager : NetworkBehaviour
 
     void Update()
     {
-        if (_bigMapPanel.activeSelf && Input.GetMouseButtonDown(0))
+        if (_bornMapPanel.activeSelf && Input.GetMouseButtonDown(0))
         {
             HandleClick();
         }
@@ -83,8 +87,9 @@ public class BornUIManager : NetworkBehaviour
         _playerMove = GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerMove>();
         if (_bigMapPanel != null)
         {
-            _bigMapPanel.SetActive(false);
+            _bornMapPanel.SetActive(false);
             _blockerPanel.SetActive(false);
+            _mapPanel.SetActive(true);
             UIManager.Instance.ActiveUIList.Remove(_bigMapPanel);
 
             var tilePosition = GridMoveController.Instance.GroundTilemap.WorldToCell(_bornPos);
@@ -146,6 +151,13 @@ public class BornUIManager : NetworkBehaviour
         // 计算点击的列和行
         float cellWidth = bigMapRect.rect.width / Columns;
         float cellHeight = bigMapRect.rect.height / Rows;
+
+        // 点击地图外区域不进行处理
+        if (localPos.x < -bigMapRect.rect.width / 2 || localPos.x > bigMapRect.rect.width / 2 ||
+        localPos.y < -bigMapRect.rect.height / 2 || localPos.y > bigMapRect.rect.height / 2)
+        {
+            return;
+        }
 
         int clickedColumn = Mathf.FloorToInt((localPos.x + bigMapRect.rect.width / 2) / cellWidth);
         int clickedRow = Mathf.FloorToInt((localPos.y + bigMapRect.rect.height / 2) / cellHeight);

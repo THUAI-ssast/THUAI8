@@ -99,10 +99,24 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
     {
         // 左键生成 followImage
         if (eventData.button == PointerEventData.InputButton.Left && gameObject.transform.IsChildOf(_battlePanel.transform) 
-            && _slotItem != null && _slotItem.ItemData is WeaponItemData)
+            && _slotItem != null)
         {
-            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Attacker &&
-            GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().QueryRemainingAP() >= (_slotItem.ItemData as WeaponItemData).AttakAPCost)
+            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Defender)
+            {
+                UIManager.Instance.DisplayHoverStatusPanel("现在不是你的回合！");
+                return ;
+            }
+            if(_slotItem.ItemData is not WeaponItemData)
+            {
+                UIManager.Instance.DisplayHoverStatusPanel("战斗中只能使用武器！");
+                return ;
+            }
+            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().QueryRemainingAP() < (_slotItem.ItemData as WeaponItemData).AttakAPCost)
+            {
+                UIManager.Instance.DisplayHoverStatusPanel("战斗回合内体力不足！");
+                return ;
+            }
+            if(GameObject.FindWithTag("LocalPlayer").GetComponent<PlayerFight>().FightingState == FightingProcess.PlayerState.Attacker)
             {
                 if (_followImage != null)
                 {
@@ -161,6 +175,7 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
                 }
                 _layout.GetChild(0).GetComponent<Button>().onClick.AddListener(() => 
                 {
+                    AudioManager.Instance.CameraSource.PlayOneShot(UIManager.Instance.ButtonAudioClip);
                     Destroy(_operationMenu);
                     if (_slotItem.ItemData is ArmorItemData)
                     {
@@ -214,6 +229,7 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
                 });
                 _layout.GetChild(1).GetComponent<Button>().onClick.AddListener(() => 
                 {
+                    AudioManager.Instance.CameraSource.PlayOneShot(UIManager.Instance.ButtonAudioClip);
                     BackpackManager.Instance.DropItem(_slotItem);
                     Destroy(_operationMenu);    
                 });
@@ -223,6 +239,10 @@ public class SlotMenuTrigger : MonoBehaviour, IPointerClickHandler
 
     void Update()
     {
+        if(Input.GetAxis("Mouse ScrollWheel") < 0f && _existingOperationMenu != null)
+        {
+            Destroy(_existingOperationMenu);
+        }
         // 如果存在跟随图片，更新它的位置
         if (_followImage != null)
         {

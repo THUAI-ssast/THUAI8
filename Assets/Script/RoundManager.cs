@@ -127,17 +127,22 @@ public class RoundManager : NetworkBehaviour
                 yield return null;
             }
         }
-        
-        StartRound();
+        RpcToggleButton(true);
+        RpcStartRound();
         yield return new WaitForSeconds(2);
         while (true)
         {
+            if(PlayerManager.Instance.IfVictory == true)
+            {
+                RpcToggleButton(false);
+                break;
+            }
             _playerCount = PlayerManager.Instance.AlivePlayerCount;
             if (_readyPlayer.Count == _playerCount)
             {
                 EndRoundOnServer();
                 yield return new WaitForSeconds(2);
-                StartRound();
+                RpcStartRound();
                 yield return new WaitForSeconds(2);
             }
             if (_timer > 0)
@@ -149,11 +154,16 @@ public class RoundManager : NetworkBehaviour
             {
                 EndRoundOnServer();
                 yield return new WaitForSeconds(2);
-                StartRound();
+                RpcStartRound();
                 yield return new WaitForSeconds(2);
             }
             yield return null;
         }
+    }
+    [ClientRpc]
+    void RpcToggleButton(bool state)
+    {
+        _round.transform.GetChild(0).gameObject.SetActive(state);
     }
     /// <summary>
     /// 结束回合时服务器操作，清空准备玩家列表、重置计时器。
@@ -205,8 +215,13 @@ public class RoundManager : NetworkBehaviour
     /// 客户端开始回合UI显示。
     /// </summary>
     [ClientRpc]
-    void StartRound()
+    void RpcStartRound()
     {
+        GameObject localPlayer = GameObject.FindWithTag("LocalPlayer");
+        if(localPlayer.GetComponent<PlayerHealth>().IsAlive == false)
+        {
+            return;
+        }
         StartCoroutine(StartRoundUI());
     }
     /// <summary>

@@ -42,6 +42,8 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private GameObject _firstResourcePoitnUI;
     [SerializeField] private GameObject _secondResourcePoitnSlots;
     [SerializeField] private GameObject _thirdResourcePoitnSlots;
+    [SerializeField] private GameObject _battleTutorial1;
+    [SerializeField] private GameObject _battleTutorial2;
     private GameObject _firstRPSlots;
     private GameObject _craftPanel;
     private TMP_Text _tutorialText;
@@ -75,11 +77,11 @@ public class TutorialManager : MonoBehaviour
             () => UIManager.Instance.BagPanel.activeSelf));
         _stateQueue.Enqueue(new TutorialState("右侧是现有物品,悬停可显示信息\n使用(鼠标滚轮)可滑动显示区域",
             null, "UI/Sprite/KeyboardSprite/Mouse2",
-            () => Input.GetAxis("Mouse ScrollWheel") < 0f, 3f));
+            () => Input.GetAxis("Mouse ScrollWheel") < 0f, 1f));
         _stateQueue.Enqueue(new TutorialState("左侧是状态栏,分为头、躯干、腿\n每个部位有独立的血量和装备",
             "UI/Sprite/Tutorial/HealthExample", "UI/Sprite/Tutorial/ArmorExample",
             () => true, 7f));
-        _stateQueue.Enqueue(new TutorialState("头部或躯干血量归零则角色死亡\n血量可以通过使用药品回复",
+        _stateQueue.Enqueue(new TutorialState("头部或躯干血量归零则角色死亡\n腿部受伤则移动AP消耗增加",
             null, "UI/Sprite/Tutorial/MedicineExample",
             () => true, 7f));
         _stateQueue.Enqueue(new TutorialState("躯干和腿部受伤了,需要处理\n(鼠标右键)点击背包内物品使用",
@@ -88,7 +90,7 @@ public class TutorialManager : MonoBehaviour
         _stateQueue.Enqueue(new TutorialState("只靠一个绷带不能完全康复\n关闭背包,搜寻更多药品",
             "UI/Sprite/KeyboardSprite/Escape",null,
             () => !UIManager.Instance.BagPanel.activeSelf));
-        _stateQueue.Enqueue(new TutorialState("移动到微弱发光的资源点地块旁\n(鼠标右键)点击资源点进行搜刮",
+        _stateQueue.Enqueue(new TutorialState("移动到微弱发光的资源点地块(旁)\n(鼠标右键)点击资源点进行搜刮",
             "UI/Sprite/Tutorial/ResourcePointExample", "UI/Sprite/KeyboardSprite/Mouse1",
             () => _firstResourcePoitnUI.activeSelf));
         _stateQueue.Enqueue(new TutorialState("点击下方按钮消耗AP搜刮\n(鼠标左键)点击物品将其加入背包",
@@ -149,12 +151,6 @@ public class TutorialManager : MonoBehaviour
         _stateQueue.Enqueue(new TutorialState("发现了一个敌人\n按住alt点击敌人,发起攻击",
             "UI/Sprite/KeyboardSprite/LeftAlt", "UI/Sprite/Tutorial/FightExample",
             () => true, 5));
-        _stateQueue.Enqueue(new TutorialState("在自己的回合点击左键选取武器\n每回合最多可消耗1AP",
-            null, null,
-            () => true, 5));
-        _stateQueue.Enqueue(new TutorialState("训练结束,战斗需实战学习\n即将退回主菜单",
-            null, null,
-            () => true, 6));
         _stateQueue.Enqueue(new TutorialState("",
             null, null,
             () => true));
@@ -196,10 +192,20 @@ public class TutorialManager : MonoBehaviour
             }
             else
             {
+                _isStateChanging = true;
                 NetworkManagerController.Instance.IsEnterTutorial = false;
-                RoomManager.Instance.StopHost();
+                StartCoroutine(endTutorial());
             }
         }
+    }
+
+    private IEnumerator endTutorial()
+    {
+        _battleTutorial1.SetActive(true);
+        yield return new WaitForSeconds(7);
+        _battleTutorial2.SetActive(true);
+        yield return new WaitForSeconds(7);
+        RoomManager.Instance.StopHost();
     }
 
     private bool _isStateChanging;
@@ -222,9 +228,20 @@ public class TutorialManager : MonoBehaviour
         _tutorialImage2.sprite = state.Sprite2;
     }
 
+    [SerializeField] private GameObject _warningPanel;
     public void OnClickExitButton()
+    {
+        UIManager.Instance.ReversePanel(_warningPanel);
+    }
+
+    public void EnsureExitTutorial()
     {
         NetworkManagerController.Instance.IsEnterTutorial = false;
         RoomManager.Instance.StopHost();
+    }
+
+    public void CancelExitTutorial()
+    {
+        UIManager.Instance.ReversePanel(_warningPanel);
     }
 }

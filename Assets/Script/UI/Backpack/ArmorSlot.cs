@@ -61,6 +61,8 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
             _displayImage.sprite = armorData.ItemIcon;
             _armorName.text = armorData.ItemName;
             _armorDurability.text = $"{_armorItem.CurrentDurability}";
+            Debug.Log(_armorItem == null);
+            Debug.Log(_armorItem.CurrentDurability); // here
         }
     }
 
@@ -103,6 +105,11 @@ public class ArmorSlot : MonoBehaviour, IPointerClickHandler
                 GameObject player = GameObject.FindWithTag("LocalPlayer");
                 if (player == null)
                     return;
+                if (BackpackManager.Instance.IsBackpackFull)
+                {
+                    UIManager.Instance.DisplayHoverStatusPanel("你的背包已满!");
+                    return;
+                }
                 player.GetComponent<PlayerHealth>().UnEquipArmor(armorData.EquipBodyPosition);
                 Destroy(_menuObject);
             });

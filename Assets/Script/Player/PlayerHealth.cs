@@ -62,6 +62,8 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (_armorEquipments.TryGetValue(position, out var armorItem))
         {
+            if (armorItem.CurrentDurability <= 0)
+                return null;
             return armorItem;
         }
 
@@ -523,6 +525,10 @@ public class PlayerHealth : NetworkBehaviour
     }
     private void DeployChangeHealth(int bodyPosition, float healthChange)
     {
+        if(!_isAlive || PlayerManager.Instance.IfVictory)
+        {
+            return;
+        }
         BodyPosition pos = (BodyPosition)bodyPosition;
         switch (pos)
         {
@@ -547,12 +553,23 @@ public class PlayerHealth : NetworkBehaviour
     {
         if (_headHealth <= 0 || _bodyHealth <= 0)
         {
+            if(gameObject.GetComponent<PlayerLog>().LogList.Last().Type == LogInfo.DamageType.fight)
+            {
+                gameObject.GetComponent<PlayerFight>().Enemy.GetComponent<PlayerLog>().CheckFlag = false;
+            }
             _isAlive = false;
             TargetCreateRP();
             TargetPlayerDie(gameObject.GetComponent<NetworkIdentity>().connectionToClient, 
                             gameObject.GetComponent<PlayerLog>().LogList.Last(),  
                             gameObject.GetComponent<PlayerLog>().EliminationCount);
             RpcPlayerDie(gameObject.GetComponent<PlayerLog>().LogList.Last(), gameObject);
+            if(gameObject.GetComponent<PlayerLog>().LogList.Last().Type == LogInfo.DamageType.fight)
+            {   
+                while(!gameObject.GetComponent<PlayerLog>().CheckFlag)
+                {
+                    continue;
+                }
+            }
             PlayerManager.Instance.DeployPlayerDie();
         }
     }

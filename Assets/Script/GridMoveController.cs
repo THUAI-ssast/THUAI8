@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 using Mirror;
 using Pathfinding;
 using Unity.VisualScripting;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// 单例Manager，地图交互类，管理本机角色点击地图的移动行为
@@ -50,6 +51,8 @@ public class GridMoveController : MonoBehaviour
         set => _pathBaker = value;
     }
 
+    private AudioClip[] _walkAudioClip;
+    private AudioClip _openDoorAudioClip;
 
     // 所用Tilemaps
     private Tilemap _groundTilemap;
@@ -110,6 +113,8 @@ public class GridMoveController : MonoBehaviour
     private void Start()
     {
         Instance = this;
+        _walkAudioClip = Resources.LoadAll<AudioClip>("Sound/Action/Walk");
+        _openDoorAudioClip = Resources.Load<AudioClip>("Sound/action/OpenDoor");
         _groundTilemap = transform.GetChild(0).Find("GroundTilemap").GetComponent<Tilemap>();
         _wallTilemap = transform.GetChild(0).Find("WallTilemap").GetComponent<Tilemap>();
         _furnitureTilemap = transform.GetChild(0).Find("FurnitureTilemap").GetComponent<Tilemap>();
@@ -139,6 +144,7 @@ public class GridMoveController : MonoBehaviour
             // 点击的位置在门的Tile上
             if (doorPosition == _wallTilemap.WorldToCell(mousePos))
             {
+                AudioManager.Instance.CameraSource.PlayOneShot(_openDoorAudioClip);
                 Player.CmdRotateDoor(doorPosition);
             }
         }
@@ -256,7 +262,7 @@ public class GridMoveController : MonoBehaviour
             //成功找到路径
             if (p.vectorPath[^1] == targetWorldPosition && _isMovable)
             {
-                float duration = (p.vectorPath.Count - 1) * 0.6f; // 假设移动速度为每格0.6秒
+                float duration = (p.vectorPath.Count - 1) * 0.5f; // 假设移动速度为每格0.6秒
                 var pathArray = p.vectorPath.ToArray();
 
                 if (CheckForDoorBlock(pathArray))
@@ -283,7 +289,7 @@ public class GridMoveController : MonoBehaviour
                     Vector3Int cellPosition_1 = _wallTilemap.WorldToCell(pathPoint);
                     CheckForAdjacentDoor(cellPosition_1);
                 }
-
+                AudioManager.Instance.CameraSource.PlayOneShot(_walkAudioClip[Random.Range(0,_walkAudioClip.Length -1)]);
                 StartCoroutine(Player.drawPathLine(pathArray, duration)); // 绘制路径
                 // 调用网络同步方法,改变位置并生成对应动画
                 Player.CmdSetPosition(targetWorldPosition, _targetCellPosition, pathArray);
@@ -458,6 +464,7 @@ public class GridMoveController : MonoBehaviour
     /// <returns>所需的体力值</returns>
     private float ComputeRequiredActionPoint(Path path)
     {
-        return 0.2f * (path.vectorPath.ToArray().Length - 1);
+        float perCost = Player.GetComponent<PlayerHealth>().LegHealth > 0 ? 0.2f : 0.3f;
+        return perCost * (path.vectorPath.ToArray().Length - 1);
     }
 }

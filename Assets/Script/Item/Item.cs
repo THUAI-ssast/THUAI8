@@ -129,7 +129,7 @@ public class Item : NetworkBehaviour
         if(ItemLocation.Owner != ItemOwner.World) return false;
         if(UIManager.Instance.IsUIActivating == true) return false;
         GameObject player = GameObject.FindWithTag("LocalPlayer");
-        if (Vector3.Distance(gameObject.transform.position, player.transform.position) > _pickUpDistance) return false;
+        if (Vector2.Distance(gameObject.transform.position, player.transform.position) > _pickUpDistance) return false;
         return true;
     }
     /// <summary>
@@ -140,6 +140,11 @@ public class Item : NetworkBehaviour
         if(Input.GetMouseButtonDown(1) && CanBePickedUp())
         {
             GameObject player = GameObject.FindWithTag("LocalPlayer");
+            if(BackpackManager.Instance.IsBackpackFull)
+            {
+                UIManager.Instance.DisplayHoverStatusPanel("你的背包已满!");
+                return;
+            }
             Item item = gameObject.GetComponent<Item>();
             player.GetComponent<PlayerItemInteraction>().PickUpItem(item.gameObject);
             BackpackManager.Instance.AddItem(item);

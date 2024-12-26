@@ -49,6 +49,8 @@ public class ResourcePointController : NetworkBehaviour
         }
         // 资源点生成时存储到字典中
         ResourcePointDictionary.Add(_furnitureTilemap.WorldToCell(transform.position), transform);
+        // 初始槽刷新显示
+        RefreshSlots();
     }
 
     void Update()
@@ -213,5 +215,10 @@ public class ResourcePointController : NetworkBehaviour
     {
         _useCustomInitItems = true;
         _customInitItems = customItems;
+    }
+
+    public void OnClickExitResourcePoint()
+    {
+        ToggleResourcePointUI();
     }
 }
